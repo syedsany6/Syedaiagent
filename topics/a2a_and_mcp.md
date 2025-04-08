@@ -3,11 +3,13 @@
 **TLDR;** Agentic applications needs both A2A and MCP. We recommend MCP for tools and A2A for agents. 
 
 <!-- TOC -->
+<!-- TOC -->
+
 - [A2A ❤️ MCP](#a2a--mcp)
-    - [Why Protocols?](#why-protocols)
-    - [Complementary](#complementary)
-    - [Example](#example)
-    - [Intersection](#intersection)
+        - [Why Protocols?](#why-protocols)
+        - [Complementary](#complementary)
+        - [Example](#example)
+        - [Intersection](#intersection)
 
 <!-- /TOC -->
 
@@ -35,4 +37,4 @@ Now let's model the shop employees as AI agents:
 ### Intersection
 We recommend that applications model A2A agents as MCP resources (represented by their [AgentCard](../documentation.md#agent-card). The frameworks can then use A2A to communicate with their user, the remote agents, and other agents. 
 
-![Agentic Application showing A2A and MCP together](../images/a2a_mcp_old.png)
+![Agentic Application showing A2A and MCP together](../images/agentic_app.png)
