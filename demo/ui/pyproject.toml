@@ -15,7 +15,7 @@ dependencies = [
     "a2a-samples",
     "pandas>=2.2.0",
     "google-genai>=1.9.0",
-    "google-adk",
+    "google-adk>=0.0.3",
 ]
 
 [tool.hatch.build.targets.wheel]

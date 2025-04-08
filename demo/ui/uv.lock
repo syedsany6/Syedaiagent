@@ -30,7 +30,7 @@ requires-dist = [
     { name = "a2a-samples", editable = "../../samples/python" },
     { name = "asyncio", specifier = ">=3.4.3" },
     { name = "fastapi", specifier = ">=0.115.0" },
-    { name = "google-adk" },
+    { name = "google-adk", specifier = ">=0.0.3" },
     { name = "google-genai", specifier = ">=1.9.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "httpx-sse", specifier = ">=0.4.0" },
@@ -409,7 +409,7 @@ wheels = [
 
 [[package]]
 name = "google-adk"
-version = "0.0.2"
+version = "0.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "authlib" },
@@ -433,9 +433,9 @@ dependencies = [
     { name = "tzlocal" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/72/44/b2f655506df49c50d787324dff3e9e18b7dcabe5857852c3c91f80da5d1d/google_adk-0.0.2.tar.gz", hash = "sha256:991a8be6db0b518af55bee9caa63ce6dcdbf5fccb399d9f9fb66f23f2cd1506d", size = 1200301 }
+sdist = { url = "https://files.pythonhosted.org/packages/12/a9/6e6b8e5edd894057cce2ee216ae0904b8ad0aef7beeca0e0f9c5d815dbc3/google_adk-0.0.3.tar.gz", hash = "sha256:ec7477fb879adacc0f8c991f044f995416822fefd54d718a81f050da697986be", size = 1398914 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/82/5dedc5e6adf9c383b293392cc4a8dec8e783da0a4c9ec89c6c5bc6718938/google_adk-0.0.2-py3-none-any.whl", hash = "sha256:4829dc4f69aa855adcebffdec461c28d508e0929cf9bfd2a89c0b62cad705a91", size = 1406702 },
+    { url = "https://files.pythonhosted.org/packages/fd/d0/bad4fcc3682f5100101a3ca65932a68a2397b6264870725a7456d5ee70e6/google_adk-0.0.3-py3-none-any.whl", hash = "sha256:9ce84917d05bd892ba47f57a9a8203a954361d09031806ba335a9a282d267d55", size = 1618686 },
 ]
 
 [[package]]
