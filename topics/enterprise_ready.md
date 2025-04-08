@@ -12,8 +12,11 @@
 
 <!-- /TOC -->
 
-A2A is designed to be Enterprise Ready by relying on industry standard auth, security, privacy, tracing, and monitoring. A2A **does not** want to invent any new standards for enterprise security and instead seamlessly integrate with existing infrastructure. In fact, A2A keeps most enterprise concerns out of the protocol and instead require enterprise-grade HTTP with Open Authentication and Open Tracing support.
-Within an enterprise, A2A Agents should be considered "standard" HTTP clients and servers with requests following standard HTTP API request/response semantics. Implementers should follow all enterprise best practices as it relates to application and user-level security. 
+A2A **does not** want to invent any new standards for enterprise security and instead seamlessly integrate with existing infrastructure. 
+
+A2A models Enterprise Agents as standard, HTTP-based, enterprise applications and therefore relies on enterprise-standard auth, security, privacy, tracing, and monitoring. This is possible because A2A agents are opaque and do not share tools or resources (and therefore "single application" client/server best practices apply). 
+
+In fact, A2A keeps most enterprise concerns out of the protocol and instead require enterprise-grade HTTP with Open Authentication and Open Tracing support. Implementers should follow all enterprise best practices as it relates to application and user-level security. 
 
 ### Transport Level Security
 A2A is built on HTTP and any production installation should require HTTPS using modern TLS ciphers. 
@@ -47,5 +50,4 @@ Agents are expected to advertise (via an [Agent Card](../documentation.md#agent-
 It is recommended that Agents restrict access to sensitive data or actions by placing them behind Tools. When an agentic flow or model needs to access this data, the agent should authorize access to a tool based on the application+user priviledge. We highly recommend utilizing API Management with Tool access. 
 
 ### Tracing and Observability
-
 As all A2A requests are 'standard' HTTP requests, both client and server should use their enterprise standard tooling and infrastructure which ideally adds appropriate instrumentation headers and writes events to standard logs and event queues. 
