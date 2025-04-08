@@ -41,7 +41,7 @@ An open protocol enabling Agent-to-Agent interoperability, bridging the gap betw
 
 ### Feedback and Changes
 
-A2A is a work in progress and is expected to change based on community feedback. This repo contains the initial specification, documentation, and [sample code](samples). We will continue to update this repo with more features, more examples, specs, and libraries as they become available. When the spec and samples can graduate to a production quality SDK, we will declare version 1.0 and maintain stable releases.
+A2A is a work in progress and is expected to change based on community feedback. This repo contains the initial specification, documentation, and [sample code](https://github.com/google/A2A/tree/main/samples). We will continue to update this repo with more features, more examples, specs, and libraries as they become available. When the spec and samples can graduate to a production quality SDK, we will declare version 1.0 and maintain stable releases.
 
 ### Key Principles
 
@@ -55,10 +55,10 @@ Using A2A, agents accomplish tasks for end-users without sharing memory, thought
 
 ### More Detailed Discussions
 
-- [A2A and MCP](topics/a2a_and_mcp.md)
-- [Enterprise Ready](topics/enterprise_ready.md)
-- [Push Notifications](topics/push_notifications.md)
-- [Agent Discovery](topics/agent_discovery.md)
+- [A2A and MCP](topics/a2a_and_mcp.md?id=a2a-❤%ef%b8%8f-mcp)
+- [Enterprise Ready](topics/enterprise_ready.md?id=enterprise-readiness)
+- [Push Notifications](topics/push_notifications.md?id=remote-agent-to-client-updates)
+- [Agent Discovery](topics/agent_discovery.md?id=discovering-agent-cards)
 
 ## Overview
 
@@ -81,13 +81,13 @@ A2A leverages [JSON-RPC 2.0](https://www.jsonrpc.org/specification) as the data 
 
 ### Async
 
-A2A is optimized for asynchronous interactions. While clients and servers can support standard request/response patterns and polling for updates, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md)" while disconnected.
+A2A is optimized for asynchronous interactions. While clients and servers can support standard request/response patterns and polling for updates, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md?id=remote-agent-to-client-updates) while disconnected.
 
 ### Authentication and Authorization
 
 A2A models agents as applications and follows [Open API’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
 
-While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish its requirements in its [Agent Card](#agent-card). Thoughts about discovering agent cards is in [this topic](topics/agent_discovery.md).
+While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish its requirements in its [Agent Card](#agent-card). Thoughts about discovering agent cards is in [this topic](topics/agent_discovery.md?id=discovering-agent-cards).
 
 Clients should use one of the servers published authentication protocols to authenticate their identity and obtain credential material. A2A servers should authenticate **every** request and reject or challenge requests with standard HTTP response codes (401, 403), and authentication-protocol-specific headers and bodies (such as a HTTP 401 response with a [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) header indicating the required authentication schema, or OIDC discovery document at a well-known path). More details discussed in [Enterprise Ready](topics/enterprise_ready.md).
 
@@ -99,7 +99,7 @@ Remote Agents that support A2A are required to publish an **Agent Card** in JSON
 
 ### Discovery
 
-We recommend host their Agent Card at https://`base url`/.well-known/agent.json. This is compatible with a DNS approach where the client finds the server IP via DNS and sends an HTTP GET to retrieve the agent card. We also anticipate that systems will maintain private registries (e.g. an ‘Agent Catalog’ or private marketplace, etc). More discussion can be found in [this document](topics/agent_discovery.md).
+We recommend host their Agent Card at https://`base url`/.well-known/agent.json. This is compatible with a DNS approach where the client finds the server IP via DNS and sends an HTTP GET to retrieve the agent card. We also anticipate that systems will maintain private registries (e.g. an ‘Agent Catalog’ or private marketplace, etc). More discussion can be found in [this document](topics/agent_discovery.md?id=discovering-agent-cards).
 
 ### Representation
 
@@ -193,7 +193,7 @@ The agent may:
 - ask the client for more information
 - delegate to other agents and systems
 
-Even after fulfilling the goal, the client can request more information or a change in the context of that same task. (For example client: "draw a picture of a rabbit", agent: <picture>", client: "make it red").
+Even after fulfilling the goal, the client can request more information or a change in the context of that same task. (For example client: "draw a picture of a rabbit", agent: "&lt;picture&gt;", client: "make it red").
 
 Tasks are used to transmit [Artifacts](#artifact) (results) and [Messages](#message) (thoughts, instructions, anything else). Tasks maintain a status and an optional history.
 
@@ -247,7 +247,7 @@ type TaskState =
 
 ### Artifact
 
-Agents generate Artifacts as a end result of a Task. Artifacts are immutable, can be named, and can have multiple parts. A streaming response can append parts to existing artifacts.
+Agents generate Artifacts as an end result of a Task. Artifacts are immutable, can be named, and can have multiple parts. A streaming response can append parts to existing artifacts.
 A single Task can generate many Artifacts. For example, "create a webpage" could create separate HTML and image Artifacts.
 
 ```typescript
@@ -265,7 +265,8 @@ interface Artifact {
 ### Message
 
 A Message contains any content that is not an Artifact. This includes thoughts, context, instructions, errors, status, or metadata.
-All content from a client comes in the form of a Message. Agents use this to communicate status or provide instructions from the agent (whereas generated results are in an Artifact)
+All content from a client comes in the form of a Message. Agents use this to communicate status or provide instructions from the agent (whereas generated results are in an Artifact).
+
 A Message can have multiple parts to denote different pieces of content. For example, a user request could include a textual description from a user and then multiple files used as context from the client.
 
 ```typescript
@@ -307,7 +308,7 @@ type Part = (TextPart | FilePart | DataPart) & {
 
 ### Push Notifications
 
-A2A supports a secure notification mechanism whereby an agent can notify a client of an update outside of a connected session via a NotificationService. Within and across Enterprises, it is critical that the agent verifies the identity of the notification service, authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
+A2A supports a secure notification mechanism whereby an agent can notify a client of an update outside of a connected session via a NotificationService. Within and across enterprises, it is critical that the agent verifies the identity of the notification service, authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
 
 The target server of the NotificationService should be considered a separate service, and it is not guaranteed or even expected to be the client directly. This NotificationService is responsible for authenticating and authorizing the agent and for proxying the verified notification to the appropriate endpoint (which could be anything from a pub/sub queue, to an email inbox, to another notification service, etc).
 
@@ -465,15 +466,6 @@ The client may also request the last N items of history of the task which will i
           {
             "type": "text",
             "text": "tell me a joke"
-          }
-        ]
-      },
-      {
-        "role": "agent",
-        "parts": [
-          {
-            "type": "text",
-            "text": "Why did the chicken cross the road? To get to the other side!"
           }
         ]
       }
@@ -692,6 +684,7 @@ Agents must set final: true attribute at the end of the stream or if the agent i
     "metadata": {}
   }
 }
+
 //Response
 data: {
   "jsonrpc": "2.0",
@@ -699,51 +692,68 @@ data: {
   "result": {
     "id": 1,
     "status": {
-      "state": "working"
+      "state": "working",
+      "timestamp":"2025-04-02T16:59:25.331844"
     },
-    "artifacts":[
+    "final": false
+  }
+}
+
+data: {
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "id": 1,    
+    "artifact": [
       "parts": [
         {"type":"text", "text": "<section 1...>"}
       ],
       "index": 0,
-      "append": false
-    ],
-    "final": false
+      "append": false,      
+      "lastChunk": false
+    ]
   }
 }
 data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,
-    "status": {
-      "state": "working"
-    },
-    "artifacts":[
+    "id": 1,  
+    "artifact": [
       "parts": [
         {"type":"text", "text": "<section 2...>"}
       ],
       "index": 0,
-      "append": true
-    ],
-    "final": false
+      "append": true,      
+      "lastChunk": false
+    ]
   }
 }
 data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,
-    "status": {
-      "state": "completed"
-    },
-    "artifacts":[
+    "id": 1,    
+    "artifact": [
       "parts": [
         {"type":"text", "text": "<section 3...>"}
       ],
       "index": 0,
-      "append": true
-    ],
+      "append": true,
+      "lastChunk": true
+    ]
+  }
+}
+
+data: {
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "id": 1,
+    "status": {
+      "state": "completed",
+      "timestamp":"2025-04-02T16:59:35.331844"
+    },
     "final": true
   }
 }
@@ -768,17 +778,14 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
-    "status": {
-      "state": "working"
-    },
-    "artifacts":[
+    "artifact":[
       "parts": [
         {"type":"text", "text": "<section 2...>"}
       ],
       "index": 0,
-      "append": true
-    ],
-    "final": false
+      "append": true,
+      "lastChunk":false
+    ]
   }
 }
 data: {
@@ -786,16 +793,26 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
-    "status": {
-      "state": "completed"
-    },
-    "artifacts":[
+    "artifact":[
       "parts": [
         {"type":"text", "text": "<section 3...>"}
       ],
       "index": 0,
-      "append": true
-    ],
+      "append": true,
+      "lastChunk": true
+    ]   
+  }
+}
+
+data: {
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "id": 1,
+    "status": {
+      "state": "completed",
+      "timestamp":"2025-04-02T16:59:35.331844"
+    },
     "final": true
   }
 }
@@ -964,3 +981,8 @@ The following are the standard JSON-RPC error codes that the server can respond 
 | \-32602            | Invalid params   | Invalid method parameters                        |
 | \-32603            | Internal error   | Internal JSON-RPC error                          |
 | \-32000 to \-32099 | Server error     | Reserved for implementation specific error codes |
+| \-32001            | Task not found   | Task not found with the provided id              |
+| \-32002            | Task cannot be canceled  | Task cannot be canceled by the remote agent|
+| \-32003            | Push notifications not supported | Push Notification is not supported by the agent|
+| \-32004            | Unsupported operation   | Operation is not supported                        |
+| \-32005            | Incompatible content types   | Incompatible content types between client and an agent  |
