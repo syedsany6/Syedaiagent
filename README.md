@@ -1,5 +1,3 @@
-![image info](images/a2a_announce.png) 
-
 ![image info](images/A2A_banner.png)
 
 **_An open protocol enabling communication and interoperability between opaque agentic applications._**
