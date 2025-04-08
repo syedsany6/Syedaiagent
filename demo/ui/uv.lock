@@ -71,7 +71,7 @@ requires-dist = [
     { name = "asyncclick", specifier = ">=8.1.8" },
     { name = "asyncio", specifier = ">=3.4.3" },
     { name = "click", specifier = ">=8.1.8" },
-    { name = "google-adk" },
+    { name = "google-adk", specifier = ">=0.0.3" },
     { name = "google-genai", specifier = ">=1.9.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "httpx-sse", specifier = ">=0.4.0" },

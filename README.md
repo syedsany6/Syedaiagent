@@ -24,7 +24,7 @@ With *A2A*, agents can show each other their capabilities and negotiate how they
 * 🎬 Use our [samples](/samples) to see A2A in action
     * Sample A2A Client/Server ([Python](/samples/python/common), [JS](/samples/js/src))
     * [Multi-Agent Web App](/demo/README.md)
-    * [CLI](/samples/python/hosts/cli/README.md)
+    * CLI ([Python](/samples/python/hosts/cli/README.md), [JS](/samples/js/README.md))
 * 🤖 Use our [sample agents](/samples/python/agents/README.md) to see how to bring A2A to agent frameworks
     * [Google Agent Developer Kit (ADK)](/samples/python/agents/google_adk/README.md)
     * [CrewAI](/samples/python/agents/crewai/README.md)
