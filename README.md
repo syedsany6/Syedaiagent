@@ -1,6 +1,6 @@
 ![image info](images/a2a_banner.png) 
 
-#### Unlock Collaborative, agent to agent scenarios with a new open protocol
+## Unlock Collaborative, agent to agent scenarios with a new open protocol
 
 <img src="images/a2a_main.png" width="70%" style="margin:20px auto;display:block;">
 
