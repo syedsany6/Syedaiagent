@@ -81,11 +81,13 @@ A2A leverages [JSON-RPC 2.0](https://www.jsonrpc.org/specification) as the data 
 
 ### Async
 
-A2A is optimized for asynchronous interactions. While clients and servers can use standard request/response patterns and polling for updates, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md?id=remote-agent-to-client-updates) while disconnected.
+A2A clients and servers can use standard request/response patterns and poll for updates. However, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md?id=remote-agent-to-client-updates) while disconnected.
 
 ### Authentication and Authorization
 
-A2A models agents as applications and follows [Open API’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
+A2A models agents as enterprise applications (and can do so because A2A agents are opaque and do not share tools and resources). This quickly brings enterprise-readiness to agentic interop.
+
+A2A follows [Open API’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
 
 While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish its requirements in its [Agent Card](#agent-card). Thoughts about discovering agent cards is in [this topic](topics/agent_discovery.md?id=discovering-agent-cards).
 
@@ -178,7 +180,7 @@ A task can be completed by a remote agent immediately or it can be long-running.
 
 ### Task
 
-A Task is a stateful entity that allows Clients and Remote Agents to achieve a specific outcome and produce Artifacts. Clients and Remote Agents exchange Messages within a Task. Remote Agents generate results as Artifacts.
+A Task is a stateful entity that allows Clients and Remote Agents to achieve a specific outcome and generate results. Clients and Remote Agents exchange Messages within a Task. Remote Agents generate results as Artifacts.
 
 A Task is always created by a Client and the status is always determined by the Remote Agent. Multiple Tasks may be part of a common session (denoted by optional sessionId) if required by the client. To do so, the Client sets an optional sessionId when creating the Task.
 
