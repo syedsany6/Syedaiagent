@@ -42,7 +42,7 @@ def return_form(
    Returns a structured json object indicating a form to complete.
    
    Args:
-       form_request (dict[str, Any]): The request form data. Must be a valid dict object.
+       form_request (dict[str, Any]): The request form data.
        tool_context (ToolContext): The context in which the tool operates.
        instructions (str): Instructions for processing the form. Can be an empty string.       
        
