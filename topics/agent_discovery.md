@@ -14,17 +14,17 @@ A2A's [AgentCard](../documentation.md#agent-card) standardizes the *format* of t
 
 Here is our current thinking. 
 
-### Open Discovery
+## Open Discovery
 We recommend enterprises host their agent cards at a well-known path. Specifically: https://`DOMAIN`/.well-known/agent.json. Clients will use DNS to resolve a known or found domain, send a simple `GET` request to the path, and receive the agent card. 
 
 This will enable web-crawlers and applications to easily discover agents for known or configured domains. This effectively reduces the discovery process to "find a domain". 
 
-### Curated Discovery (Registry-Based)
+## Curated Discovery (Registry-Based)
 We anticipate enterprise applications making curated registries of agents available through a catalog interface. This opens up more enterprise scenarios such as company-specific or team-specific agent registries that is curated by an administrator. 
 
 *We **are** considering adding Registry support to the protocol - please drop us a [note](https://github.com/google/A2A/blob/main/README.md#contributing) with your opinion and where you see this being valuable as a standard*
 
-### Private Discovery (API-Based)
+## Private Discovery (API-Based)
 There will undoubtably be private "agent stores" or prioprietary agents where cards are exchanged behind custom APIs.
 
 *We **are not** considering private discovery APIs as an A2A concern - please drop us a [note](https://github.com/google/A2A/blob/main/README.md#contributing) with your opinion and where you see this being valuable as a standard*
