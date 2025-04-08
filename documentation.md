@@ -1,7 +1,7 @@
 # Agent2Agent Protocol (A2A)
 
 An open protocol enabling Agent-to-Agent interoperability, bridging the gap between **opaque** agentic systems.
-![Image Info](/images/agent_mesh.png)
+<img src="images/a2a_actors.png" width="70%" style="margin:20px auto;display:block;">
 
 <!-- TOC -->
 
