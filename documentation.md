@@ -81,7 +81,7 @@ A2A leverages [JSON-RPC 2.0](https://www.jsonrpc.org/specification) as the data 
 
 ### Async
 
-A2A is optimized for asynchronous interactions. While clients and servers can support standard request/response patterns and polling for updates, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md?id=remote-agent-to-client-updates) while disconnected.
+A2A is optimized for asynchronous interactions. While clients and servers can use standard request/response patterns and polling for updates, A2A also supports streaming updates through SSE (while connected) and receiving [push notifications](/topics/push_notifications.md?id=remote-agent-to-client-updates) while disconnected.
 
 ### Authentication and Authorization
 
@@ -172,17 +172,15 @@ interface AgentCard {
 
 The communication between a Client and a Remote Agent is oriented towards **_task completion_** where agents collaboratively fulfill an end-user’s request. A Task object allows a Client and a Remote Agent to collaborate for completing the submitted task.
 
-A task that can be completed by a remote agent immediately, or it can be long-running. For long-running tasks, the client may poll the agent for fetching the latest status. Agents can also push notifications to the client via SSE (if connected) or through an external notification service.
+A task can be completed by a remote agent immediately or it can be long-running. For long-running tasks, the client may poll the agent for fetching the latest status. Agents can also push notifications to the client via SSE (if connected) or through an external notification service.
 
 ## Core Objects
 
 ### Task
 
-A Task is a stateful entity that allows Clients and Agents to achieve a specific outcome and produce Artifacts. Clients and Remote Agents exchange Messages within a Task. Remote Agents generate results as Artifacts.
+A Task is a stateful entity that allows Clients and Remote Agents to achieve a specific outcome and produce Artifacts. Clients and Remote Agents exchange Messages within a Task. Remote Agents generate results as Artifacts.
 
-A Task is always created by a client and the status is always determined by the Remote Agent. Multiple Tasks may be part of a common session (denoted by optional sessionId) if required by the client. To do so, the client sets an optional sessionId when creating the Task.
-
-A Task represents a collaboration. Clients create tasks to ask the agent to fulfill a goal and create an artifact.
+A Task is always created by a Client and the status is always determined by the Remote Agent. Multiple Tasks may be part of a common session (denoted by optional sessionId) if required by the client. To do so, the Client sets an optional sessionId when creating the Task.
 
 The agent may:
 
@@ -193,9 +191,9 @@ The agent may:
 - ask the client for more information
 - delegate to other agents and systems
 
-Even after fulfilling the goal, the client can request more information or a change in the context of that same task. (For example client: "draw a picture of a rabbit", agent: "&lt;picture&gt;", client: "make it red").
+Even after fulfilling the goal, the client can request more information or a change in the context of that same Task. (For example client: "draw a picture of a rabbit", agent: "&lt;picture&gt;", client: "make it red").
 
-Tasks are used to transmit [Artifacts](#artifact) (results) and [Messages](#message) (thoughts, instructions, anything else). Tasks maintain a status and an optional history.
+Tasks are used to transmit [Artifacts](#artifact) (results) and [Messages](#message) (thoughts, instructions, anything else). Tasks maintain a status and an optional history of status and Messages.
 
 ```typescript
 interface Task {
@@ -247,7 +245,8 @@ type TaskState =
 
 ### Artifact
 
-Agents generate Artifacts as an end result of a Task. Artifacts are immutable, can be named, and can have multiple parts. A streaming response can append parts to existing artifacts.
+Agents generate Artifacts as an end result of a Task. Artifacts are immutable, can be named, and can have multiple parts. A streaming response can append parts to existing Artifacts.
+
 A single Task can generate many Artifacts. For example, "create a webpage" could create separate HTML and image Artifacts.
 
 ```typescript
@@ -264,8 +263,9 @@ interface Artifact {
 
 ### Message
 
-A Message contains any content that is not an Artifact. This includes thoughts, context, instructions, errors, status, or metadata.
-All content from a client comes in the form of a Message. Agents use this to communicate status or provide instructions from the agent (whereas generated results are in an Artifact).
+A Message contains any content that is not an Artifact. This can include things like agent thoughts, user context, instructions, errors, status, or metadata.
+
+All content from a client comes in the form of a Message. Agents send Messages to communicate status or to provide instructions (whereas generated results are sent as Artifacts).
 
 A Message can have multiple parts to denote different pieces of content. For example, a user request could include a textual description from a user and then multiple files used as context from the client.
 
@@ -308,11 +308,11 @@ type Part = (TextPart | FilePart | DataPart) & {
 
 ### Push Notifications
 
-A2A supports a secure notification mechanism whereby an agent can notify a client of an update outside of a connected session via a NotificationService. Within and across enterprises, it is critical that the agent verifies the identity of the notification service, authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
+A2A supports a secure notification mechanism whereby an agent can notify a client of an update outside of a connected session via a PushNotificationService. Within and across enterprises, it is critical that the agent verifies the identity of the notification service, authenticates itself with the service, and presents an identifier that ties the notification to the executing Task.
 
-The target server of the NotificationService should be considered a separate service, and it is not guaranteed or even expected to be the client directly. This NotificationService is responsible for authenticating and authorizing the agent and for proxying the verified notification to the appropriate endpoint (which could be anything from a pub/sub queue, to an email inbox, to another notification service, etc).
+The target server of the PushNotificationService should be considered a separate service, and is not guaranteed (or even expected) to be the client directly. This PushNotificationService is responsible for authenticating and authorizing the agent and for proxying the verified notification to the appropriate endpoint (which could be anything from a pub/sub queue, to an email inbox or other service, etc).
 
-For contrived scenarios with isolated client-agent pairs (e.g. local service mesh in a contained VPC, etc.) or environments where security is not a concern, the client may choose to simply open a port and act as its own NotificationService. Any enterprise implementation will likely have a centralized service that authenticates the remote agents with trusted notification credentials and can handle online/offline scenarios. This can be thought of similarly to a mobile Push Notification Service.
+For contrived scenarios with isolated client-agent pairs (e.g. local service mesh in a contained VPC, etc.) or isolated environments without enterprise security concerns, the client may choose to simply open a port and act as its own PushNotificationService. Any enterprise implementation will likely have a centralized service that authenticates the remote agents with trusted notification credentials and can handle online/offline scenarios. (This should be thought of similarly to a mobile Push Notification Service).
 
 ```typescript
 interface PushNotificationConfig {
@@ -384,7 +384,7 @@ interface TaskPushNotificationConfig {
 
 ## Send a Task
 
-Allows a client to send content to a remote agent to start a new task, resume an interrupted task or reopen a completed task. A task interrupt may be caused due to an agent requiring additional user input or a runtime error.
+Allows a client to send content to a remote agent to start a new Task, resume an interrupted Task or reopen a completed Task. A Task interrupt may be caused due to an agent requiring additional user input or a runtime error.
 
 ```json
 //Request
@@ -428,8 +428,9 @@ Allows a client to send content to a remote agent to start a new task, resume an
 
 ## Get a Task
 
-Clients may use this method to retrieve the generated artifacts for a task. The agent determines the retention window for tasks previously submitted to it. An agent may return an error code for tasks that were past the retention window for an agent or for tasks that are short-lived and not persisted by the agent.
-The client may also request the last N items of history of the task which will include all messages, in order, sent by client and server. By default this is 0 (no history).
+Clients may use this method to retrieve the generated Artifacts for a Task. The agent determines the retention window for Tasks previously submitted to it. An agent may return an error code for Tasks that were past the retention window for an agent or for Tasks that are short-lived and not persisted by the agent.
+
+The client may also request the last N items of history of the Task which will include all Messages, in order, sent by client and server. By default this is 0 (no history).
 
 ```json
 //Request
@@ -477,7 +478,7 @@ The client may also request the last N items of history of the task which will i
 
 ## Cancel a Task
 
-A client may choose to cancel previously submitted tasks as shown below.
+A client may choose to cancel previously submitted Tasks as shown below.
 
 ```json
 //Request
@@ -507,7 +508,7 @@ A client may choose to cancel previously submitted tasks as shown below.
 
 ## Set Task Push Notifications
 
-Clients may configure a push notification URL for receiving an update on task completion.
+Clients may configure a push notification URL for receiving an update on Task status change.
 
 ```json
 //Request
@@ -543,7 +544,7 @@ Clients may configure a push notification URL for receiving an update on task co
 
 ## Get Task Push Notifications
 
-Clients may retrieve the currently configured push notification configuration for a task using this method.
+Clients may retrieve the currently configured push notification configuration for a Task using this method.
 
 ```json
 //Request
@@ -573,8 +574,9 @@ Clients may retrieve the currently configured push notification configuration fo
 
 ## Multi-turn Conversations
 
-A Task may pause to be executed on the remote agent if they require additional user input. When a task is in `input-required` state, the client is required to provide additional input for the task to resume processing on the remote agent.
-The message included in the `input-required` state must include the details indicating what the client must do. For example "fill out a form" or "log into SaaS service foo". If this includes structured data, the instruction should be sent as one `Part` and the structured data as a second `Part`.
+A Task may pause to be executed on the remote agent if they require additional user input. When a Task is in `input-required` state, the client is required to provide additional input for the Task to resume processing on the remote agent.
+
+The Message included in the `input-required` state must include the details indicating what the client must do. For example "fill out a form" or "log into SaaS service foo". If this includes structured data, the instruction should be sent as one `Part` and the structured data as a second `Part`.
 
 ```json
 //Request - seq 1
@@ -656,8 +658,8 @@ The message included in the `input-required` state must include the details indi
 
 ## Streaming Support
 
-For clients and remote agents capable of communicating over HTTP with SSE, clients can send the RPC request with method `tasks/sendSubscribe` when creating a new task. The remote agent can respond with a stream of TaskStatusUpdateEvents (to communicate status changes or instructions/requests) and TaskArtifactUpdateEvents (to stream generated results).
-Note that TaskArtifactUpdateEvents can append new parts to existing artifacts. Clients
+For clients and remote agents capable of communicating over HTTP with SSE, clients can send the RPC request with method `tasks/sendSubscribe` when creating a new Task. The remote agent can respond with a stream of TaskStatusUpdateEvents (to communicate status changes or instructions/requests) and TaskArtifactUpdateEvents (to stream generated results).
+Note that TaskArtifactUpdateEvents can append new parts to existing Artifacts. Clients
 can use `task/get` to retrieve the entire Artifact outside of the streaming.
 Agents must set final: true attribute at the end of the stream or if the agent is interrupted and require additional user input.
 
@@ -761,7 +763,7 @@ data: {
 
 ### Resubscribe to Task
 
-A disconnected client may resubscribe to a remote agent that supports streaming to receive task updates.
+A disconnected client may resubscribe to a remote agent that supports streaming to receive Task updates via SSE.
 
 ```json
 //Request
