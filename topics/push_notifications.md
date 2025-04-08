@@ -61,7 +61,7 @@ The NotificationService should be considered a separate service from the client 
 For contrived scenarios with isolated client-agent pairs (e.g. local service mesh in a contained VPC, etc.), the client may choose to simply open a port and act as its own NotificationService. However, any enterprise implementation is recommended to have a centralized service that authenticates the remote agents with trusted notification credentials and can handle online/offline scenarios. This can be thought of similarly to a mobile Push Notification Service with its own Authentication and Authorization controls.
 
 
-### Setting Task Notifications
+## Setting Task Notifications
 Clients need to set task push notification config to asynchronously receive task updates. They should generate a taskId and set the push notification configuration for the same using “tasks/pushNotification/set” RPC or directly in the `pushNotification` param of "tasks/send", "tasks/sendSubscribe".
 
 
