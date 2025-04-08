@@ -10,7 +10,7 @@
   * [Push Notifications](topics/push_notifications.md)
 * [Json Specification](https://github.com/google/A2A/tree/main/specification/json)
 * [Samples to see A2A in action](https://github.com/google/A2A/tree/main/samples)
-  * [Sample A2A Client/Server](https://github.com/google/A2A/tree/main/samples/common)
+  * [Sample A2A Client/Server](https://github.com/google/A2A/tree/main/samples/python/common)
   * [Multi-Agent Web App](https://github.com/google/A2A/tree/main/demo/README.md)
   * [CLI](https://github.com/google/A2A/blob/main/samples/python/hosts/cli/README.md)
 * [Sample Agents](https://github.com/google/A2A/tree/main/samples)

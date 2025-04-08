@@ -39,11 +39,11 @@ An open protocol enabling Agent-to-Agent interoperability, bridging the gap betw
 
 <!-- /TOC -->
 
-### Feedback and Changes
+## Feedback and Changes
 
 A2A is a work in progress and is expected to change based on community feedback. This repo contains the initial specification, documentation, and [sample code](https://github.com/google/A2A/tree/main/samples). We will continue to update this repo with more features, more examples, specs, and libraries as they become available. When the spec and samples can graduate to a production quality SDK, we will declare version 1.0 and maintain stable releases.
 
-### Key Principles
+## Key Principles
 
 Using A2A, agents accomplish tasks for end-users without sharing memory, thoughts, or tools. Instead the agents exchange context, status, instructions, and data in their native modalities.
 

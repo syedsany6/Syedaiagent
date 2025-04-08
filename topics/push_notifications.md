@@ -41,26 +41,29 @@ The agent can use below methods to get updates about task execution:
 1. **Persistent Connection**: Clients can establish a persistent connection with the agent using HTTP + Server-sent events. The agent can then send task updates using those connections per client.
 
 2. **Push Notifications**: Agents can send the latest full Task object payload to client specified push notification URL. This is similar to webhooks on some platforms.
-Clients can set notifications for their tasks whether they have subscribed to a Task or not. Agents should send a notification when Agent has processed a task to a stopping state like “completed”, “input-required” etc and fully generated state associated message and artifacts.
+Clients can set notifications for their tasks whether they have subscribed to a Task or not. Agents should send a notification when Agent has processed a task to a stopping state like "completed", "input-required" etc and fully generated state associated message and artifacts.
 
-Clients can set notification info for their tasks whether they have subscribed to a Task or not. Agents should send a notification when Agent sees it appropriate to notify the client. One paradigm could be to send a notification when agent has processed a task to a stopping state like “completed”, “input-required” etc and fully generated state associated message and artifacts.
+Clients can set notification info for their tasks whether they have subscribed to a Task or not. Agents should send a notification when Agent sees it appropriate to notify the client. One paradigm could be to send a notification when agent has processed a task to a stopping state like "completed", "input-required" etc and fully generated state associated message and artifacts.
 
 ## Connected
 While connected, Agents update each other with Task (and related) messages. Clients and Remote Agents can work on multiple tasks concurrently over the same connection. 
 
-Clients use [Task/Send](../documentation.md#send-a-task) to update a current task with more information or reply to an agent need. Remote Agents reply with [Task/Update](../documentation.md#streaming-support) while streaming or [Task](../documentation.md#get-a-task) while not streaming. While not streaming, it is acceptable to poll at reasonable intervals. 
+Clients use [Task/Send](../documentation.md#send-a-task) to update a current task with more information or reply to an agent need. Remote Agents reply with [Task Updates](../documentation.md#streaming-support) while streaming or [Task](../documentation.md#get-a-task) while not streaming. While not streaming, it is acceptable to poll at reasonable intervals. 
 
 If the agents become disconnected, they can resume the connection and receive live updates via the [Task/Resubscribe](../documentation.md#resubscribe-to-task) method.
 
-### Disconnected
-For disconnected scenarios, A2A supports a push notification mechanism whereby an Agent can notify a Client of an update outside of a connected session via a [PushNotificationConfig](../documentation.md#push-notifications). Within and across Enterprises, it is critical that the agent verifies the identity of the notification service,  authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
+
+## Disconnected
+For disconnected scenarios, A2A supports a push notification mechanism whereby an Agent can notify a Client of an update outside of a connected session via a [PushNotificationConfig](../documentation.md#push-notifications). Within and across enterprises, it is critical that the agent verifies the identity of the notification service,  authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
 
 The NotificationService should be considered a separate service from the client agent, and it is not guaranteed or even expected to be the client directly. This NotificationService is responsible for authenticating and authorizing the agent and for proxying the verified notification to the appropriate endpoint (which could be anything from a pub/sub queue, to an email inbox, to another notification service, etc).
 
 For contrived scenarios with isolated client-agent pairs (e.g. local service mesh in a contained VPC, etc.), the client may choose to simply open a port and act as its own NotificationService. However, any enterprise implementation is recommended to have a centralized service that authenticates the remote agents with trusted notification credentials and can handle online/offline scenarios. This can be thought of similarly to a mobile Push Notification Service with its own Authentication and Authorization controls.
 
-### Setting Task Notifications
-Clients need to set task notification info to asynchronously receive task updates. They should generate a taskId and set the notification info for the same using “tasks/pushNotification/set” RPC or directly in the `pushNotification` param of “tasks/send”, “tasks/sendSubscribe”.
+
+## Setting Task Notifications
+Clients need to set task push notification config to asynchronously receive task updates. They should generate a taskId and set the push notification configuration for the same using “tasks/pushNotification/set” RPC or directly in the `pushNotification` param of "tasks/send", "tasks/sendSubscribe".
+
 
 <pre>
 interface PushNotificationConfig {
@@ -154,7 +157,7 @@ interface TaskPushNotificationConfig {
 }
 </pre>
 
-### Agent Security
+## Agent Security
 Agents should not blindly trust the push notification URL specified by the client. Some commonly used practices are as below:
 
 1. They should verify the push notification URL by issuing a GET challenge request.
@@ -178,7 +181,7 @@ Agents should not blindly trust the push notification URL specified by the clien
     * The secret could be generated by the agent, specifically for this challenge request.
     * Or if the notification service and agent use a symmetric shared key for authentication, the same key can be used by notification service to sign the validationToken.
 
-### Notification Receiver Security
+## Notification Receiver Security
 Notification Receivers should check the authenticity of the notifications they are receiving. A few ways they can do that are described as follows. Also, a collection of ideas for notification security can be found at https://webhooks.fyi
 
 An example of push notifications using JWT + JWKS using assymetric keys has been added in [LangGraph](https://github.com/google/A2A/blob/main/samples/python/agents/langgraph/__main__.py) and [CLI Host](https://github.com/google/A2A/blob/main/samples/python/hosts/cli/__main__.py)
@@ -205,7 +208,7 @@ Either party can generate the bearer token. If generated by the Notification Rec
 
 Since this is part of a request in plain-text, this has a chance of being leaked and hence malicious request payloads can be sent with this token. With asymmetric or symmetric keys, the payload was signed, which allowed Notification Receivers to verify authenticity of request payloads.
 
-### Other Considerations
+## Other Considerations
 #### Replay Prevention
 Use iat in JWT or other header to describe the event timestamp. Ideally any event older than 5 mins should be rejected. This provides some protection from replay attacks.
 The timestamp should also be part of the overall request data which is fed into calculation of request signature. This validates the authenticity of timestamps as well.
