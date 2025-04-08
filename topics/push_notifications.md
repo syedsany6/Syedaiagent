@@ -53,7 +53,7 @@ Clients use [Task/Send](../documentation.md#send-a-task) to update a current tas
 If the agents become disconnected, they can resume the connection and receive live updates via the [Task/Resubscribe](../documentation.md#resubscribe-to-task) method.
 
 
-### Disconnected
+## Disconnected
 For disconnected scenarios, A2A supports a push notification mechanism whereby an Agent can notify a Client of an update outside of a connected session via a [PushNotificationConfig](../documentation.md#push-notifications). Within and across enterprises, it is critical that the agent verifies the identity of the notification service,  authenticates itself with the service, and presents an identifier that ties the notification to the executing task.
 
 The NotificationService should be considered a separate service from the client agent, and it is not guaranteed or even expected to be the client directly. This NotificationService is responsible for authenticating and authorizing the agent and for proxying the verified notification to the appropriate endpoint (which could be anything from a pub/sub queue, to an email inbox, to another notification service, etc).
