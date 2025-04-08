@@ -1,4 +1,4 @@
-![image info](images/A2A_announce.png) 
+![image info](images/a2a_announce.png) 
 
 ![image info](images/A2A_banner.png)
 
