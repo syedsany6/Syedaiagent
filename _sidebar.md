@@ -1,6 +1,6 @@
 <!-- docs/_sidebar.md -->
 
-* [Agent2Agent protocol A2A](/)
+* [Home](/)
 * [Blog Post](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/)
 * [Technical Documentation](documentation.md)
 * Review Key Topics

@@ -1,8 +1,8 @@
-![image info](images/A2A_announce.png) 
 ![image info](images/a2a_banner.png) 
 
-## Unlock Collaborative, agent to agent scenarios with a new open protocol
-![image info](images/a2a_main.png) 
+#### Unlock Collaborative, agent to agent scenarios with a new open protocol
+
+<img src="images/a2a_main.png" width="70%" style="margin:20px auto;display:block;">
 
 * **Seamless Agent Collaboration**: Introduces a standard protocol for autonomous, opaque agents built on different frameworks and by various vendors to communicate and collaborate effectively with each other and with users, addressing the current lack of agent interoperability.
 * **Simplifies Enterprise Agent Integration**: Provides a straightforward way to integrate intelligent agents into existing enterprise applications, allowing businesses to leverage agent capabilities across their technology landscape.
@@ -10,7 +10,7 @@
 
 ## Open standards for connecting Agents
 
-![image info](images/a2a_mcp_readme.png) 
+<img src="images/a2a_mcp_readme.png" width="70%" style="margin:20px auto;display:block;">
 
 * **MCP (Model Context Protocol)** for tools and resources
   * Connect agents to tools, APIs, and resources with structured inputs/outputs.
