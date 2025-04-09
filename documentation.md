@@ -505,15 +505,6 @@ The client may also request the last N items of history of the task which will i
             "text": "tell me a joke"
           }
         ]
-      },
-      {
-        "role": "agent",
-        "parts": [
-          {
-            "type": "text",
-            "text": "Why did the chicken cross the road? To get to the other side!"
-          }
-        ]
       }
     ],
     "metadata": {}
@@ -553,7 +544,7 @@ A client may choose to cancel previously submitted tasks as shown below.
 
 ## Set Task Push Notifications
 
-Clients may configure a push notification URL for receiving an update on task completion.
+Clients may configure a push notification URL for receiving an update on task status change.
 
 ```json
 //Request
@@ -618,6 +609,7 @@ Clients may retrieve the currently configured push notification configuration fo
 ## Multi-turn Conversations
 
 A Task may pause to be executed on the remote agent if they require additional user input. When a task is in `input-required` state, the client is required to provide additional input for the task to resume processing on the remote agent.
+
 The message included in the `input-required` state must include the details indicating what the client must do. For example "fill out a form" or "log into SaaS service foo". If this includes structured data, the instruction should be sent as one `Part` and the structured data as a second `Part`.
 
 ```json
