@@ -63,9 +63,6 @@ sequenceDiagram
    # Basic run
    uv run .
 
-   # With simulated streaming enabled
-   uv run . --enable-streaming
-
    # With file-based cache persistence
    uv run . --file-cache
 
