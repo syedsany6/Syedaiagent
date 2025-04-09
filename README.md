@@ -24,7 +24,7 @@ Watch this demo video to see how A2A enables seamless communication between diff
   Your browser does not support the video tag.
 </video>
 
-### Conceptual Overview
+### **Conceptual Overview**
 
 The Agent2Agent (A2A) protocol facilitates communication between independent AI agents. Here are the core concepts:
 
@@ -71,8 +71,8 @@ The Agent2Agent (A2A) protocol facilitates communication between independent AI 
 
 We welcome contributions! Please see our [contributing guide](CONTRIBUTING.md) to get started.\
 Have questions? Join our community in GitHub discussions.\
-Help with protocol improvement feedback, in GitHub issues.\
-Want to send private feedback? use this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScS23OMSKnVFmYeqS2dP7dxY3eTyT7lmtGLUa8OJZfP4RTijQ/viewform)
+Help us with protocol improvement feedback, in GitHub issues.\
+Want to send private feedback? If so, please use this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScS23OMSKnVFmYeqS2dP7dxY3eTyT7lmtGLUa8OJZfP4RTijQ/viewform)
 
 ### **What's next**
 
