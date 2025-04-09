@@ -33,6 +33,6 @@ Now let's model the shop employees as AI agents:
 * A2A is the protocol that enables end-users or other agents to work with the shop employees (*"my car is making a rattling noise"*). A2A enables ongoing back-and-forth communication and an evolving plan to achieve results (*"send me a picture of the left wheel"*, *"I notice fluid leaking. How long has that been happening?"*). A2A also helps the auto shop employees work with other agents such as their part suppliers. 
 
 ## Intersection
-We recommend that applications model A2A agents as MCP resources (represented by their [AgentCard](../documentation.md#agent-card)). The frameworks can then use A2A to communicate with their user, the remote agents, and other agents. 
+We recommend that applications model A2A agents as MCP resources (represented by their [AgentCard](/documentation.md#agent-card)). The frameworks can then use A2A to communicate with their user, the remote agents, and other agents. 
 
 ![Agentic Application showing A2A and MCP together](../images/a2a_mcp.png)
