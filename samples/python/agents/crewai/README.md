@@ -63,9 +63,6 @@ sequenceDiagram
    # Basic run
    uv run .
 
-   # With file-based cache persistence
-   uv run . --file-cache
-
    # On custom host/port
    uv run . --host 0.0.0.0 --port 8080
    ```
@@ -82,16 +79,13 @@ sequenceDiagram
 
 - Text-to-image generation using Google Gemini
 - Support for modifying existing images using references
-- Simulated streaming for progress updates during generation
 - Robust error handling with automatic retries
 - Optional file-based cache persistence
 - Improved artifact ID extraction from queries
-- A2A protocol compatibility with streaming support
 
 **Limitations:**
 
 - No true streaming (CrewAI doesn't natively support it)
-- Simple file-based cache without size management
 - Limited agent interactions (no multi-turn conversations)
 
 ## Learn More
