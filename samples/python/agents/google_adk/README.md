@@ -25,6 +25,6 @@ This agent takes text requests from the client and, if any details are missing, 
 
 4. Run an agent:
     ```bash
-    uv run google_adk/agent
+    uv run agents/google_adk
     ```
 5. Run one of the [client apps](/samples/python/hosts/README.md)
