@@ -2,13 +2,14 @@
 
 * [Home](/)
 * [Blog Post](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/)
+* [Demo Video](demos.md)
 * [Technical Documentation](documentation.md)
 * Review Key Topics
   * [A2A and MCP](topics/a2a_and_mcp.md)
   * [Agent Discovery](topics/agent_discovery.md)
   * [Enterprise Ready](topics/enterprise_ready.md)
   * [Push Notifications](topics/push_notifications.md)
-* [Json Specification](https://github.com/google/A2A/tree/main/specification/json)
+* [json Specification](https://github.com/google/A2A/tree/main/specification/json)
 * [Samples to see A2A in action](https://github.com/google/A2A/tree/main/samples)
   * [Sample A2A Client/Server](https://github.com/google/A2A/tree/main/samples/python/common)
   * [Multi-Agent Web App](https://github.com/google/A2A/tree/main/demo/README.md)
