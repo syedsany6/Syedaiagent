@@ -13,7 +13,7 @@ This sample uses [CrewAI](https://www.crewai.com/open-source) to build a simple 
 
 1. Navigate to the samples directory:
     ```bash
-    cd samples/agents/crewai
+    cd samples/python/agents/crewai
     ```
 2. Create a file named .env under agents/crewai. 
     ```bash
