@@ -87,7 +87,7 @@ A2A clients and servers can use standard request/response patterns and poll for 
 
 A2A models agents as enterprise applications (and can do so because A2A agents are opaque and do not share tools and resources). This quickly brings enterprise-readiness to agentic interop.
 
-A2A follows [Open API’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
+A2A follows [OpenAPI’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
 
 While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish its requirements in its [Agent Card](#agent-card). Thoughts about discovering agent cards is in [this topic](topics/agent_discovery.md?id=discovering-agent-cards).
 
