@@ -1,6 +1,6 @@
 # A2A ❤️ MCP
 
-**TLDR;** Agentic applications needs both A2A and MCP. We recommend MCP for tools and A2A for agents. 
+**TLDR;** Agentic applications need both A2A and MCP. We recommend MCP for tools and A2A for agents. 
 
 <!-- TOC -->
 - [A2A ❤️ MCP](#a2a--mcp)
