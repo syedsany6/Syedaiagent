@@ -26,11 +26,17 @@ The following example will run the langgraph agent with the python CLI host:
     ```bash
     cd samples/python
     ```
-2. Run an agent:
+2. Create an environment file with your API key:
+
+   ```bash
+   echo "GOOGLE_API_KEY=your_api_key_here" > .env
+   ```
+
+3. Run an agent:
     ```bash
     uv run agents/langgraph
     ```
-3. Run the example client
+4. Run the example client
     ```
     uv run hosts/cli
     ```
