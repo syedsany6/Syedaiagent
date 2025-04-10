@@ -51,7 +51,7 @@ Using A2A, agents accomplish tasks for end-users without sharing memory, thought
 - **Enterprise Ready**: Auth, Security, Privacy, Tracing, Monitoring
 - **Async First**: (Very) Long running-tasks and human-in-the-loop
 - **Modality Agnostic**: text, audio/video, forms, iframe, etc.
-- **Opaque Execution** Agents do not have to share thoughts, plans, or tools.
+- **Opaque Execution**: Agents do not have to share thoughts, plans, or tools.
 
 ### More Detailed Discussions
 
@@ -89,7 +89,7 @@ A2A models agents as enterprise applications (and can do so because A2A agents a
 
 A2A follows [OpenAPI’s Authentication specification](https://swagger.io/docs/specification/v3_0/authentication/) for authentication. Importantly, A2A agents do not exchange identity information within the A2A protocol. Instead, they obtain materials (such as tokens) out of band and transmit materials in HTTP headers and not in A2A payloads.
 
-While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish its requirements in its [Agent Card](#agent-card). Thoughts about discovering agent cards is in [this topic](topics/agent_discovery.md?id=discovering-agent-cards).
+While A2A does not transmit identity in-band, servers do send authentication requirements in A2A payloads. At minimum, servers are expected to publish their requirements in their [Agent Card](#agent-card). Thoughts about discovering agent cards are in [this topic](topics/agent_discovery.md?id=discovering-agent-cards).
 
 Clients should use one of the servers published authentication protocols to authenticate their identity and obtain credential material. A2A servers should authenticate **every** request and reject or challenge requests with standard HTTP response codes (401, 403), and authentication-protocol-specific headers and bodies (such as a HTTP 401 response with a [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) header indicating the required authentication schema, or OIDC discovery document at a well-known path). More details discussed in [Enterprise Ready](topics/enterprise_ready.md).
 
@@ -101,7 +101,7 @@ Remote Agents that support A2A are required to publish an **Agent Card** in JSON
 
 ### Discovery
 
-We recommend host their Agent Card at https://`base url`/.well-known/agent.json. This is compatible with a DNS approach where the client finds the server IP via DNS and sends an HTTP GET to retrieve the agent card. We also anticipate that systems will maintain private registries (e.g. an ‘Agent Catalog’ or private marketplace, etc). More discussion can be found in [this document](topics/agent_discovery.md?id=discovering-agent-cards).
+We recommend agents host their Agent Card at https://`base url`/.well-known/agent.json. This is compatible with a DNS approach where the client finds the server IP via DNS and sends an HTTP GET to retrieve the agent card. We also anticipate that systems will maintain private registries (e.g. an ‘Agent Catalog’ or private marketplace, etc). More discussion can be found in [this document](topics/agent_discovery.md?id=discovering-agent-cards).
 
 ### Representation
 
@@ -576,7 +576,7 @@ Clients may retrieve the currently configured push notification configuration fo
 
 ## Multi-turn Conversations
 
-A Task may pause to be executed on the remote agent if they require additional user input. When a Task is in `input-required` state, the client is required to provide additional input for the Task to resume processing on the remote agent.
+A Task may pause to be executed on the remote agent if it requires additional user input. When a Task is in `input-required` state, the client is required to provide additional input for the Task to resume processing on the remote agent.
 
 The Message included in the `input-required` state must include the details indicating what the client must do. For example "fill out a form" or "log into SaaS service foo". If this includes structured data, the instruction should be sent as one `Part` and the structured data as a second `Part`.
 
