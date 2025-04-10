@@ -34,7 +34,7 @@ Different authentication protocols and service providers have different requirem
 It is currently recommended that if Agent A requires the user/client to provide an alternate identity for part of a task, it send an update in the `INPUT-REQUIRED` state with the specific authentication requirements (in the same structure as an AgentCard's authentication requirements) to the client. The client then, out of band to A2A and also out of band to A-system, negotiate with B-system's authority to obtain credential material. Those materials (such as tokens) can be passed through Agent A to Agent B. Agent B will exchange when speaking to its upstream systems.
 
 ## Authenticating Clients
-A2A servers are expected to publish supported and required authentication protocol(s) in its [Agent Card](/documentation.md#agent-card). These protocols should be one of the standard [Open API Authentication formats](https://swagger.io/docs/specification/v3_0/authentication/) (such as API Keys, OAuth, OIDC, etc) but can be extended to another protocol supported by both client and server.
+A2A servers are expected to publish supported and required authentication protocol(s) in its [Agent Card](/documentation.md#agent-card). These protocols should be one of the standard [OpenAPI Authentication formats](https://swagger.io/docs/specification/v3_0/authentication/) (such as API Keys, OAuth, OIDC, etc) but can be extended to another protocol supported by both client and server.
 
 Individual authentication protocols have their own mechanisms for acquiring, refreshing, and challenging credential material (such as bearer or session tokens). The credential acquisition and maintenance process is considered external to A2A. 
 
