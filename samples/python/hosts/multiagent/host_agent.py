@@ -4,6 +4,7 @@ import functools
 import json
 import uuid
 import threading
+import os
 from typing import List, Optional, Callable
 
 from google.genai import types
@@ -29,8 +30,12 @@ from common.types import (
     DataPart,
     Part,
     TaskStatusUpdateEvent,
+    MissingAPIKeyError,
 )
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class HostAgent:
   """The host agent.
@@ -68,6 +73,8 @@ class HostAgent:
     self.agents = '\n'.join(agent_info)
 
   def create_agent(self) -> Agent:
+    if not os.getenv("GOOGLE_API_KEY"):
+      raise MissingAPIKeyError("GOOGLE_API_KEY environment variable not set.")
     return Agent(
         model="gemini-2.0-flash-001",
         name="host_agent",
