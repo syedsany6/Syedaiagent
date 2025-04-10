@@ -7,7 +7,7 @@ This agent takes text requests from the client and, if any details are missing, 
 ## Prerequisites
 
 - Python 3.9 or higher
-- UV
+- uv
 - Access to an LLM and API Key
 
 

@@ -51,7 +51,7 @@ sequenceDiagram
 ## Prerequisites
 
 - Python 3.13 or higher
-- UV
+- uv
 - Access to an LLM and API Key
 
 ## Setup & Running

@@ -30,7 +30,7 @@ Click on the task list to see all the A2A task updates from the remote agents
 ## Prerequisites
 
 - Python 3.12 or higher
-- UV
+- uv
 - Agent servers speaking A2A ([use these samples](/samples/python/agents/README.md))
 
 ## Running the Examples

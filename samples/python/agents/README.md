@@ -14,6 +14,3 @@ Sample agent which can convert currency using tools. Showcases multi-turn intera
 
 * [**CrewAI**](/samples/python/agents/crewai/README.md)  
 Sample agent which can generate images. Showcases multi-turn interactions and sending images through A2A.
-
-
-

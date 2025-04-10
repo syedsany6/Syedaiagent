@@ -7,7 +7,7 @@ The client will use streaming if the server supports it.
 ## Prerequisites
 
 - Python 3.13 or higher
-- UV
+- uv
 - A running A2A server
 
 ## Running the CLI
