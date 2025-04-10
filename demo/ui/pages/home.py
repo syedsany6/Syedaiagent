@@ -1,13 +1,13 @@
 import mesop as me
-
-from components.header import header
 from components.conversation_list import conversation_list
+from components.header import header
 from state.state import AppState
 
 
 @me.stateclass
 class PageState:
-    """ Local Page State"""
+    """Local Page State"""
+
     temp_name: str = ""
 
 
@@ -60,5 +60,6 @@ def home_page_content(app_state: AppState):
                     width="100%",
                 )
             ):
-                with header("Conversations", "message"): pass
+                with header("Conversations", "message"):
+                    pass
                 conversation_list(app_state.conversations)

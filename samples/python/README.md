@@ -38,3 +38,13 @@ The following example will run the langgraph agent with the python CLI host:
 **NOTE:** 
 This is sample code and not production-quality libraries.
 ---
+
+## Format Code
+
+```bash
+# Format code
+uv tool run ruff format .
+
+# Sort imports
+uv tool run ruff check . --select I --fix
+```

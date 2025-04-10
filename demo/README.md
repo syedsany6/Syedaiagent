@@ -44,3 +44,13 @@ Click on the task list to see all the A2A task updates from the remote agents
     uv run main.py
     ```
 Note: The application runs on port 12000 by default
+
+## Format Code
+
+```bash
+# Format code
+uv tool run ruff format .
+
+# Sort imports
+uv tool run ruff check . --select I --fix
+```

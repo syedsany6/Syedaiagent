@@ -1,14 +1,12 @@
 import mesop as me
-
 from components.header import header
-from components.page_scaffold import page_scaffold
-from components.page_scaffold import page_frame
+from components.page_scaffold import page_frame, page_scaffold
 from state.state import SettingsState
 
 
 def on_selection_change_output_types(e: me.SelectSelectionChangeEvent):
-  s = me.state(SettingsState)
-  s.output_mime_types = e.values
+    s = me.state(SettingsState)
+    s.output_mime_types = e.values
 
 
 def settings_page_content():
@@ -16,7 +14,8 @@ def settings_page_content():
     settings_state = me.state(SettingsState)
     with page_scaffold():  # pylint: disable=not-context-manager
         with page_frame():
-            with header("Settings", "settings"): pass
+            with header("Settings", "settings"):
+                pass
             with me.box(
                 style=me.Style(
                     display="flex",
@@ -36,5 +35,3 @@ def settings_page_content():
                     appearance="outline",
                     value=settings_state.output_mime_types,
                 )
-
-

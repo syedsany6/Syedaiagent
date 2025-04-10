@@ -1,14 +1,17 @@
-from common.server import A2AServer
-from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
-from common.utils.push_notification_auth import PushNotificationSenderAuth
-from agents.langgraph.task_manager import AgentTaskManager
-from agents.langgraph.agent import CurrencyAgent
-import click
-import os
 import logging
+import os
+
+import click
+
+from agents.langgraph.agent import CurrencyAgent
+from agents.langgraph.task_manager import AgentTaskManager
+from common.server import A2AServer
+from common.types import AgentCapabilities, AgentCard, AgentSkill, MissingAPIKeyError
+from common.utils.push_notification_auth import PushNotificationSenderAuth
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option("--host", "host", default="localhost")
@@ -42,13 +45,17 @@ def main(host, port):
         notification_sender_auth.generate_jwk()
         server = A2AServer(
             agent_card=agent_card,
-            task_manager=AgentTaskManager(agent=CurrencyAgent(), notification_sender_auth=notification_sender_auth),
+            task_manager=AgentTaskManager(
+                agent=CurrencyAgent(), notification_sender_auth=notification_sender_auth
+            ),
             host=host,
             port=port,
         )
 
         server.app.add_route(
-            "/.well-known/jwks.json", notification_sender_auth.handle_jwks_endpoint, methods=["GET"]
+            "/.well-known/jwks.json",
+            notification_sender_auth.handle_jwks_endpoint,
+            methods=["GET"],
         )
 
         logger.info(f"Starting server on {host}:{port}")

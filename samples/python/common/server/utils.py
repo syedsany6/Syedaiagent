@@ -1,9 +1,10 @@
+from typing import List
+
 from common.types import (
-    JSONRPCResponse,
     ContentTypeNotSupportedError,
+    JSONRPCResponse,
     UnsupportedOperationError,
 )
-from typing import List
 
 
 def are_modalities_compatible(

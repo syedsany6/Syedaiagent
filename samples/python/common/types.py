@@ -1,10 +1,16 @@
-from typing import Union, Any
-from pydantic import BaseModel, Field, TypeAdapter
-from typing import Literal, List, Annotated, Optional
 from datetime import datetime
-from pydantic import model_validator, ConfigDict, field_serializer
-from uuid import uuid4
 from enum import Enum
+from typing import Annotated, Any, List, Literal, Optional, Union
+from uuid import uuid4
+
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    field_serializer,
+    model_validator,
+)
 from typing_extensions import Self
 
 
@@ -100,7 +106,7 @@ class TaskStatusUpdateEvent(BaseModel):
 
 class TaskArtifactUpdateEvent(BaseModel):
     id: str
-    artifact: Artifact    
+    artifact: Artifact
     metadata: dict[str, Any] | None = None
 
 
