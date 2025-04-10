@@ -1,5 +1,7 @@
 # A2A Go Implementation
 
+> **Note**: This is sample code for demonstration purposes only. It is not intended for production use. The implementation is simplified and lacks important production features such as proper error handling, security measures, and performance optimizations.
+
 This directory contains a Go implementation of the Agent-to-Agent (A2A) communication protocol.
 
 ## Overview
