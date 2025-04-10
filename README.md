@@ -17,7 +17,7 @@ With *A2A*, agents can show each other their capabilities and negotiate how they
 
 ### **See A2A in Action**
 
-Watch this [demo video](https://storage.googleapis.com/gweb-developer-goog-blog-assets/original_videos/A2A_demo_v4.mp4) to see how A2A enables seamless communication between different agent frameworks:
+Watch [this demo video](https://storage.googleapis.com/gweb-developer-goog-blog-assets/original_videos/A2A_demo_v4.mp4) to see how A2A enables seamless communication between different agent frameworks.
 
 ### Conceptual Overview
 
