@@ -17,15 +17,12 @@ This agent takes text requests from the client and, if any details are missing, 
     ```bash
     cd samples/python/agents/google_adk
     ```
-    
 2. Create an environment file with your API key (sample uses Google Gemini by default):
     ```bash
     echo "GOOGLE_API_KEY=your_api_key_here" > .env
     ```
-    
-4. Run an agent:
+3. Run an agent:
     ```bash
-    uv run agent
+    uv run .
     ```
-    
-5. Run one of the [client apps](/samples/python/hosts/README.md)
+4. Run one of the [client apps](/samples/python/hosts/README.md)
