@@ -20,6 +20,10 @@
   * Open standard driven by community.
   * Samples available using Google ADK, LangGraph, Crew.AI
 
+## Feedback and Changes
+
+A2A is a work in progress and is expected to change based on community feedback. This repo contains the initial specification, documentation, and [sample code](https://github.com/google/A2A/tree/main/samples). We will continue to update this repo with more features, more examples, specs, and libraries as they become available. When the spec and samples can graduate to a production quality SDK, we will declare version 1.0 and maintain stable releases.
+
 To understand A2A design principles and external partners supporting A2A, [public blog post](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/)
 
 Interested to contribute and know more about the internals of A2A protocol ? [Github](https://github.com/google/A2A) 
