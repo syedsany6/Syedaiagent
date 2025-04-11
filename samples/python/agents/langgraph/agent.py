@@ -1,4 +1,17 @@
+import os
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain_groq import ChatGroq
+from langchain_cohere import ChatCohere
+from langchain_nvidia_ai_endpoints import ChatNVIDIA
+from langchain_fireworks import ChatFireworks
+from langchain_mistralai.chat_models import ChatMistralAI
+from langchain_together import ChatTogether
+from databricks_langchain import ChatDatabricks
+from langchain_ibm import ChatWatsonx
+from langchain_xai import ChatXAI
+from langchain_perplexity import ChatPerplexity
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
@@ -60,9 +73,48 @@ class CurrencyAgent:
         "Set response status to error if there is an error while processing the request."
         "Set response status to completed if the request is complete."
     )
-     
+
     def __init__(self):
-        self.model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+        if os.getenv("GOOGLE_API_KEY"):
+            model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+        elif os.getenv("OPENAI_API_KEY"):
+            model = ChatOpenAI(model="gpt-4o-mini")
+        elif os.getenv("ANTHROPIC_API_KEY"):
+            model = ChatAnthropic(model="claude-3-5-sonnet-latest")
+        elif (
+            os.getenv("AZURE_OPENAI_API_KEY")
+            and os.getenv("AZURE_OPENAI_ENDPOINT")
+            and os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+            and os.getenv("AZURE_OPENAI_API_VERSION")
+        ):
+            model = AzureChatOpenAI(
+                azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+                azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+                openai_api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+            )
+        elif os.getenv("GROQ_API_KEY"):
+            model = ChatGroq(temperature=0, model_name="llama3-8b-8192")
+        elif  os.getenv("COHERE_API_KEY"):
+            model = ChatCohere("command-r-plus")
+        elif os.getenv("NVIDIA_API_KEY"):
+            model = ChatNVIDIA(model="meta/llama3-70b-instruct")
+        elif os.getenv("FIREWORKS_API_KEY"):
+            model = ChatFireworks(model="accounts/fireworks/models/llama-v3p1-70b-instruct")
+        elif os.getenv("MISTRAL_API_KEY"):
+            model = ChatMistralAI(model="mistral-large-latest")
+        elif os.getenv("TOGETHER_API_KEY"):
+            model = ChatTogether(model="mistralai/Mixtral-8x7B-Instruct-v0.1")
+        elif os.getenv("WATSONX_API_KEY"):
+            model = ChatWatsonx(model="ibm/granite-34b-code-instruct")
+        elif os.getenv("DATABRICKS_API_KEY") and os.getenv("DATABRICKS_HOST"):
+            model = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct")
+        elif os.getenv("XAI_API_KEY"):
+            model = ChatXAI(model="grok-2")
+        elif os.getenv("PPLX_API_KEY"):
+            model = ChatPerplexity(model="llama-3.1-sonar-small-128k-online")
+        else:
+            raise ValueError("No valid API key found in environment variables.")
+        self.model = model
         self.tools = [get_exchange_rate]
 
         self.graph = create_react_agent(

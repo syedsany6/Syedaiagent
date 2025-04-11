@@ -19,8 +19,23 @@ logger = logging.getLogger(__name__)
 def main(host, port):
     """Starts the Currency Agent server."""
     try:
-        if not os.getenv("GOOGLE_API_KEY"):
-            raise MissingAPIKeyError("GOOGLE_API_KEY environment variable not set.")
+        if (
+            not os.getenv("GOOGLE_API_KEY")
+            and not os.getenv("OPENAI_API_KEY")
+            and not os.getenv("ANTHROPIC_API_KEY")
+            and not os.getenv("AZURE_OPENAI_API_KEY")
+            and not os.getenv("GROQ_API_KEY")
+            and not os.getenv("COHERE_API_KEY")
+            and not os.getenv("NVIDIA_API_KEY")
+            and not os.getenv("FIREWORKS_API_KEY")
+            and not os.getenv("MISTRAL_API_KEY")
+            and not os.getenv("TOGETHER_API_KEY")
+            and not os.getenv("WATSONX_API_KEY")
+            and not os.getenv("DATABRICKS_API_KEY")
+            and not os.getenv("XAI_API_KEY")
+            and not os.getenv("PPLX_API_KEY")
+        ):
+            raise MissingAPIKeyError("API_KEY environment variable not set.")
 
         capabilities = AgentCapabilities(streaming=True, pushNotifications=True)
         skill = AgentSkill(
