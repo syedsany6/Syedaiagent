@@ -2,7 +2,7 @@ from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
 from common.utils.push_notification_auth import PushNotificationSenderAuth
 from agents.langgraph.task_manager import AgentTaskManager
-from agents.langgraph.agent import CurrencyAgent
+from agents.langgraph.agent import SUPPORTED_API_KEYS, CurrencyAgent
 import click
 import os
 import logging
@@ -13,29 +13,21 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+def check_environment_variables_any(variable_names):
+    if not any(os.getenv(var) is not None for var in variable_names):
+        raise MissingAPIKeyError(
+            f"None of the required environment variables are set: {', '.join(variable_names)}"
+        )
+
+
 @click.command()
 @click.option("--host", "host", default="localhost")
 @click.option("--port", "port", default=10000)
 def main(host, port):
     """Starts the Currency Agent server."""
     try:
-        if (
-            not os.getenv("GOOGLE_API_KEY")
-            and not os.getenv("OPENAI_API_KEY")
-            and not os.getenv("ANTHROPIC_API_KEY")
-            and not os.getenv("AZURE_OPENAI_API_KEY")
-            and not os.getenv("GROQ_API_KEY")
-            and not os.getenv("COHERE_API_KEY")
-            and not os.getenv("NVIDIA_API_KEY")
-            and not os.getenv("FIREWORKS_API_KEY")
-            and not os.getenv("MISTRAL_API_KEY")
-            and not os.getenv("TOGETHER_API_KEY")
-            and not os.getenv("WATSONX_API_KEY")
-            and not os.getenv("DATABRICKS_API_KEY")
-            and not os.getenv("XAI_API_KEY")
-            and not os.getenv("PPLX_API_KEY")
-        ):
-            raise MissingAPIKeyError("API_KEY environment variable not set.")
+        check_environment_variables_any(SUPPORTED_API_KEYS)
 
         capabilities = AgentCapabilities(streaming=True, pushNotifications=True)
         skill = AgentSkill(

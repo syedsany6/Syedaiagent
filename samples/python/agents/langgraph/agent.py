@@ -23,6 +23,32 @@ from pydantic import BaseModel
 memory = MemorySaver()
 
 
+SUPPORTED_API_KEYS = {
+    "GOOGLE_API_KEY",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "AZURE_OPENAI_API_KEY",
+    "GROQ_API_KEY",
+    "COHERE_API_KEY",
+    "NVIDIA_API_KEY",
+    "FIREWORKS_API_KEY",
+    "MISTRAL_API_KEY",
+    "TOGETHER_API_KEY",
+    "WATSONX_API_KEY",
+    "DATABRICKS_API_KEY",
+    "XAI_API_KEY",
+    "PPLX_API_KEY",
+}
+
+
+def get_api_key() -> str:
+    """Helper method to handle API Key."""
+    return next(
+        (os.getenv(var) for var in SUPPORTED_API_KEYS if os.getenv(var) is not None),
+        None,
+    )
+
+
 @tool
 def get_exchange_rate(
     currency_from: str = "USD",
@@ -75,45 +101,53 @@ class CurrencyAgent:
     )
 
     def __init__(self):
-        if os.getenv("GOOGLE_API_KEY"):
-            model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-        elif os.getenv("OPENAI_API_KEY"):
-            model = ChatOpenAI(model="gpt-4o-mini")
-        elif os.getenv("ANTHROPIC_API_KEY"):
-            model = ChatAnthropic(model="claude-3-5-sonnet-latest")
-        elif (
-            os.getenv("AZURE_OPENAI_API_KEY")
-            and os.getenv("AZURE_OPENAI_ENDPOINT")
-            and os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-            and os.getenv("AZURE_OPENAI_API_VERSION")
-        ):
-            model = AzureChatOpenAI(
-                azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-                azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
-                openai_api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-            )
-        elif os.getenv("GROQ_API_KEY"):
-            model = ChatGroq(temperature=0, model_name="llama3-8b-8192")
-        elif  os.getenv("COHERE_API_KEY"):
-            model = ChatCohere("command-r-plus")
-        elif os.getenv("NVIDIA_API_KEY"):
-            model = ChatNVIDIA(model="meta/llama3-70b-instruct")
-        elif os.getenv("FIREWORKS_API_KEY"):
-            model = ChatFireworks(model="accounts/fireworks/models/llama-v3p1-70b-instruct")
-        elif os.getenv("MISTRAL_API_KEY"):
-            model = ChatMistralAI(model="mistral-large-latest")
-        elif os.getenv("TOGETHER_API_KEY"):
-            model = ChatTogether(model="mistralai/Mixtral-8x7B-Instruct-v0.1")
-        elif os.getenv("WATSONX_API_KEY"):
-            model = ChatWatsonx(model="ibm/granite-34b-code-instruct")
-        elif os.getenv("DATABRICKS_API_KEY") and os.getenv("DATABRICKS_HOST"):
-            model = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct")
-        elif os.getenv("XAI_API_KEY"):
-            model = ChatXAI(model="grok-2")
-        elif os.getenv("PPLX_API_KEY"):
-            model = ChatPerplexity(model="llama-3.1-sonar-small-128k-online")
-        else:
-            raise ValueError("No valid API key found in environment variables.")
+        match get_api_key():
+            case "GOOGLE_API_KEY":
+                model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+            case "OPENAI_API_KEY":
+                model = ChatOpenAI(model="gpt-4o-mini")
+            case "ANTHROPIC_API_KEY":
+                model = ChatAnthropic(model="claude-3-5-sonnet-latest")
+            case "AZURE_OPENAI_API_KEY":
+                if (
+                    os.getenv("AZURE_OPENAI_ENDPOINT")
+                    and os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+                    and os.getenv("AZURE_OPENAI_API_VERSION")
+                ):
+                    model = AzureChatOpenAI(
+                        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+                        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+                        openai_api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+                    )
+                else:
+                    raise ValueError(
+                        "AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT_NAME, and AZURE_OPENAI_API_VERSION not set."
+                    )
+            case "GROQ_API_KEY":
+                model = ChatGroq(temperature=0, model_name="llama3-8b-8192")
+            case "COHERE_API_KEY":
+                model = ChatCohere("command-r-plus")
+            case "NVIDIA_API_KEY":
+                model = ChatNVIDIA(model="meta/llama3-70b-instruct")
+            case "FIREWORKS_API_KEY":
+                model = ChatFireworks(model="accounts/fireworks/models/llama-v3p1-70b-instruct")
+            case "MISTRAL_API_KEY":
+                model = ChatMistralAI(model="mistral-large-latest")
+            case "TOGETHER_API_KEY":
+                model = ChatTogether(model="mistralai/Mixtral-8x7B-Instruct-v0.1")
+            case "WATSONX_API_KEY":
+                model = ChatWatsonx(model="ibm/granite-34b-code-instruct")
+            case "DATABRICKS_API_KEY":
+                if os.getenv("DATABRICKS_HOST"):
+                    model = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct")
+                else:
+                    raise ValueError("DATABRICKS_HOST not found in environment variables.")
+            case "XAI_API_KEY":
+                model = ChatXAI(model="grok-2")
+            case "PPLX_API_KEY":
+                model = ChatPerplexity(model="llama-3.1-sonar-small-128k-online")
+            case _:
+                raise ValueError("No valid API key found in environment variables.")
         self.model = model
         self.tools = [get_exchange_rate]
 
