@@ -398,7 +398,7 @@ Allows a client to send content to a remote agent to start a new Task, resume an
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "message": {
       "role":"user",
-      "data": [{
+      "parts": [{
         "type":"text",
         "text": "tell me a joke"
       }]
