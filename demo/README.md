@@ -12,7 +12,7 @@ This demo application showcases agents talking to other agents over A2A.
 
 ## Features
 
-<need quick gif>
+![image](/images/A2A_ui_demo.gif)
 
 ### Dynamically add agents
 Clicking on the robot icon in the web app lets you add new agents. Enter the address of the remote agent's AgentCard and the app will fetch the card and add the remote agent to the local set of known agents.  
@@ -37,7 +37,7 @@ Click on the task list to see all the A2A task updates from the remote agents
 
 1. Navigate to the demo ui directory:
     ```bash
-    cd demo/ui
+    cd demo
     ```
 2. Create an environment file with your API key:
 
