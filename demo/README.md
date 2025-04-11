@@ -12,7 +12,7 @@ This demo application showcases agents talking to other agents over A2A.
 
 ## Features
 
-![image](/images/A2A_ui_demo.gif)
+![image](/images/A2A_demo_ui.gif)
 
 ### Dynamically add agents
 Clicking on the robot icon in the web app lets you add new agents. Enter the address of the remote agent's AgentCard and the app will fetch the card and add the remote agent to the local set of known agents.  
