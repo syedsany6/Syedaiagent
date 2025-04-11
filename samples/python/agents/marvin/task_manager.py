@@ -196,7 +196,7 @@ class AgentTaskManager(InMemoryTaskManager):
 
             asyncio.create_task(self._run_streaming_agent(request))
 
-            return await self.dequeue_events_for_sse(
+            return self.dequeue_events_for_sse(
                 request.id, task_send_params.id, sse_event_queue
             )
         except Exception as e:

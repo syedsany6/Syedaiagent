@@ -31,7 +31,6 @@ The implementation follows the A2A architecture pattern:
 - `agent.py` - Core agent implementation using Marvin's `Agent` class and `result_type`
 - `task_manager.py` - A2A integration that passes structured data with `DataPart`
 - `__main__.py` - Server entry point
-- `example.py` - Standalone example (without A2A)
 
 ## Prerequisites
 
