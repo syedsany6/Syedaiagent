@@ -4,33 +4,37 @@ This example demonstrates how to implement an agent using the Marvin framework t
 
 ## Overview
 
-This example showcases Marvin's strengths in structured data extraction and type-safe outputs:
+This example showcases Marvin's strengths in structured data extraction and multi-turn interactions:
 
-- Uses Marvin's `Agent` class with `result_type` parameter to get structured data
-- Returns both human-readable text and structured contact information
-- Passes structured data through A2A's DataPart
-- Uses `marvin.Thread` to manage the agent's context by `sessionId`
+- **Multi-Turn Interaction** - Agent asks for missing information when extraction is incomplete
+- **Type-Safe Extraction** - Uses `result_type=ContactInfo` to get structured data
+- **Custom Tools** - Validates emails and formats phone numbers
+- **State Management** - Maintains extraction state across conversation turns
 
 ## How It Works
 
 1. User sends text containing potential contact information
 2. Marvin agent extracts structured data using `agent.run(result_type=ContactInfo)`
-3. A2A sends back both a text summary and structured JSON data
-4. Client can use either the human-readable text or process the structured data
+3. If information is incomplete, agent identifies missing fields and asks specific questions
+4. User provides additional information in subsequent messages
+5. Agent merges new information with previously extracted data
+6. When contact information is complete, agent returns final structured data
+7. A2A sends back both a text summary and structured JSON data
 
 ## Architecture
 
 The implementation follows the A2A architecture pattern:
 
-1. **ExtractorAgent (agent.py)** - Core agent using Marvin's type-safe extraction capabilities
-2. **AgentTaskManager (task_manager.py)** - A2A integration that handles both text and structured data
+1. **ExtractorAgent (agent.py)** - Core agent with multi-turn extraction logic
+2. **AgentTaskManager (task_manager.py)** - A2A integration layer handling task state transitions
 3. **Server Entry Point (__main__.py)** - Sets up and runs the A2A server
 
 ## Files
 
-- `agent.py` - Core agent implementation using Marvin's `Agent` class and `result_type`
-- `task_manager.py` - A2A integration that passes structured data with `DataPart`
+- `agent.py` - Core agent implementation with multi-turn extraction
+- `task_manager.py` - A2A integration using DataPart for structured data
 - `__main__.py` - Server entry point
+- `example.py` - Standalone example (without A2A)
 
 ## Prerequisites
 
@@ -76,11 +80,19 @@ The implementation follows the A2A architecture pattern:
    uv run hosts/cli --agent http://localhost:10001
    ```
 
-## Example Inputs
+## Example Multi-Turn Interactions
 
-- "My name is Jane Smith, email jane.smith@example.com, phone (555) 123-4567"
-- "Contact our sales team at sales@company.com"
-- "John Doe is the CEO of TechCorp and can be reached at john@techcorp.com"
+**Interaction 1: Partial Information**
+- User: "John's email is john@example.com"
+- Agent: "Thanks for providing John's email. Could you also share John's full name and any other contact details like a phone number or organization?"
+- User: "His name is John Smith and he works at Acme Corp"
+- Agent: "Thank you! I've recorded the contact information for John Smith who works at Acme Corp with email john@example.com."
+
+**Interaction 2: Missing Contact Method**
+- User: "Sarah Jones is the new marketing director"
+- Agent: "I see that Sarah Jones is the marketing director. To complete the contact record, could you provide an email address or phone number where she can be reached?"
+- User: "You can reach her at (555) 123-4567"
+- Agent: "Great! I've saved the contact information for Sarah Jones, marketing director, with phone number (555) 123-4567."
 
 ## Structure of the Extracted Data
 
@@ -96,14 +108,21 @@ The agent returns structured contact information in this format:
 }
 ```
 
+## Contact Validation
+
+The agent includes validation capabilities for contact information:
+- Phone number formatting for consistency
+- Email validation to ensure correct format
+- Completeness checking to ensure essential fields are present
+
 ## Why Marvin?
 
-This example showcases how Marvin simplifies working with LLMs:
+This example showcases how Marvin simplifies building conversational AI applications:
 
 1. **Type-Safe Outputs** - Get structured data directly with `result_type=ContactInfo`
-2. **Minimal Code** - Simple implementation with Marvin's clean API
-3. **Broad Model Support** - Marvin supports a wide range of models via [`pydantic-ai`](https://github.com/pydantic/pydantic-ai)
-4. **Focus on Core Logic** - No need for complex prompt engineering
+2. **Thread Context** - Maintain conversation context across multiple turns
+3. **Tool Integration** - Easily add validation tools to enhance extraction
+4. **Simple Multi-Turn** - Natural handling of stateful conversations
 
 ## Learn More
 

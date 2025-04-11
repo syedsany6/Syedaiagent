@@ -56,7 +56,7 @@ class AgentTaskManager(InMemoryTaskManager):
                 # Create parts list based on response content
                 parts = []
 
-                # Always add text part
+                # Add text part
                 parts.append(TextPart(type="text", text=item["content"]))
 
                 # Add data part if we have structured data
@@ -220,7 +220,7 @@ class AgentTaskManager(InMemoryTaskManager):
         # Create parts list based on response content
         parts = []
 
-        # Always add text part
+        # Add text part
         parts.append(TextPart(type="text", text=agent_response["content"]))
 
         # Add data part if we have structured data
@@ -271,7 +271,7 @@ class AgentTaskManager(InMemoryTaskManager):
         task_id_params: TaskIdParams = request.params
         try:
             sse_event_queue = await self.setup_sse_consumer(task_id_params.id, True)
-            return await self.dequeue_events_for_sse(
+            return self.dequeue_events_for_sse(
                 request.id, task_id_params.id, sse_event_queue
             )
         except Exception as e:

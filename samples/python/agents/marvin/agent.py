@@ -7,7 +7,7 @@ class ContactInfo(BaseModel):
     """Structured contact information extracted from text."""
 
     name: str = Field(description="Person's full name")
-    email: str | None = Field(None, description="Email address if present")
+    email: str = Field(description="Email address")
     phone: str | None = Field(None, description="Phone number if present")
     organization: str | None = Field(
         None, description="Organization or company if mentioned"
@@ -24,10 +24,13 @@ class ExtractorAgent:
             name="Contact Extractor",
             instructions=(
                 "You are a specialized assistant for extracting contact information from text. "
-                "If the input doesn't contain contact information, politely explain this and ask for relevant input. "
+                "If the input doesn't contain complete contact information, identify what's missing "
+                "and ask specific questions to gather that information. "
                 "Be precise and only extract what is explicitly mentioned in the text."
             ),
         )
+
+        self.session_states: dict[str, ContactInfo] = {}
 
     def invoke(self, query: str, sessionId: str) -> dict[str, Any]:
         """Process a user query and return a response with extracted contact information.
@@ -41,17 +44,74 @@ class ExtractorAgent:
         """
         try:
             with marvin.Thread(id=sessionId):
-                contact_info = self.agent.run(
-                    f"Extract contact information from this text: {query}",
-                    result_type=ContactInfo,
-                )
+                # Check if we have partial information from a previous turn
+                partial_info = self.session_states.get(sessionId)
 
-            return {
-                "is_task_complete": True,
-                "require_user_input": False,
-                "content": "Extracted contact information",
-                "contact_info": contact_info,
-            }
+                if partial_info:
+                    # Extract new info, providing context from previous turn
+                    prompt = (
+                        f"Update this partial contact information with new details from: '{query}'\n"
+                        f"Current information: {partial_info.model_dump_json()}"
+                    )
+
+                    # Try to extract a ContactInfo object
+                    contact_info = self.agent.run(prompt, result_type=ContactInfo)
+                else:
+                    # Fresh extraction
+                    contact_info = self.agent.run(
+                        f"Extract contact information from this text: {query}",
+                        result_type=ContactInfo,
+                    )
+
+                # Check if we have required fields
+                if not contact_info.name or not contact_info.email:
+                    # Store the partial information
+                    self.session_states[sessionId] = contact_info
+
+                    # Generate a request for more information
+                    missing = []
+                    if not contact_info.name:
+                        missing.append("name")
+                    if not contact_info.email:
+                        missing.append("email")
+
+                    missing_str = ", ".join(missing)
+                    question = self.agent.run(
+                        f"I need to collect contact information but I'm missing: {missing_str}. "
+                        f"Based on what I know so far: {contact_info.model_dump_json()}, "
+                        f"ask a natural question to get the missing information."
+                    )
+
+                    return {
+                        "is_task_complete": False,
+                        "require_user_input": True,
+                        "content": question,
+                        "contact_info": contact_info,
+                    }
+                else:
+                    if sessionId in self.session_states:
+                        del self.session_states[sessionId]
+
+                    # Generate a summary of the complete contact info
+                    content = (
+                        "Great! I've collected the following contact information:\n\n"
+                    )
+                    content += f"👤 Name: {contact_info.name}\n"
+                    content += f"📧 Email: {contact_info.email}\n"
+
+                    if contact_info.phone:
+                        content += f"📱 Phone: {contact_info.phone}\n"
+                    if contact_info.organization:
+                        content += f"🏢 Organization: {contact_info.organization}\n"
+                    if contact_info.role:
+                        content += f"🧑‍💼 Role: {contact_info.role}\n"
+
+                    return {
+                        "is_task_complete": True,
+                        "require_user_input": False,
+                        "content": content,
+                        "contact_info": contact_info,
+                    }
 
         except Exception as e:
             return {
