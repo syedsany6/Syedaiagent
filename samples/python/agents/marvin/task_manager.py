@@ -49,17 +49,14 @@ class AgentTaskManager(InMemoryTaskManager):
         """Parses the dictionary output from agent.invoke() into A2A TaskStatus and Artifacts."""
         is_task_complete = agent_outcome["is_task_complete"]
         require_user_input = not is_task_complete
-        content = agent_outcome["content"]
-        contact_info = agent_outcome["contact_info"]
-
+        data = agent_outcome.get("data", {})
+        text_parts = agent_outcome.get("text_parts", [])
+        print(f"Data: {data}")
         parts = []
-        parts.append(TextPart(type="text", text=content or ""))
+        parts.extend(text_parts)
 
-        if contact_info:
-            contact_data = (
-                contact_info.model_dump() if hasattr(contact_info, "model_dump") else {}
-            )
-            parts.append(DataPart(type="data", data=contact_data))
+        if data:
+            parts.append(DataPart(type="data", data=data))
 
         task_status: TaskStatus | None = None
         artifacts: list[Artifact] = []
