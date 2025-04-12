@@ -13,6 +13,7 @@ First, follow the instructions in the agent's README file, then run `npx tsx ./c
 
 ```bash
 export GEMINI_API_KEY=<your_api_key>
+npm install
 npm run agents:coder
 
 # in a separate terminal
