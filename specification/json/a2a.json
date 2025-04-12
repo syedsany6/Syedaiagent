@@ -72,7 +72,7 @@
           },
           "url": {
             "title": "Url",
-            "type": "string"            
+            "type": "string"
           },
           "provider": {
             "anyOf": [
@@ -715,7 +715,7 @@
         },
         "title": "GetTaskPushNotificationResponse",
         "type": "object"
-      },      
+      },
       "GetTaskRequest": {
         "properties": {
           "jsonrpc": {
@@ -1126,7 +1126,7 @@
             },
             "title": "Parts",
             "type": "array"
-          },          
+          },
           "metadata": {
             "anyOf": [
               {
@@ -1192,7 +1192,7 @@
           },
           "token": {
             "title": "Token",
-            "anyOf": [              
+            "anyOf": [
               {
                 "type": "string"
               },
@@ -1271,7 +1271,7 @@
         ],
         "title": "SendTaskRequest",
         "type": "object"
-      },      
+      },
       "SendTaskResponse": {
         "properties": {
           "jsonrpc": {
@@ -1298,7 +1298,7 @@
             "anyOf": [
               {
                 "$ref": "#/$defs/Task"
-              },              
+              },
               {
                 "type": "null"
               }
@@ -1382,7 +1382,7 @@
             "title": "Id"
           },
           "result": {
-            "anyOf": [              
+            "anyOf": [
               {
                 "$ref": "#/$defs/TaskStatusUpdateEvent"
               },
@@ -1570,7 +1570,7 @@
         ],
         "title": "TaskPushNotificationConfig",
         "type": "object"
-      },      
+      },
       "TaskNotCancelableError": {
         "properties": {
           "code": {
@@ -1679,14 +1679,14 @@
             "anyOf": [
               {
                 "type": "integer"
-              },              
+              },
               {
                 "type": "null"
               }
             ],
             "default": null,
             "title": "HistoryLength"
-          },          
+          },
           "metadata": {
             "anyOf": [
               {
@@ -1719,7 +1719,7 @@
           },
           "message": {
             "$ref": "#/$defs/Message"
-          },          
+          },
           "pushNotification": {
             "anyOf": [
               {
@@ -1735,14 +1735,14 @@
             "anyOf": [
               {
                 "type": "integer"
-              },              
+              },
               {
                 "type": "null"
               }
             ],
             "default": null,
             "title": "HistoryLength"
-          },   
+          },
           "metadata": {
             "anyOf": [
               {
@@ -1773,6 +1773,7 @@
           "completed",
           "canceled",
           "failed",
+          "rejected",
           "unknown"
         ],
         "title": "TaskState",
@@ -1992,7 +1993,7 @@
           },
           {
             "$ref": "#/$defs/CancelTaskRequest"
-          },          
+          },
           {
             "$ref": "#/$defs/SetTaskPushNotificationRequest"
           },
