@@ -1,130 +1,79 @@
-# Marvin Contact Extractor Agent
+# Marvin Contact Extractor Agent (A2A Sample)
 
-This example demonstrates how to implement an agent using the Marvin framework to extract structured contact information from text and integrate it with the A2A framework.
+This sample demonstrates an agent using the [Marvin](https://github.com/prefecthq/marvin) framework to extract structured contact information from text, integrated with the Agent2Agent (A2A) protocol.
 
 ## Overview
 
-This example showcases Marvin's strengths in structured data extraction and multi-turn interactions:
+The agent receives text, attempts to extract contact details (name, email, phone, etc.) into a structured format using Marvin. It manages conversational state across multiple turns to gather required information (name, email) before confirming the extracted data. The agent's response includes both a textual summary/question and the structured data via A2A.
 
-- **Multi-Turn Interaction** - Agent asks for missing information when extraction is incomplete
-- **Type-Safe Extraction** - Uses `result_type=ContactInfo` to get structured data
-- **Custom Tools** - Validates emails and formats phone numbers
-- **State Management** - Maintains extraction state across conversation turns
 
-## How It Works
+## Key Components
 
-1. User sends text containing potential contact information
-2. Marvin agent extracts structured data using `agent.run(result_type=ContactInfo)`
-3. If information is incomplete, agent identifies missing fields and asks specific questions
-4. User provides additional information in subsequent messages
-5. Agent merges new information with previously extracted data
-6. When contact information is complete, agent returns final structured data
-7. A2A sends back both a text summary and structured JSON data
-
-## Architecture
-
-The implementation follows the A2A architecture pattern:
-
-1. **ExtractorAgent (agent.py)** - Core agent with multi-turn extraction logic
-2. **AgentTaskManager (task_manager.py)** - A2A integration layer handling task state transitions
-3. **Server Entry Point (__main__.py)** - Sets up and runs the A2A server
-
-## Files
-
-- `agent.py` - Core agent implementation with multi-turn extraction
-- `task_manager.py` - A2A integration using DataPart for structured data
-- `__main__.py` - Server entry point
-- `example.py` - Standalone example (without A2A)
+-   **Marvin `ExtractorAgent` (`agent.py`)**: Core logic using `marvin` for extraction and managing multi-turn state via a dictionary.
+-   **A2A `AgentTaskManager` (`task_manager.py`)**: Integrates the agent with the A2A protocol, managing task state (including streaming via SSE) and response formatting.
+-   **A2A Server (`__main__.py`)**: Hosts the agent and task manager.
 
 ## Prerequisites
 
-- Python 3.12 or higher
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- OpenAI API Key (or appropriate API key for the model you're using)
+-   Python 3.12 or higher
+-   [uv](https://docs.astral.sh/uv/getting-started/installation/)
+-   `OPENAI_API_KEY` (or other LLM provider creds supported by pydantic-ai)
 
 ## Setup & Running
 
-1. Navigate to the samples directory:
+1.  Navigate to the Python samples directory:
+    ```bash
+    cd samples/python
+    ```
 
-   ```bash
-   cd samples/python
-   ```
+2.  Set an LLM provider API key:
+    ```bash
+    export OPENAI_API_KEY=your_api_key_here
+    ```
 
-2. Create an environment file with your API key:
+3.  Set up the Python environment:
+    ```bash
+    uv venv
+    source .venv/bin/activate
+    uv sync
+    ```
 
-   ```bash
-   echo "OPENAI_API_KEY=your_api_key_here" > .env
-   ```
+4.  Run the Marvin agent server:
+    ```bash
+    # Default host/port (localhost:10001)
+    MARVIN_DATABASE_URL=sqlite+aiosqlite://test.db MARVIN_LOG_LEVEL=DEBUG uv run agents/marvin
 
-3. Set up the Python environment:
+    # Custom host/port
+    # uv run agents/marvin --host 0.0.0.0 --port 8080
+    ```
 
-   ```bash
-   uv python pin 3.12
-   uv venv
-   source .venv/bin/activate
-   ```
+    Without `MARVIN_DATABASE_URL` set, multi-turn state will not be persisted by Marvin due
+    to some interaction with the A2A protocol that I don't fully understand yet.
 
-4. Run the agent:
+5.  In a separate terminal, run an A2A client (e.g., the sample CLI):
+    ```bash
+    # Ensure the environment is active (source .venv/bin/activate)
+    uv run hosts/cli --agent http://localhost:10001 # Use the correct agent URL/port
+    ```
 
-   ```bash
-   # Basic run
-   uv run agents/marvin
 
-   # On custom host/port
-   uv run agents/marvin --host 0.0.0.0 --port 8080
-   ```
+## Extracted Data Structure
 
-5. In a separate terminal, run the A2A client:
+The structured data returned in the `DataPart` is defined as:
 
-   ```bash
-   uv run hosts/cli --agent http://localhost:10001
-   ```
-
-## Example Multi-Turn Interactions
-
-**Interaction 1: Partial Information**
-- User: "John's email is john@example.com"
-- Agent: "Thanks for providing John's email. Could you also share John's full name and any other contact details like a phone number or organization?"
-- User: "His name is John Smith and he works at Acme Corp"
-- Agent: "Thank you! I've recorded the contact information for John Smith who works at Acme Corp with email john@example.com."
-
-**Interaction 2: Missing Contact Method**
-- User: "Sarah Jones is the new marketing director"
-- Agent: "I see that Sarah Jones is the marketing director. To complete the contact record, could you provide an email address or phone number where she can be reached?"
-- User: "You can reach her at (555) 123-4567"
-- Agent: "Great! I've saved the contact information for Sarah Jones, marketing director, with phone number (555) 123-4567."
-
-## Structure of the Extracted Data
-
-The agent returns structured contact information in this format:
-
-```json
-{
-  "name": "Jane Smith",
-  "email": "jane.smith@example.com",
-  "phone": "(555) 123-4567",
-  "organization": "TechCorp",
-  "role": "Software Engineer"
-}
+```python
+class ContactInfo(BaseModel):
+    name: str = Field(description="Person's first and last name")
+    email: EmailStr
+    phone: str = Field(description="standardized phone number")
+    organization: str | None = Field(None, description="org if mentioned")
+    role: str | None = Field(None, description="title or role if mentioned")
 ```
 
-## Contact Validation
-
-The agent includes validation capabilities for contact information:
-- Phone number formatting for consistency
-- Email validation to ensure correct format
-- Completeness checking to ensure essential fields are present
-
-## Why Marvin?
-
-This example showcases how Marvin simplifies building conversational AI applications:
-
-1. **Type-Safe Outputs** - Get structured data directly with `result_type=ContactInfo`
-2. **Thread Context** - Maintain conversation context across multiple turns
-3. **Tool Integration** - Easily add validation tools to enhance extraction
-4. **Simple Multi-Turn** - Natural handling of stateful conversations
+with a validator to render things nicely if you want and maybe serialize weird things.
 
 ## Learn More
 
-- [marvin repo](https://github.com/prefecthq/marvin)
-- [marvin docs](https://www.askmarvin.ai)
+-   [Marvin Documentation](https://www.askmarvin.ai/)
+-   [Marvin GitHub Repository](https://github.com/prefecthq/marvin)
+-   [A2A Protocol Documentation](https://google.github.io/A2A/#/documentation)

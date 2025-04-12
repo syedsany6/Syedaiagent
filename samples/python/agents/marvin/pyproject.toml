@@ -8,3 +8,6 @@ dependencies = ["marvin>=3.0.0", "a2a-samples"]
 
 [tool.uv.sources]
 a2a-samples = { workspace = true }
+
+[tool.ruff.lint]
+extend-select = ["I", "UP"]

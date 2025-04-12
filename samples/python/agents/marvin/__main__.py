@@ -1,14 +1,11 @@
-from common.server import A2AServer
-from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
-from common.utils.push_notification_auth import PushNotificationSenderAuth
-from agents.marvin.task_manager import AgentTaskManager
-from agents.marvin.agent import ExtractorAgent
-import click
-import os
 import logging
-from dotenv import load_dotenv
 
-load_dotenv()
+import click
+from agents.marvin.agent import ExtractorAgent
+from agents.marvin.task_manager import AgentTaskManager
+from common.server import A2AServer
+from common.types import AgentCapabilities, AgentCard, AgentSkill
+from common.utils.push_notification_auth import PushNotificationSenderAuth
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,9 +17,6 @@ logger = logging.getLogger(__name__)
 def main(host, port):
     """Starts the Marvin Contact Extractor Agent server."""
     try:
-        if not os.getenv("OPENAI_API_KEY"):
-            raise MissingAPIKeyError("OPENAI_API_KEY environment variable not set.")
-
         capabilities = AgentCapabilities(streaming=True, pushNotifications=True)
         skill = AgentSkill(
             id="extract_contacts",
@@ -64,9 +58,6 @@ def main(host, port):
 
         logger.info(f"Starting Marvin Contact Extractor server on {host}:{port}")
         server.start()
-    except MissingAPIKeyError as e:
-        logger.error(f"Error: {e}")
-        exit(1)
     except Exception as e:
         logger.error(f"An error occurred during server startup: {e}")
         exit(1)

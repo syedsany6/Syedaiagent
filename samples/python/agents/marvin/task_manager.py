@@ -1,33 +1,34 @@
-from typing import AsyncIterable, Any
-from common.types import (
-    SendTaskRequest,
-    TaskSendParams,
-    Message,
-    TaskStatus,
-    Artifact,
-    TextPart,
-    DataPart,
-    TaskState,
-    SendTaskResponse,
-    InternalError,
-    JSONRPCResponse,
-    SendTaskStreamingRequest,
-    SendTaskStreamingResponse,
-    TaskArtifactUpdateEvent,
-    TaskStatusUpdateEvent,
-    Task,
-    TaskIdParams,
-    PushNotificationConfig,
-    InvalidParamsError,
-)
-from common.server.task_manager import InMemoryTaskManager
-from agents.marvin.agent import ExtractorAgent
-from common.utils.push_notification_auth import PushNotificationSenderAuth
-import common.server.utils as utils
-from typing import Union
 import asyncio
 import logging
 import traceback
+from collections.abc import AsyncIterable
+from typing import Any
+
+import common.server.utils as utils
+from agents.marvin.agent import ExtractorAgent
+from common.server.task_manager import InMemoryTaskManager
+from common.types import (
+    Artifact,
+    DataPart,
+    InternalError,
+    InvalidParamsError,
+    JSONRPCResponse,
+    Message,
+    PushNotificationConfig,
+    SendTaskRequest,
+    SendTaskResponse,
+    SendTaskStreamingRequest,
+    SendTaskStreamingResponse,
+    Task,
+    TaskArtifactUpdateEvent,
+    TaskIdParams,
+    TaskSendParams,
+    TaskState,
+    TaskStatus,
+    TaskStatusUpdateEvent,
+    TextPart,
+)
+from common.utils.push_notification_auth import PushNotificationSenderAuth
 
 logger = logging.getLogger(__name__)
 
@@ -42,77 +43,129 @@ class AgentTaskManager(InMemoryTaskManager):
         self.agent = agent
         self.notification_sender_auth = notification_sender_auth
 
+    def _parse_agent_outcome(
+        self, agent_outcome: dict[str, Any]
+    ) -> tuple[TaskStatus, list[Artifact]]:
+        """Parses the dictionary output from agent.invoke() into A2A TaskStatus and Artifacts."""
+        is_task_complete = agent_outcome["is_task_complete"]
+        require_user_input = not is_task_complete
+        content = agent_outcome["content"]
+        contact_info = agent_outcome["contact_info"]
+
+        parts = []
+        parts.append(TextPart(type="text", text=content or ""))
+
+        if contact_info:
+            contact_data = (
+                contact_info.model_dump() if hasattr(contact_info, "model_dump") else {}
+            )
+            parts.append(DataPart(type="data", data=contact_data))
+
+        task_status: TaskStatus | None = None
+        artifacts: list[Artifact] = []
+
+        if is_task_complete:
+            task_state = TaskState.COMPLETED
+            # For completed tasks, the primary output is the artifact.
+            # The status message might be minimal or omitted if redundant with the artifact.
+            task_status = TaskStatus(state=task_state)
+            # Create the final artifact containing both text and data parts
+            artifacts.append(Artifact(parts=parts, index=0, append=False))
+        elif require_user_input:
+            task_state = TaskState.INPUT_REQUIRED
+            # For input required, the message contains the agent's question (and potentially partial data)
+            message = Message(role="agent", parts=parts)
+            task_status = TaskStatus(state=task_state, message=message)
+        else:  # Agent is just providing an update without finishing or needing input
+            task_state = TaskState.WORKING
+            message = Message(role="agent", parts=parts)
+            task_status = TaskStatus(state=task_state, message=message)
+
+        return task_status, artifacts
+
     async def _run_streaming_agent(self, request: SendTaskStreamingRequest):
         task_send_params: TaskSendParams = request.params
         query = self._get_user_query(task_send_params)
 
         try:
-            async for item in self.agent.stream(query, task_send_params.sessionId):
-                is_task_complete = item["is_task_complete"]
-                require_user_input = item["require_user_input"]
-                artifact = None
-                message = None
-
-                # Create parts list based on response content
-                parts = []
-
-                # Add text part
-                parts.append(TextPart(type="text", text=item["content"]))
-
-                # Add data part if we have structured data
-                if "contact_info" in item:
-                    parts.append(
-                        DataPart(type="data", data=item["contact_info"].model_dump())
-                    )
-
-                end_stream = False
-
-                if not is_task_complete and not require_user_input:
-                    task_state = TaskState.WORKING
-                    message = Message(role="agent", parts=parts)
-                elif require_user_input:
-                    task_state = TaskState.INPUT_REQUIRED
-                    message = Message(role="agent", parts=parts)
-                    end_stream = True
-                else:
-                    task_state = TaskState.COMPLETED
-                    artifact = Artifact(parts=parts, index=0, append=False)
-                    end_stream = True
-
-                task_status = TaskStatus(state=task_state, message=message)
-                latest_task = await self.update_store(
-                    task_send_params.id,
-                    task_status,
-                    [] if artifact is None else [artifact],
-                )
-                await self.send_task_notification(latest_task)
-
-                if artifact:
-                    task_artifact_update_event = TaskArtifactUpdateEvent(
-                        id=task_send_params.id, artifact=artifact
-                    )
-                    await self.enqueue_events_for_sse(
-                        task_send_params.id, task_artifact_update_event
-                    )
-
-                task_update_event = TaskStatusUpdateEvent(
-                    id=task_send_params.id, status=task_status, final=end_stream
-                )
-                await self.enqueue_events_for_sse(
-                    task_send_params.id, task_update_event
-                )
-
-        except Exception as e:
-            logger.error(f"An error occurred while streaming the response: {e}")
+            initial_status = TaskStatus(
+                state=TaskState.WORKING,
+                message=Message(
+                    role="agent", parts=[TextPart(text="Analyzing your text...")]
+                ),
+            )
+            await self.update_store(task_send_params.id, initial_status, [])
             await self.enqueue_events_for_sse(
                 task_send_params.id,
-                InternalError(
-                    message=f"An error occurred while streaming the response: {e}"
+                TaskStatusUpdateEvent(
+                    id=task_send_params.id, status=initial_status, final=False
+                ),
+            )
+
+            agent_outcome = await self.agent.invoke(query, task_send_params.sessionId)
+
+            final_task_status, final_artifacts = self._parse_agent_outcome(
+                agent_outcome
+            )
+
+            latest_task = await self.update_store(
+                task_send_params.id,
+                final_task_status,
+                final_artifacts,
+            )
+            await self.send_task_notification(latest_task)
+
+            # Enqueue artifact events first (if any)
+            for artifact in final_artifacts:
+                await self.enqueue_events_for_sse(
+                    task_send_params.id,
+                    TaskArtifactUpdateEvent(id=task_send_params.id, artifact=artifact),
+                )
+
+            # Enqueue the final status update event (marking stream end)
+            await self.enqueue_events_for_sse(
+                task_send_params.id,
+                TaskStatusUpdateEvent(
+                    id=task_send_params.id, status=final_task_status, final=True
+                ),
+            )
+
+        except Exception as e:
+            logger.error(
+                f"Error during streaming agent execution: {e}\n{traceback.format_exc()}"
+            )
+            fail_status = TaskStatus(
+                state=TaskState.FAILED,
+                message=Message(
+                    role="agent",
+                    parts=[TextPart(text=f"An internal error occurred: {e}")],
+                ),
+            )
+            failed_task = None
+            try:
+                await self.update_store(task_send_params.id, fail_status, [])
+                failed_task = await self.get_task(task_send_params.id)  # type: ignore
+            except Exception as update_err:
+                logger.error(
+                    f"Failed to update task store to FAILED state: {update_err}"
+                )
+
+            if failed_task:
+                await self.send_task_notification(failed_task)
+
+            await self.enqueue_events_for_sse(
+                task_send_params.id,
+                InternalError(message=f"An error occurred during agent execution: {e}"),
+            )
+            await self.enqueue_events_for_sse(
+                task_send_params.id,
+                TaskStatusUpdateEvent(
+                    id=task_send_params.id, status=fail_status, final=True
                 ),
             )
 
     def _validate_request(
-        self, request: Union[SendTaskRequest, SendTaskStreamingRequest]
+        self, request: SendTaskRequest | SendTaskStreamingRequest
     ) -> JSONRPCResponse | None:
         task_send_params: TaskSendParams = request.params
         if task_send_params.acceptedOutputModes and not utils.are_modalities_compatible(
@@ -163,7 +216,7 @@ class AgentTaskManager(InMemoryTaskManager):
         task_send_params: TaskSendParams = request.params
         query = self._get_user_query(task_send_params)
         try:
-            agent_response = self.agent.invoke(query, task_send_params.sessionId)
+            agent_response = await self.agent.invoke(query, task_send_params.sessionId)
         except Exception as e:
             logger.error(f"Error invoking agent: {e}")
             raise ValueError(f"Error invoking agent: {e}")
@@ -174,8 +227,7 @@ class AgentTaskManager(InMemoryTaskManager):
         self, request: SendTaskStreamingRequest
     ) -> AsyncIterable[SendTaskStreamingResponse] | JSONRPCResponse:
         try:
-            error = self._validate_request(request)
-            if error:
+            if error := self._validate_request(request):
                 return error
 
             await self.upsert_task(request.params)
@@ -196,11 +248,11 @@ class AgentTaskManager(InMemoryTaskManager):
 
             asyncio.create_task(self._run_streaming_agent(request))
 
-            return self.dequeue_events_for_sse(
+            return self.dequeue_events_for_sse(  # type: ignore
                 request.id, task_send_params.id, sse_event_queue
             )
         except Exception as e:
-            logger.error(f"Error in SSE stream: {e}")
+            logger.error(f"Error in SSE stream setup/dequeuing: {e}")
             print(traceback.format_exc())
             return JSONRPCResponse(
                 id=request.id,
@@ -217,33 +269,9 @@ class AgentTaskManager(InMemoryTaskManager):
         task_id = task_send_params.id
         history_length = task_send_params.historyLength
 
-        # Create parts list based on response content
-        parts = []
+        task_status, artifacts = self._parse_agent_outcome(agent_response)
 
-        # Add text part
-        parts.append(TextPart(type="text", text=agent_response["content"]))
-
-        # Add data part if we have structured data
-        if "contact_info" in agent_response:
-            parts.append(
-                DataPart(type="data", data=agent_response["contact_info"].model_dump())
-            )
-
-        task_status = None
-        artifact = None
-
-        if agent_response["require_user_input"]:
-            task_status = TaskStatus(
-                state=TaskState.INPUT_REQUIRED,
-                message=Message(role="agent", parts=parts),
-            )
-        else:
-            task_status = TaskStatus(state=TaskState.COMPLETED)
-            artifact = Artifact(parts=parts)
-
-        task = await self.update_store(
-            task_id, task_status, [] if artifact is None else [artifact]
-        )
+        task = await self.update_store(task_id, task_status, artifacts)
         task_result = self.append_task_history(task, history_length)
         await self.send_task_notification(task)
         return SendTaskResponse(id=request.id, result=task_result)
@@ -271,7 +299,7 @@ class AgentTaskManager(InMemoryTaskManager):
         task_id_params: TaskIdParams = request.params
         try:
             sse_event_queue = await self.setup_sse_consumer(task_id_params.id, True)
-            return self.dequeue_events_for_sse(
+            return self.dequeue_events_for_sse(  # type: ignore
                 request.id, task_id_params.id, sse_event_queue
             )
         except Exception as e:
@@ -286,11 +314,9 @@ class AgentTaskManager(InMemoryTaskManager):
     async def set_push_notification_info(
         self, task_id: str, push_notification_config: PushNotificationConfig
     ):
-        # Verify the ownership of notification URL by issuing a challenge request.
-        is_verified = await self.notification_sender_auth.verify_push_notification_url(
+        if not await self.notification_sender_auth.verify_push_notification_url(
             push_notification_config.url
-        )
-        if not is_verified:
+        ):
             return False
 
         await super().set_push_notification_info(task_id, push_notification_config)
