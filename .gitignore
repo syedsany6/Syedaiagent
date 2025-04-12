@@ -1,5 +1,6 @@
 .DS_Store
 __pycache__
+.env
 
 # Go specific
 *.exe
@@ -10,3 +11,4 @@ __pycache__
 *.test
 *.out
 go.work
+

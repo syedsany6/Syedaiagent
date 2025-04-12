@@ -17,7 +17,7 @@ class StateConversation:
 
 @dataclass
 class StateMessage:
-  """StateMessage provdes mesop state compliant view of a message"""
+  """StateMessage provides mesop state compliant view of a message"""
   message_id: str = ""
   role: str = ""
   # Each content entry is a content, media type pair.
@@ -65,6 +65,7 @@ class AppState:
   completed_forms: dict[str, dict[str, Any] | None] = dataclasses.field(default_factory=dict)
   # This is used to track the message sent to agent with form data
   form_responses: dict[str, str] = dataclasses.field(default_factory=dict)
+  polling_interval: int = 1
 
 @me.stateclass
 class SettingsState:
