@@ -4,7 +4,7 @@
     他の言語で表示:
     <a href="README.md">English</a> |
     <a href="README.ko.md">한국어 (Korean)</a> |
-    <a href="README.zh.md">中文 (Chinese)</a>
+    <a href="README.cn.md">中文 (Chinese)</a>
 </p>
 
 **_不透明なエージェントアプリケーション間の通信と相互運用性を可能にするオープンプロトコル_**

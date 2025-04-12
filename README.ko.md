@@ -4,7 +4,7 @@
     다른 언어로 보기:
     <a href="README.md">English</a> |
     <a href="README.ja.md">日本語 (Japanese)</a> |
-    <a href="README.zh.md">中文 (Chinese)</a>
+    <a href="README.cn.md">中文 (Chinese)</a>
 </p>
 
 **_불투명한 에이전트 애플리케이션 간의 통신과 상호 운용성을 가능하게 하는 오픈 프로토콜_**
