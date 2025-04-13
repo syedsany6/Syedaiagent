@@ -1,6 +1,9 @@
 import tomllib
 from pathlib import Path
 
+from utils import constants
+
+
 def get_project_root() -> Path:
     """Get the project root directory"""
     return Path(__file__).resolve().parent.parent
@@ -23,10 +26,10 @@ class Config:
         raise FileNotFoundError("No configuration file found in config directory")
 
     def _load_initial_config(self):
-        config_path = self._get_config_path()
+        config_path = Config._get_config_path()
         with config_path.open("rb") as f:
             raw_config = tomllib.load(f)
-        base_remote_agent_addresses = raw_config.get("remote_agent_addresses", {})
+        base_remote_agent_addresses = raw_config.get(constants.REMOTE_AGENT_ADDRESSES_KEY, {})
         self.address = list(base_remote_agent_addresses.values())
 
     @property
