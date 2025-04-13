@@ -1,7 +1,7 @@
 # A2A Protocol Extension: Knowledge Graph Collaboration
 
 
-![image info](images/A2A_kg_extension_banner.png)
+![Banner Image](images/A2A_kg_extension_banner.png)
 
 **Version:** 1.0 (Draft) 13/04/2025
 

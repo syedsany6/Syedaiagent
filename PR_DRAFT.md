@@ -1,6 +1,6 @@
 # Feature: Add Knowledge Graph Collaboration Extension to A2A Protocol
 
----
+![Banner Image](images/A2A_kg_extension_banner.png)
 
 ## **Context & Motivation:**
 
@@ -174,14 +174,12 @@ sequenceDiagram
 
 ---
 
-## Alignment & Compliance
-
-This extension is designed with strong safety and compliance principles in mind:
+## Reasoning, Safety & Compliance
 
 *   **Cognitive Mapping & Symbolic Reasoning:** Directly supports representing and sharing the symbolic relationships modeled in cognitive maps and latent spaces.
+*   **Multi-Agent Reasoning:** Provides the foundation for shared understanding needed for complex collaborative reasoning.  
 *   **Secure Collaboration:** `metadata` fields allow secure context passing; update verification enforces rules.
 *   **Alignment & Auditability:** `provenance`, `certainty`, `justification`, and `verificationStatus` fields support verifiable and aligned AI behavior.
-*   **Multi-Agent Reasoning:** Provides the foundation for shared understanding needed for complex collaborative reasoning.
 
 ## Benefits
 
@@ -195,7 +193,11 @@ This extension is designed with strong safety and compliance principles in mind:
 
 ## Next Steps
 
+- Updating the JS samples.
 - Updating the demo UI code to include a KG-driven workflow.
 - Implementing agents will require integrating KG storage (e.g., RDFLib, GraphDB, Neo4j) and a GraphQL engine (e.g., Ariadne, Graphene) into the A2A server implementation.
+
+## Docs
+[KNOWLEDGE GRAPH EXTENSION README](KNOWLEDGE_GRAPH_EXTENSION.md)
 
 ---

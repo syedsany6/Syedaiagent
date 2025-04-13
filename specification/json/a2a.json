@@ -2458,7 +2458,7 @@
             },
              "verificationStatus": {
                 "title": "VerificationStatus",
-                "description": "Optional status regarding the verification of the update against alignment rules (CO-FORM).",
+                "description": "Optional status regarding the verification of the update against alignment rules.",
                 "anyOf": [ { "type": "string" }, { "type": "null" } ],
                 "default": null,
                 "examples": ["Verified", "Pending Review", "Rejected - Constraint Violation"]
