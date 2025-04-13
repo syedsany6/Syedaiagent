@@ -1,14 +1,16 @@
-# Feature: Add Knowledge Graph Collaboration Extension to A2A Protocol
+# Feature: Adding Knowledge Graph Collaboration Extension to the A2A Protocol
 
 ![Banner Image](images/A2A_kg_extension_banner.png)
 
 ## **Context & Motivation:**
 
-This PR introduces a major extension to the A2A protocol enabling agents to interact with each other's Knowledge Graphs (KGs). Advanced agentic collaboration also requires sharing and querying operational knowledge in a safe and verifiable way. This extension provides standardized methods for KG query, update, and subscription, directly inspired by principles for enhanced reasoning, alignment, and multi-agent understanding. It prominently features support for GraphQL as the primary query language.
+This PR introduces a significant extension to the Agent-to-Agent (A2A) protocol, enabling agents to collaboratively build, query, and react to shared structured knowledge using Knowledge Graphs (KGs).
+Advanced agentic collaboration requires sharing and querying operational knowledge in a safe and verifiable way. This extension defines standardized methods for KG query, update, and subscription, providing enhanced protocol-level reasoning, alignment, and multi-agent understanding functionality. It prominently features support for GraphQL as the primary query language.
+
 
 ---
 
-## Conceptual Flow
+## Client-Server Conceptual Flow
 
 ```mermaid
 sequenceDiagram
@@ -30,6 +32,60 @@ sequenceDiagram
 
 ```
 
+## Peer-to-Peer Conceptual Flow
+
+```mermaid
+sequenceDiagram
+    title A2A P2P Knowledge Graph Collaboration Example
+
+    participant AgentA as 💡 Agent A
+    participant AgentB as 🧩 Agent B
+    participant AgentC as 🌍 Agent C
+
+    Note over AgentA, AgentC: Agents collaborating on 'Task T'
+
+    %% --- Agent A needs context from Agent B ---
+    AgentA ->>+ AgentB: knowledge/query <br/> query: "{ task(id: 'T') { context } }"
+    activate AgentB
+    Note over AgentB: Queries internal KG for Task T context
+    AgentB ->>- AgentA: Response <br/> result: { "data": { "task": { "context": "Initial details..." } } }
+    deactivate AgentB
+
+    %% --- Agent C discovers new relevant info and shares it with peers ---
+    Note over AgentC: Discovers Fact F relevant to Task T
+    AgentC ->>+ AgentA: knowledge/update <br/> mutations: [ {op: "add", statement: <Fact F related to T>} ], <br/> sourceAgentId: "AgentC", taskId: "T"
+    activate AgentA
+    AgentA -->> AgentA: Verify & Integrate Fact F
+    AgentA ->>- AgentC: Response <br/> result: { success: true, verificationStatus: "Verified" }
+    deactivate AgentA
+
+    AgentC ->>+ AgentB: knowledge/update <br/> mutations: [ {op: "add", statement: <Fact F related to T>} ], <br/> sourceAgentId: "AgentC", taskId: "T"
+    activate AgentB
+    AgentB -->> AgentB: Verify & Integrate Fact F
+    AgentB ->>- AgentC: Response <br/> result: { success: true, verificationStatus: "Verified" }
+    deactivate AgentB
+
+    %% --- Agent B was subscribing to changes related to Task T from Agent A ---
+    Note over AgentA, AgentB: Agent B previously subscribed to Agent A <br/> for updates related to Task T
+
+    activate AgentA
+    Note over AgentA: Integrating Fact F triggers subscription event
+    AgentA -->> AgentB: SSE Stream: KnowledgeSubscriptionEvent <br/> result: { op: "add", statement: <Fact F related to T> }
+    deactivate AgentA
+
+    %% --- Agent B reacts to the update and queries Agent C for details ---
+    activate AgentB
+    Note over AgentB: Processes Fact F via subscription, needs clarification
+    AgentB ->>+ AgentC: knowledge/query <br/> query: "{ factDetails(id: 'Fact F ID') { sourceCertainty } }"
+    activate AgentC
+    Note over AgentC: Provides details based on its observation
+    AgentC ->>- AgentB: Response <br/> result: { "data": { "factDetails": { "sourceCertainty": 0.9 } } }
+    deactivate AgentC
+    deactivate AgentB
+
+    Note over AgentA, AgentC: Collaboration on Task T continues...
+
+```
 ---
 
 ## **Description of Changes:**
@@ -125,58 +181,9 @@ This extension introduces a new `knowledge/` namespace with methods that allow a
 
 ---
 
-## Example Workflow
-
-```mermaid
-sequenceDiagram
-    title A2A Knowledge Graph Collaboration Example
-
-    participant AgentA as 🧠 Agent A <br/> (Researcher)
-    participant AgentB as 📚 Agent B <br/> (KG Custodian/Verifier)
-    participant AgentC as 👀 Agent C <br/> (Field Reporter)
-
-    %% --- Phase 1: Querying Existing Knowledge ---
-    Note over AgentA: Needs info on ongoing projects
-    AgentA ->>+ AgentB: knowledge/query <br/> query: "{ projects(status: \"active\") { id name } }"
-    activate AgentB
-    Note over AgentB: Processes GraphQL query <br/> Checks Agent A's permissions
-    AgentB ->>- AgentA: Response <br/> result: { "data": { "projects": [{"id": "proj-1", "name": "Project Phoenix"}] } }
-    deactivate AgentB
-
-    %% --- Phase 2: Adding New Knowledge ---
-    Note over AgentC: Observes project completion
-    AgentC ->>+ AgentB: knowledge/update <br/> mutations: [ {op: "add", statement: {subj: "proj-1", pred: "hasStatus", obj: "Completed", certainty: 0.95}} ], <br/> justification: "Field observation confirmed completion", sourceAgentId: "AgentC"
-    activate AgentB
-    Note over AgentB: Verifies update against <br/> Alignment Manifest (e.g., source trust, data consistency)
-    AgentB -->> AgentB: Internal KG Update
-    AgentB ->>- AgentC: Response <br/> result: { success: true, verificationStatus: "Verified" }
-    deactivate AgentB
-
-    %% --- Phase 3: Subscription and Notification ---
-    Note left of AgentA: Had previously subscribed to project status changes <br/> via knowledge/subscribe query targeting 'hasStatus' predicate <br/> for projects it has access to.
-
-    activate AgentB
-    Note over AgentB: KG change triggers notification <br/> for Agent A's active subscription
-    AgentB -->> AgentA: SSE Stream: KnowledgeSubscriptionEvent <br/> result: { op: "add", statement: {subj: "proj-1", pred: "hasStatus", obj: "Completed", certainty: 0.95}, changeId: "uuid-...", timestamp: "..." }
-    deactivate AgentB
-
-    %% --- Phase 4: Reacting to New Knowledge ---
-    activate AgentA
-    Note over AgentA: Processes received update <br/> Decides to fetch final report artifact ID
-    AgentA ->>+ AgentB: knowledge/query <br/> query: "{ project(id: \"proj-1\") { finalReport { artifactId } } }"
-    activate AgentB
-    Note over AgentB: Processes query
-    AgentB ->>- AgentA: Response <br/> result: { "data": { "project": { "finalReport": { "artifactId": "artifact-xyz" } } } }
-    deactivate AgentB
-    deactivate AgentA
-    Note over AgentA: Can now use tasks/get to retrieve artifact-xyz
-```
-
----
-
 ## Reasoning, Safety & Compliance
 
-*   **Cognitive Mapping & Symbolic Reasoning:** Directly supports representing and sharing the symbolic relationships modeled in cognitive maps and latent spaces.
+*   **Cognitive Mapping & Symbolic Reasoning:** Directly supports representing and sharing the symbolic relationships modeled in knowledge bases, cognitive maps, and structured / discrete latent spaces.
 *   **Multi-Agent Reasoning:** Provides the foundation for shared understanding needed for complex collaborative reasoning.  
 *   **Secure Collaboration:** `metadata` fields allow secure context passing; update verification enforces rules.
 *   **Alignment & Auditability:** `provenance`, `certainty`, `justification`, and `verificationStatus` fields support verifiable and aligned AI behavior.

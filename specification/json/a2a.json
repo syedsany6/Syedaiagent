@@ -58,14 +58,17 @@
           "type": "boolean"
         },
         "knowledgeGraphQueryLanguages": {
-            "items": {
-                "type": "string",
-                "enum": ["graphql", "sparql"]
-            },
-            "title": "KnowledgeGraphQueryLanguages",
-            "description": "List of query languages supported for knowledge graph interactions (e.g., 'graphql', 'sparql').",
-            "type": "array",
-            "default": []
+          "items": {
+            "type": "string",
+            "enum": [
+              "graphql",
+              "sparql"
+            ]
+          },
+          "title": "KnowledgeGraphQueryLanguages",
+          "description": "List of query languages supported for knowledge graph interactions (e.g., 'graphql', 'sparql').",
+          "type": "array",
+          "default": []
         }
       },
       "title": "AgentCapabilities",
@@ -1266,7 +1269,9 @@
       ],
       "title": "Part",
       "description": "Represents a distinct piece of content within a Message or Artifact. Use 'type' field to discriminate.",
-       "discriminator": { "propertyName": "type" }
+      "discriminator": {
+        "propertyName": "type"
+      }
     },
     "SendTaskRequest": {
       "properties": {
@@ -1580,22 +1585,22 @@
           "default": null,
           "title": "Artifacts"
         },
-         "history": {
-           "anyOf": [
-             {
-               "items": {
-                 "$ref": "#/$defs/Message"
-               },
-               "type": "array"
-             },
-             {
-               "type": "null"
-             }
-           ],
-           "default": null,
-           "title": "History",
-           "description": "Sequence of messages exchanged during the task execution. May be truncated."
-         },
+        "history": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Message"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "History",
+          "description": "Sequence of messages exchanged during the task execution. May be truncated."
+        },
         "metadata": {
           "anyOf": [
             {
@@ -1821,7 +1826,7 @@
           ],
           "default": null,
           "title": "HistoryLength",
-           "description": "Maximum number of historical messages to include in the task response. If null or 0, history is omitted."
+          "description": "Maximum number of historical messages to include in the task response. If null or 0, history is omitted."
         },
         "metadata": {
           "anyOf": [
@@ -1873,7 +1878,7 @@
             }
           ],
           "default": null,
-           "description": "Optional message associated with this status update (e.g., agent response, error message)."
+          "description": "Optional message associated with this status update (e.g., agent response, error message)."
         },
         "timestamp": {
           "format": "date-time",
@@ -1971,7 +1976,7 @@
         "id": {
           "title": "Id",
           "type": "string",
-           "description": "The ID of the task this artifact belongs to."
+          "description": "The ID of the task this artifact belongs to."
         },
         "artifact": {
           "$ref": "#/$defs/Artifact"
@@ -2106,470 +2111,1013 @@
       "title": "ContentTypeNotSupportedError",
       "type": "object"
     },
-
     "KGSubject": {
-        "title": "KGSubject",
-        "description": "Represents the subject of a Knowledge Graph statement.",
-        "type": "object",
-        "properties": {
-            "id": {
-                "title": "Id",
-                "description": "URI or unique identifier for the subject.",
-                "type": "string"
-            },
-            "type": {
-                "title": "Type",
-                "description": "Optional URI representing the type of the subject.",
-                "anyOf": [ { "type": "string", "format": "uri" }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KGSubject",
+      "description": "Represents the subject of a Knowledge Graph statement.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "description": "URI or unique identifier for the subject.",
+          "type": "string"
         },
-        "required": ["id"]
+        "type": {
+          "title": "Type",
+          "description": "Optional URI representing the type of the subject.",
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
     },
     "KGPredicate": {
-        "title": "KGPredicate",
-        "description": "Represents the predicate (relationship) of a Knowledge Graph statement.",
-        "type": "object",
-        "properties": {
-            "id": {
-                "title": "Id",
-                "description": "URI representing the type of the predicate/relationship.",
-                "type": "string",
-                "format": "uri"
-            }
-        },
-        "required": ["id"]
+      "title": "KGPredicate",
+      "description": "Represents the predicate (relationship) of a Knowledge Graph statement.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "description": "URI representing the type of the predicate/relationship.",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id"
+      ]
     },
     "KGObject": {
-        "title": "KGObject",
-        "description": "Represents the object of a Knowledge Graph statement, which can be another node (resource) or a literal value. Enforces that either 'id' or 'value' must be present, but not both (logic implemented in application based on Pydantic validator).",
-        "type": "object",
-        "properties": {
-            "id": {
-                "title": "Id",
-                "description": "URI or unique identifier if the object is a resource/node.",
-                 "anyOf": [ { "type": "string", "format": "uri" }, { "type": "null" } ],
-                "default": null
+      "title": "KGObject",
+      "description": "Represents the object of a Knowledge Graph statement, which can be another node (resource) or a literal value. Enforces that either 'id' or 'value' must be present, but not both (logic implemented in application based on Pydantic validator).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "description": "URI or unique identifier if the object is a resource/node.",
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
             },
-            "value": {
-                "title": "Value",
-                "description": "The literal value if the object is an attribute (e.g., string, number, boolean).",
-                "anyOf": [
-                    { "type": "string" },
-                    { "type": "number" },
-                    { "type": "boolean" },
-                    { "type": "null" }
-                ],
-                 "default": null
-            },
-            "type": {
-                "title": "Type",
-                "description": "Optional URI representing the type of the object node (if 'id' is present) or the literal datatype (if 'value' is present, e.g., xsd:string, xsd:integer).",
-                "anyOf": [ { "type": "string", "format": "uri" }, { "type": "null" } ],
-                "default": null
+            {
+              "type": "null"
             }
+          ],
+          "default": null
         },
-        "oneOf": [
-            { "required": ["id"] },
-            { "required": ["value"] }
-        ]
+        "value": {
+          "title": "Value",
+          "description": "The literal value if the object is an attribute (e.g., string, number, boolean).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "title": "Type",
+          "description": "Optional URI representing the type of the object node (if 'id' is present) or the literal datatype (if 'value' is present, e.g., xsd:string, xsd:integer).",
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "value"
+          ]
+        }
+      ]
     },
     "KGStatement": {
-        "title": "KGStatement",
-        "description": "Represents a single Knowledge Graph statement (triple).",
-        "type": "object",
-        "properties": {
-            "subject": { "$ref": "#/$defs/KGSubject" },
-            "predicate": { "$ref": "#/$defs/KGPredicate" },
-            "object": { "$ref": "#/$defs/KGObject" },
-            "graph": {
-                "title": "Graph",
-                "description": "Optional named graph URI this statement belongs to.",
-                "anyOf": [ { "type": "string", "format": "uri" }, { "type": "null" } ],
-                "default": null
-            },
-            "certainty": {
-                "title": "Certainty",
-                "description": "Optional certainty score (0.0 to 1.0) associated with this statement.",
-                "anyOf": [ { "type": "number", "minimum": 0.0, "maximum": 1.0 }, { "type": "null" } ],
-                "default": null
-            },
-            "provenance": {
-                "title": "Provenance",
-                "description": "Optional metadata about the source or origin of this statement (e.g., source agent ID, timestamp).",
-                "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KGStatement",
+      "description": "Represents a single Knowledge Graph statement (triple).",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/KGSubject"
         },
-        "required": ["subject", "predicate", "object"]
+        "predicate": {
+          "$ref": "#/$defs/KGPredicate"
+        },
+        "object": {
+          "$ref": "#/$defs/KGObject"
+        },
+        "graph": {
+          "title": "Graph",
+          "description": "Optional named graph URI this statement belongs to.",
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "certainty": {
+          "title": "Certainty",
+          "description": "Optional certainty score (0.0 to 1.0) associated with this statement.",
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "title": "Provenance",
+          "description": "Optional metadata about the source or origin of this statement (e.g., source agent ID, timestamp).",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "subject",
+        "predicate",
+        "object"
+      ]
     },
     "PatchOperationType": {
-        "title": "PatchOperationType",
-        "description": "Defines the type of operation in a knowledge graph patch.",
-        "type": "string",
-        "enum": ["add", "remove", "replace"]
+      "title": "PatchOperationType",
+      "description": "Defines the type of operation in a knowledge graph patch.",
+      "type": "string",
+      "enum": [
+        "add",
+        "remove",
+        "replace"
+      ]
     },
     "KnowledgeGraphPatch": {
-        "title": "KnowledgeGraphPatch",
-        "description": "Represents a single proposed change (add, remove, replace) to a knowledge graph.",
-        "type": "object",
-        "properties": {
-            "op": { "$ref": "#/$defs/PatchOperationType" },
-            "statement": { "$ref": "#/$defs/KGStatement" }
+      "title": "KnowledgeGraphPatch",
+      "description": "Represents a single proposed change (add, remove, replace) to a knowledge graph.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "$ref": "#/$defs/PatchOperationType"
         },
-        "required": ["op", "statement"]
+        "statement": {
+          "$ref": "#/$defs/KGStatement"
+        }
+      },
+      "required": [
+        "op",
+        "statement"
+      ]
     },
     "KnowledgeQueryParams": {
-        "title": "KnowledgeQueryParams",
-        "description": "Parameters for the knowledge/query method.",
-        "type": "object",
-        "properties": {
-            "query": {
-                "title": "Query",
-                "description": "The query string (e.g., GraphQL query).",
-                "type": "string"
-            },
-            "queryLanguage": {
-                "title": "QueryLanguage",
-                "description": "Specifies the language of the query.",
-                "type": "string",
-                "enum": ["graphql"],
-                "default": "graphql"
-            },
-            "variables": {
-                "title": "Variables",
-                "description": "Optional dictionary of variables for the query (common in GraphQL).",
-                "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            },
-            "taskId": {
-                "title": "TaskId",
-                "description": "Optional ID linking this query to a specific task.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-            "sessionId": {
-                "title": "SessionId",
-                 "description": "Optional ID linking this query to a specific session.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-             "requiredCertainty": {
-                "title": "RequiredCertainty",
-                "description": "Optional minimum certainty score for results.",
-                "anyOf": [ { "type": "number", "minimum": 0.0, "maximum": 1.0 }, { "type": "null" } ],
-                "default": null
-            },
-            "maxAgeSeconds": {
-                "title": "MaxAgeSeconds",
-                "description": "Optional maximum age (in seconds) for the data considered.",
-                "anyOf": [ { "type": "integer", "minimum": 0 }, { "type": "null" } ],
-                "default": null
-            },
-             "metadata": {
-                "title": "Metadata",
-                "description": "Optional metadata, potentially including authentication tokens or alignment context.",
-                 "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KnowledgeQueryParams",
+      "description": "Parameters for the knowledge/query method.",
+      "type": "object",
+      "properties": {
+        "query": {
+          "title": "Query",
+          "description": "The query string (e.g., GraphQL query).",
+          "type": "string"
         },
-        "required": ["query", "queryLanguage"]
+        "queryLanguage": {
+          "title": "QueryLanguage",
+          "description": "Specifies the language of the query.",
+          "type": "string",
+          "enum": [
+            "graphql"
+          ],
+          "default": "graphql"
+        },
+        "variables": {
+          "title": "Variables",
+          "description": "Optional dictionary of variables for the query (common in GraphQL).",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "taskId": {
+          "title": "TaskId",
+          "description": "Optional ID linking this query to a specific task.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sessionId": {
+          "title": "SessionId",
+          "description": "Optional ID linking this query to a specific session.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "requiredCertainty": {
+          "title": "RequiredCertainty",
+          "description": "Optional minimum certainty score for results.",
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxAgeSeconds": {
+          "title": "MaxAgeSeconds",
+          "description": "Optional maximum age (in seconds) for the data considered.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metadata": {
+          "title": "Metadata",
+          "description": "Optional metadata, potentially including authentication tokens or alignment context.",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "query",
+        "queryLanguage"
+      ]
     },
-     "KnowledgeUpdateParams": {
-        "title": "KnowledgeUpdateParams",
-        "description": "Parameters for the knowledge/update method.",
-        "type": "object",
-        "properties": {
-            "mutations": {
-                "title": "Mutations",
-                "description": "A list of patch operations to apply to the knowledge graph.",
-                "type": "array",
-                "items": { "$ref": "#/$defs/KnowledgeGraphPatch" }
-            },
-             "taskId": {
-                "title": "TaskId",
-                 "description": "Optional ID linking this update to a specific task.",
-                 "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-             "sessionId": {
-                "title": "SessionId",
-                 "description": "Optional ID linking this update to a specific session.",
-                 "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-            "sourceAgentId": {
-                "title": "SourceAgentId",
-                "description": "Optional identifier of the agent proposing the update.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-             "justification": {
-                "title": "Justification",
-                "description": "Optional textual justification for the proposed update.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-             "metadata": {
-                "title": "Metadata",
-                "description": "Optional metadata, potentially including authentication tokens or alignment context.",
-                 "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            }
+    "KnowledgeUpdateParams": {
+      "title": "KnowledgeUpdateParams",
+      "description": "Parameters for the knowledge/update method.",
+      "type": "object",
+      "properties": {
+        "mutations": {
+          "title": "Mutations",
+          "description": "A list of patch operations to apply to the knowledge graph.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/KnowledgeGraphPatch"
+          }
         },
-        "required": ["mutations"]
+        "taskId": {
+          "title": "TaskId",
+          "description": "Optional ID linking this update to a specific task.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sessionId": {
+          "title": "SessionId",
+          "description": "Optional ID linking this update to a specific session.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sourceAgentId": {
+          "title": "SourceAgentId",
+          "description": "Optional identifier of the agent proposing the update.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "justification": {
+          "title": "Justification",
+          "description": "Optional textual justification for the proposed update.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metadata": {
+          "title": "Metadata",
+          "description": "Optional metadata, potentially including authentication tokens or alignment context.",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "mutations"
+      ]
     },
     "KnowledgeSubscribeParams": {
-        "title": "KnowledgeSubscribeParams",
-        "description": "Parameters for the knowledge/subscribe method.",
-        "type": "object",
-        "properties": {
-            "subscriptionQuery": {
-                "title": "SubscriptionQuery",
-                "description": "The query string for the subscription (e.g., GraphQL subscription).",
-                "type": "string"
-            },
-            "queryLanguage": {
-                "title": "QueryLanguage",
-                 "description": "Specifies the language of the subscription query.",
-                "type": "string",
-                "enum": ["graphql"],
-                "default": "graphql"
-            },
-            "variables": {
-                "title": "Variables",
-                "description": "Optional dictionary of variables for the subscription query.",
-                "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            },
-             "taskId": {
-                "title": "TaskId",
-                 "description": "Optional ID linking this subscription to a specific task.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-            "sessionId": {
-                "title": "SessionId",
-                "description": "Optional ID linking this subscription to a specific session.",
-                 "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            },
-             "metadata": {
-                "title": "Metadata",
-                "description": "Optional metadata, potentially including authentication tokens or alignment context.",
-                 "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KnowledgeSubscribeParams",
+      "description": "Parameters for the knowledge/subscribe method.",
+      "type": "object",
+      "properties": {
+        "subscriptionQuery": {
+          "title": "SubscriptionQuery",
+          "description": "The query string for the subscription (e.g., GraphQL subscription).",
+          "type": "string"
         },
-        "required": ["subscriptionQuery", "queryLanguage"]
+        "queryLanguage": {
+          "title": "QueryLanguage",
+          "description": "Specifies the language of the subscription query.",
+          "type": "string",
+          "enum": [
+            "graphql"
+          ],
+          "default": "graphql"
+        },
+        "variables": {
+          "title": "Variables",
+          "description": "Optional dictionary of variables for the subscription query.",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "taskId": {
+          "title": "TaskId",
+          "description": "Optional ID linking this subscription to a specific task.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sessionId": {
+          "title": "SessionId",
+          "description": "Optional ID linking this subscription to a specific session.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metadata": {
+          "title": "Metadata",
+          "description": "Optional metadata, potentially including authentication tokens or alignment context.",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "subscriptionQuery",
+        "queryLanguage"
+      ]
     },
     "KnowledgeQueryRequest": {
       "title": "KnowledgeQueryRequest",
       "description": "Request to query an agent's knowledge graph.",
       "properties": {
-        "jsonrpc": { "const": "2.0", "default": "2.0" },
-        "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] },
-        "method": { "const": "knowledge/query", "default": "knowledge/query" },
-        "params": { "$ref": "#/$defs/KnowledgeQueryParams" }
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "const": "knowledge/query",
+          "default": "knowledge/query"
+        },
+        "params": {
+          "$ref": "#/$defs/KnowledgeQueryParams"
+        }
       },
-      "required": [ "jsonrpc", "method", "params" ],
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
       "type": "object"
     },
     "KnowledgeUpdateRequest": {
       "title": "KnowledgeUpdateRequest",
       "description": "Request to propose updates to an agent's knowledge graph.",
       "properties": {
-        "jsonrpc": { "const": "2.0", "default": "2.0" },
-        "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] },
-        "method": { "const": "knowledge/update", "default": "knowledge/update" },
-        "params": { "$ref": "#/$defs/KnowledgeUpdateParams" }
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "const": "knowledge/update",
+          "default": "knowledge/update"
+        },
+        "params": {
+          "$ref": "#/$defs/KnowledgeUpdateParams"
+        }
       },
-      "required": [ "jsonrpc", "method", "params" ],
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
       "type": "object"
     },
     "KnowledgeSubscribeRequest": {
       "title": "KnowledgeSubscribeRequest",
       "description": "Request to subscribe to changes in an agent's knowledge graph.",
       "properties": {
-        "jsonrpc": { "const": "2.0", "default": "2.0" },
-        "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] },
-        "method": { "const": "knowledge/subscribe", "default": "knowledge/subscribe" },
-        "params": { "$ref": "#/$defs/KnowledgeSubscribeParams" }
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "const": "knowledge/subscribe",
+          "default": "knowledge/subscribe"
+        },
+        "params": {
+          "$ref": "#/$defs/KnowledgeSubscribeParams"
+        }
       },
-      "required": [ "jsonrpc", "method", "params" ],
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
       "type": "object"
     },
-     "KnowledgeQueryResponseResult": {
-        "title": "KnowledgeQueryResponseResult",
-        "description": "Result structure for a knowledge query.",
-        "type": "object",
-        "properties": {
-            "data": {
-                "title": "Data",
-                "description": "The result data from the query execution, typically matching the structure requested in the GraphQL query (can be an object or array).",
-                "anyOf": [
-                    { "type": "object", "additionalProperties": {} },
-                    { "type": "array", "items": {} },
-                    { "type": "null"}
-                 ],
-                 "default": null
+    "KnowledgeQueryResponseResult": {
+      "title": "KnowledgeQueryResponseResult",
+      "description": "Result structure for a knowledge query.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "title": "Data",
+          "description": "The result data from the query execution, typically matching the structure requested in the GraphQL query (can be an object or array).",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
             },
-            "queryMetadata": {
-                "title": "QueryMetadata",
-                "description": "Optional metadata about the query execution (e.g., sources consulted, execution time, certainty aggregation).",
-                "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
+            {
+              "type": "array",
+              "items": {}
+            },
+            {
+              "type": "null"
             }
+          ],
+          "default": null
+        },
+        "queryMetadata": {
+          "title": "QueryMetadata",
+          "description": "Optional metadata about the query execution (e.g., sources consulted, execution time, certainty aggregation).",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
+      }
     },
     "KnowledgeQueryResponse": {
-        "title": "KnowledgeQueryResponse",
-        "description": "Response to a knowledge/query request.",
-        "type": "object",
-        "properties": {
-          "jsonrpc": { "const": "2.0", "default": "2.0" },
-          "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] },
-          "result": { "anyOf": [ { "$ref": "#/$defs/KnowledgeQueryResponseResult" }, { "type": "null" } ], "default": null },
-          "error": { "anyOf": [ { "$ref": "#/$defs/JSONRPCError" }, { "type": "null" } ], "default": null }
+      "title": "KnowledgeQueryResponse",
+      "description": "Response to a knowledge/query request.",
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
         },
-        "required": [ "jsonrpc" ]
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KnowledgeQueryResponseResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JSONRPCError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "jsonrpc"
+      ]
     },
     "KnowledgeUpdateResponseResult": {
-        "title": "KnowledgeUpdateResponseResult",
-        "description": "Result structure for a knowledge update operation.",
-        "type": "object",
-        "properties": {
-            "success": {
-                "title": "Success",
-                "description": "Indicates if the update operation was accepted and applied (at least provisionally).",
-                "type": "boolean"
-            },
-            "statementsAffected": {
-                "title": "StatementsAffected",
-                "description": "Optional count of how many statements were added or removed.",
-                "anyOf": [ { "type": "integer", "minimum": 0 }, { "type": "null" } ],
-                "default": null
-            },
-            "affectedIds": {
-                "title": "AffectedIds",
-                "description": "Optional list of URIs or identifiers of entities created or modified by the update.",
-                "anyOf": [ { "type": "array", "items": { "type": "string" } }, { "type": "null" } ],
-                "default": null
-            },
-             "verificationStatus": {
-                "title": "VerificationStatus",
-                "description": "Optional status regarding the verification of the update against alignment rules.",
-                "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null,
-                "examples": ["Verified", "Pending Review", "Rejected - Constraint Violation"]
-            },
-            "verificationDetails": {
-                "title": "VerificationDetails",
-                "description": "Optional details explaining the verification status.",
-                 "anyOf": [ { "type": "string" }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KnowledgeUpdateResponseResult",
+      "description": "Result structure for a knowledge update operation.",
+      "type": "object",
+      "properties": {
+        "success": {
+          "title": "Success",
+          "description": "Indicates if the update operation was accepted and applied (at least provisionally).",
+          "type": "boolean"
         },
-        "required": ["success"]
+        "statementsAffected": {
+          "title": "StatementsAffected",
+          "description": "Optional count of how many statements were added or removed.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "affectedIds": {
+          "title": "AffectedIds",
+          "description": "Optional list of URIs or identifiers of entities created or modified by the update.",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verificationStatus": {
+          "title": "VerificationStatus",
+          "description": "Optional status regarding the verification of the update against alignment rules.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "examples": [
+            "Verified",
+            "Pending Review",
+            "Rejected - Constraint Violation"
+          ]
+        },
+        "verificationDetails": {
+          "title": "VerificationDetails",
+          "description": "Optional details explaining the verification status.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "success"
+      ]
     },
     "KnowledgeUpdateResponse": {
-        "title": "KnowledgeUpdateResponse",
-        "description": "Response to a knowledge/update request.",
-        "type": "object",
-        "properties": {
-          "jsonrpc": { "const": "2.0", "default": "2.0" },
-          "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] },
-          "result": { "anyOf": [ { "$ref": "#/$defs/KnowledgeUpdateResponseResult" }, { "type": "null" } ], "default": null },
-          "error": { "anyOf": [ { "$ref": "#/$defs/JSONRPCError" }, { "type": "null" } ], "default": null }
+      "title": "KnowledgeUpdateResponse",
+      "description": "Response to a knowledge/update request.",
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
         },
-        "required": [ "jsonrpc" ]
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KnowledgeUpdateResponseResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JSONRPCError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "jsonrpc"
+      ]
     },
     "KnowledgeGraphChangeEvent": {
-        "title": "KnowledgeGraphChangeEvent",
-        "description": "Represents a confirmed change event in the knowledge graph, streamed for subscriptions.",
-        "type": "object",
-        "properties": {
-            "op": { "$ref": "#/$defs/PatchOperationType" },
-            "statement": { "$ref": "#/$defs/KGStatement" },
-            "changeId": {
-                "title": "ChangeId",
-                "description": "Unique identifier for this specific change event.",
-                "type": "string",
-                "format": "uuid"
-            },
-            "timestamp": {
-                "title": "Timestamp",
-                "description": "Timestamp when the change was confirmed (ISO 8601 format).",
-                "type": "string",
-                "format": "date-time"
-            },
-            "changeMetadata": {
-                "title": "ChangeMetadata",
-                "description": "Optional metadata about the confirmed change (e.g., who verified it, relation to a task).",
-                "anyOf": [ { "type": "object", "additionalProperties": {} }, { "type": "null" } ],
-                "default": null
-            }
+      "title": "KnowledgeGraphChangeEvent",
+      "description": "Represents a confirmed change event in the knowledge graph, streamed for subscriptions.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "$ref": "#/$defs/PatchOperationType"
         },
-        "required": ["op", "statement", "changeId", "timestamp"]
+        "statement": {
+          "$ref": "#/$defs/KGStatement"
+        },
+        "changeId": {
+          "title": "ChangeId",
+          "description": "Unique identifier for this specific change event.",
+          "type": "string",
+          "format": "uuid"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "description": "Timestamp when the change was confirmed (ISO 8601 format).",
+          "type": "string",
+          "format": "date-time"
+        },
+        "changeMetadata": {
+          "title": "ChangeMetadata",
+          "description": "Optional metadata about the confirmed change (e.g., who verified it, relation to a task).",
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "op",
+        "statement",
+        "changeId",
+        "timestamp"
+      ]
     },
     "KnowledgeSubscriptionEvent": {
-        "title": "KnowledgeSubscriptionEvent",
-        "description": "A single event message streamed as part of a knowledge/subscribe response.",
-        "type": "object",
-        "properties": {
-          "jsonrpc": { "const": "2.0", "default": "2.0" },
-          "id": { "anyOf": [ { "type": "integer" }, { "type": "string" }, { "type": "null" } ] , "description": "Corresponds to the ID of the original KnowledgeSubscribeRequest."},
-          "result": { "anyOf": [ { "$ref": "#/$defs/KnowledgeGraphChangeEvent" }, { "type": "null" } ], "default": null },
-          "error": { "anyOf": [ { "$ref": "#/$defs/JSONRPCError" }, { "type": "null" } ], "default": null , "description": "Errors can also be streamed if the subscription fails."}
+      "title": "KnowledgeSubscriptionEvent",
+      "description": "A single event message streamed as part of a knowledge/subscribe response.",
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0",
+          "default": "2.0"
         },
-        "required": [ "jsonrpc" ]
+        "id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Corresponds to the ID of the original KnowledgeSubscribeRequest."
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KnowledgeGraphChangeEvent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JSONRPCError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Errors can also be streamed if the subscription fails."
+        }
+      },
+      "required": [
+        "jsonrpc"
+      ]
     },
-
     "KnowledgeQueryError": {
-        "title": "KnowledgeQueryError",
-        "description": "Error specific to knowledge query failures.",
-        "type": "object",
-        "properties": {
-          "code": { "const": -32010, "default": -32010, "type": "integer" },
-          "message": { "type": "string", "default": "Knowledge query failed" },
-          "data": { "anyOf": [ {}, { "type": "null" } ], "default": null }
+      "title": "KnowledgeQueryError",
+      "description": "Error specific to knowledge query failures.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": -32010,
+          "default": -32010,
+          "type": "integer"
         },
-        "required": [ "code", "message" ]
+        "message": {
+          "type": "string",
+          "default": "Knowledge query failed"
+        },
+        "data": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
     },
     "KnowledgeUpdateError": {
-        "title": "KnowledgeUpdateError",
-        "description": "Error specific to knowledge update failures.",
-        "type": "object",
-        "properties": {
-          "code": { "const": -32011, "default": -32011, "type": "integer" },
-          "message": { "type": "string", "default": "Knowledge update failed (e.g., conflict, constraint violation)" },
-          "data": { "anyOf": [ {}, { "type": "null" } ], "default": null }
+      "title": "KnowledgeUpdateError",
+      "description": "Error specific to knowledge update failures.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": -32011,
+          "default": -32011,
+          "type": "integer"
         },
-        "required": [ "code", "message" ]
+        "message": {
+          "type": "string",
+          "default": "Knowledge update failed (e.g., conflict, constraint violation)"
+        },
+        "data": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
     },
     "KnowledgeSubscriptionError": {
-        "title": "KnowledgeSubscriptionError",
-        "description": "Error specific to knowledge subscription failures.",
-        "type": "object",
-        "properties": {
-          "code": { "const": -32012, "default": -32012, "type": "integer" },
-          "message": { "type": "string", "default": "Knowledge subscription failed" },
-          "data": { "anyOf": [ {}, { "type": "null" } ], "default": null }
+      "title": "KnowledgeSubscriptionError",
+      "description": "Error specific to knowledge subscription failures.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": -32012,
+          "default": -32012,
+          "type": "integer"
         },
-        "required": [ "code", "message" ]
-    },
-     "AlignmentViolationError": {
-        "title": "AlignmentViolationError",
-        "description": "Error indicating an operation violates alignment constraints.",
-        "type": "object",
-        "properties": {
-          "code": { "const": -32013, "default": -32013, "type": "integer" },
-          "message": { "type": "string", "default": "Operation violates alignment constraints" },
-          "data": { "anyOf": [ {}, { "type": "null" } ], "default": null, "description": "May contain details about the specific constraint violated." }
+        "message": {
+          "type": "string",
+          "default": "Knowledge subscription failed"
         },
-        "required": [ "code", "message" ]
+        "data": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
     },
-
+    "AlignmentViolationError": {
+      "title": "AlignmentViolationError",
+      "description": "Error indicating an operation violates alignment constraints.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": -32013,
+          "default": -32013,
+          "type": "integer"
+        },
+        "message": {
+          "type": "string",
+          "default": "Operation violates alignment constraints"
+        },
+        "data": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "May contain details about the specific constraint violated."
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
+    },
     "A2ARequest": {
       "oneOf": [
         {
@@ -2591,25 +3139,31 @@
           "$ref": "#/$defs/TaskResubscriptionRequest"
         },
         {
-            "$ref": "#/$defs/SendTaskStreamingRequest"
+          "$ref": "#/$defs/SendTaskStreamingRequest"
         },
         {
-            "$ref": "#/$defs/KnowledgeQueryRequest"
+          "$ref": "#/$defs/KnowledgeQueryRequest"
         },
         {
-            "$ref": "#/$defs/KnowledgeUpdateRequest"
+          "$ref": "#/$defs/KnowledgeUpdateRequest"
         },
         {
-            "$ref": "#/$defs/KnowledgeSubscribeRequest"
+          "$ref": "#/$defs/KnowledgeSubscribeRequest"
         }
       ],
       "title": "A2ARequest",
       "description": "Represents any valid A2A request message. Use 'method' field to discriminate.",
-      "discriminator": { "propertyName": "method" }
+      "discriminator": {
+        "propertyName": "method"
+      }
     }
   },
   "oneOf": [
-      { "$ref": "#/$defs/A2ARequest" },
-      { "$ref": "#/$defs/JSONRPCResponse"}
+    {
+      "$ref": "#/$defs/A2ARequest"
+    },
+    {
+      "$ref": "#/$defs/JSONRPCResponse"
+    }
   ]
 }
