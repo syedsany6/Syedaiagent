@@ -20,6 +20,36 @@ def chat_bubble(message: StateMessage, key: str):
     for pair in message.content:
       chat_box(pair[0], pair[1], message.role, key, progress_bar=show_progress_bar, progress_text=progress_text)
 
+def bubble_style(role: str) -> me.Style:
+  is_dark_mode = me.theme_brightness() == "dark"
+  # Establish 'default' settings then adapt to theme and role.
+  bg_color = "lightgrey"
+  box_shadow = (
+          "0 1px 2px 0 rgba(60, 64, 67, 0.3), "
+          "0 1px 3px 1px rgba(60, 64, 67, 0.15)"
+      )
+  font_color = "rgb(20, 20, 20)"
+  if is_dark_mode:
+    if role == "user":
+      bg_color = "green"
+      font_color = "rgb(228, 225, 230)"
+    box_shadow = (
+          "0 1px 2px 0 rgba(248, 245, 250, 0.8), "
+          "0 1px 3px 1px rgba(248, 245, 250, 0.55)"
+      )
+
+  elif role == "user":
+    bg_color = "lightgreen"
+
+  return me.Style(
+      font_family="Google Sans",
+      box_shadow=box_shadow,
+      padding=me.Padding(top=1, left=15, right=15, bottom=1),
+      margin=me.Margin(top=5, left=0, right=0, bottom=5),
+      background=bg_color,
+      border_radius=15,
+      color=font_color,
+  )
 
 def chat_box(
     content: str,
@@ -56,21 +86,8 @@ def chat_box(
                     ),
                 )
             else:
-                me.markdown(
-                    content,
-                    style=me.Style(
-                        font_family="Google Sans",
-                        box_shadow=(
-                            "0 1px 2px 0 rgba(60, 64, 67, 0.3), "
-                            "0 1px 3px 1px rgba(60, 64, 67, 0.15)"
-                        ),
-                        padding=me.Padding(top=1, left=15, right=15, bottom=1),
-                        margin=me.Margin(top=5, left=0, right=0, bottom=5),
-                        background=(
-                            "lightgreen" if role == "user" else "lightgrey"
-                        ),
-                        border_radius=15),
-                )
+                me.markdown(content, style=bubble_style(role))
+
     if progress_bar:
       with me.box(
         style=me.Style(
