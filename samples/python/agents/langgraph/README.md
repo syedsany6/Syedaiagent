@@ -68,24 +68,27 @@ sequenceDiagram
    echo "YOUR_API_KEY=your_api_key_here" > .env
    ```
    Where you can replace YOUR_API_KEY with a key to any of the following LLM language models supported by langchain:
-   - GOOGLE_API_KEY
-   - OPENAI_API_KEY 
-   - ANTHROPIC_API_KEY 
-   - AZURE_OPENAI_API_KEY
-      - AZURE_OPENAI_ENDPOINT
-      - AZURE_OPENAI_DEPLOYMENT_NAME
-      - AZURE_OPENAI_API_VERSION
-   - GROQ_API_KEY 
-   - COHERE_API_KEY 
-   - NVIDIA_API_KEY 
-   - FIREWORKS_API_KEY 
-   - MISTRAL_API_KEY 
-   - TOGETHER_API_KEY 
-   - WATSONX_API_KEY 
-   - DATABRICKS_API_KEY
-      - DATABRICKS_HOST
-   - XAI_API_KEY 
-   - PPLX_API_KEY
+   - `GOOGLE_API_KEY`
+   - `OPENAI_API_KEY` 
+   - `ANTHROPIC_API_KEY` 
+   - `AZURE_OPENAI_API_KEY`
+      - `AZURE_OPENAI_ENDPOINT`
+      - `AZURE_OPENAI_DEPLOYMENT_NAME`
+      - `AZURE_OPENAI_API_VERSION`
+   - `GROQ_API_KEY` 
+   - `COHERE_API_KEY` 
+   - `NVIDIA_API_KEY` 
+   - `FIREWORKS_API_KEY` 
+   - `MISTRAL_API_KEY` 
+   - `TOGETHER_API_KEY` 
+   - `WATSONX_API_KEY` 
+   - `DATABRICKS_API_KEY`
+      - `DATABRICKS_HOST`
+   - `XAI_API_KEY` 
+   - `PPLX_API_KEY`
+   
+   If you have multiple api keys in your environment, you can disambiguate by setting `SELECTED_API_KEY_NAME`
+   to one of the key names above.
 
 3. Run the agent:
 

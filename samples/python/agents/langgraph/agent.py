@@ -43,6 +43,13 @@ SUPPORTED_API_KEYS = {
 
 def get_api_key() -> str:
     """Helper method to handle API Key."""
+    selected_api_key_name = os.getenv("SELECTED_API_KEY_NAME")
+    if (
+        selected_api_key_name is not None
+        and selected_api_key_name in SUPPORTED_API_KEYS
+    ):
+        return os.getenv(selected_api_key_name)
+
     return next(
         (os.getenv(var) for var in SUPPORTED_API_KEYS if os.getenv(var) is not None),
         None,
