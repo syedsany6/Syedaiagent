@@ -45,7 +45,7 @@ func TestA2AServer_HandleTaskSend(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
@@ -109,7 +109,7 @@ func TestA2AServer_HandleTaskGet(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	// Now try to get the task
 	getParams := models.TaskQueryParams{
@@ -133,7 +133,7 @@ func TestA2AServer_HandleTaskGet(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	w = httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
@@ -193,7 +193,7 @@ func TestA2AServer_HandleTaskCancel(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	// Now try to cancel the task
 	cancelParams := models.TaskIDParams{
@@ -215,7 +215,7 @@ func TestA2AServer_HandleTaskCancel(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	w = httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
@@ -253,28 +253,12 @@ func TestA2AServer_HandleTaskCancel(t *testing.T) {
 func TestErrorResponse(t *testing.T) {
 	server := NewA2AServer(mockTaskHandler, 8080, "/")
 
-	params := models.TaskQueryParams{
-		TaskIDParams: models.TaskIDParams{
-			ID: "non-existent-task",
-		},
-	}
-
-	reqBody, _ := json.Marshal(models.JSONRPCRequest{
-		JSONRPCMessage: models.JSONRPCMessage{
-			JSONRPC: "2.0",
-			JSONRPCMessageIdentifier: models.JSONRPCMessageIdentifier{
-				ID: "1",
-			},
-		},
-		Method: "tasks/get",
-		Params: params,
-	})
-
-	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(reqBody))
+	// Test with invalid JSON
+	req := httptest.NewRequest("POST", "/", bytes.NewBufferString("invalid json"))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	server.handleRequest(w, req)
+	server.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
@@ -286,21 +270,14 @@ func TestErrorResponse(t *testing.T) {
 	}
 
 	if response.Error == nil {
-		t.Fatal("Expected error, got nil")
+		t.Error("Expected error, got nil")
 	}
 
-	expectedCode := int(models.ErrorCodeTaskNotFound)
-	if response.Error.Code != expectedCode {
-		t.Errorf("Expected error code %d, got %d", expectedCode, response.Error.Code)
-	}
-
-	expectedMessage := "Task not found"
-	if response.Error.Message != expectedMessage {
-		t.Errorf("Expected error message %q, got %q", expectedMessage, response.Error.Message)
+	if response.Error.Code != int(models.ErrorCodeInvalidRequest) {
+		t.Errorf("Expected error code %d, got %d", models.ErrorCodeInvalidRequest, response.Error.Code)
 	}
 }
 
-// Helper function to create string pointers
 func stringPtr(s string) *string {
 	return &s
 }

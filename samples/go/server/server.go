@@ -36,12 +36,12 @@ func NewA2AServer(handler TaskHandler, port int, basePath string) *A2AServer {
 // Start starts the A2A server
 func (s *A2AServer) Start() error {
 	mux := http.NewServeMux()
-	mux.HandleFunc(s.basePath, s.handleRequest)
+	mux.Handle(s.basePath, s)
 	return http.ListenAndServe(fmt.Sprintf(":%d", s.port), mux)
 }
 
-// handleRequest handles incoming HTTP requests
-func (s *A2AServer) handleRequest(w http.ResponseWriter, r *http.Request) {
+// ServeHTTP implements the http.Handler interface
+func (s *A2AServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
