@@ -1,0 +1,22 @@
+[project]
+name = "a2a-semantic-kernel"
+version = "0.1.0"
+description = "Leverage Semantic Kernel Agents using the A2A protocol."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "semantic-kernel>=1.28.0",
+    "a2a-samples",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv.sources]
+a2a-samples = { workspace = true }
+
+[project.scripts]
+semantic-kernel-agent = "semantickernel.__main__:main"

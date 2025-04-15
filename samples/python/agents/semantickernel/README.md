@@ -50,31 +50,44 @@ sequenceDiagram
 1. **Navigate to the samples directory**:
 
 ```bash
-cd samples/python/agents/semantic_kernel
+cd samples/python/agents/semantickernel
 ```
 
-2. **Create an environment file (.env) with your API key and the model ID (e.g., "gpt-4o"):**:
+2. **Create an environment file (.env) with your API key and the model ID (e.g., "gpt-4.1"):**:
 
 ```bash
 OPENAI_API_KEY="your_api_key_here"
 OPENAI_CHAT_MODEL_ID="your-model-id"
 ```
 
-3. **Set up the Python Environment**
+3. **Set up the Python Environment**:
 
 ```bash
 uv venv --python "3.12"
 source .venv/bin/activate
 ```
 
-4. **Run the agent**:
+4. **Install the project in editable mode**:
+
+```bash
+uv pip install -e .
+```
+
+This will install the `a2a-semantic-kernel` package from `src/semantickernel` and resolve workspace-local dependencies like `a2a-samples`.
+
+5. **Run the agent**:
+
+Choose one of the following options:
 
 ```bash
 # Basic run on default port 10000
-uv run .
+uv run semantic-kernel-agent
+```
+or
 
+```bash
 # On custom host/port
-uv run . --host 0.0.0.0 --port 8080
+uv run semantic-kernel-agent --host 0.0.0.0 --port 8080
 ```
 
 5. **In a separate terminal, run the A2A client:

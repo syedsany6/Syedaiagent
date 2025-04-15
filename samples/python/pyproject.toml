@@ -3,7 +3,7 @@ name = "a2a-samples"
 version = "0.1.0"
 description = "Agent2Agent samples"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "asyncclick>=8.1.8",
     "asyncio>=3.4.3",
@@ -14,7 +14,6 @@ dependencies = [
     "langchain-google-genai>=2.0.10",
     "langgraph>=0.3.18",
     "pydantic>=2.10.6",
-    "semantic-kernel>=1.28.0",
     "sse-starlette>=2.2.1",
     "starlette>=0.46.1",
     "streamlit>=1.44.0",
@@ -28,7 +27,7 @@ dependencies = [
 packages = ["common", "hosts"]
 
 [tool.uv.workspace]
-members = ["agents/crewai"]
+members = ["agents/crewai", "agents/semantickernel"]
 
 [build-system]
 requires = ["hatchling"]
