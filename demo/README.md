@@ -39,7 +39,7 @@ Click on the task list to see all the A2A task updates from the remote agents
     ```bash
     cd demo/ui
     ```
-2. Create an environment file with your API key:
+2. Create an environment file with your API key or enter it directly in the UI when prompted:
 
    ```bash
    echo "GOOGLE_API_KEY=your_api_key_here" > .env
