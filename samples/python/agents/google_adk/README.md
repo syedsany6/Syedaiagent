@@ -35,5 +35,3 @@ This agent takes text requests from the client and, if any details are missing, 
     # If you changed the port when starting the agent, use that port instead
     # uv run hosts/cli --agent http://localhost:YOUR_PORT
     ```
-
-Note: Other client can refer to [client apps](/samples/python/hosts/README.md)
