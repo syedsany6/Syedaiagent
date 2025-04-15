@@ -24,7 +24,7 @@ async def save_api_key(e: me.ClickEvent):
     
     # Update the API key in the server
     await UpdateApiKey(state.api_key)
-    
+
     state.api_key_dialog_open = False
     
     yield
@@ -56,4 +56,4 @@ def api_key_dialog():
             )
         
         with dialog_actions():
-            me.button("Save", on_click=save_api_key, disabled=not state.api_key.strip())
+            me.button("Save", on_click=save_api_key)
