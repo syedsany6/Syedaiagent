@@ -37,14 +37,14 @@ class HyperwhalesAgent:
     if not api_key:
         print("API_KEY not found in environment variables.")
         return None
-    model_client = OpenAIChatCompletionClient(model="o3-mini", api_key=api_key)
-    mcp_agent = AssistantAgent(name="MCPTools", model_client=model_client, tools=tools)
-    self.orchestrator_agent = MagenticOneGroupChat(participants=[mcp_agent], model_client=model_client)
+    self.model_client = OpenAIChatCompletionClient(model="o3-mini", api_key=api_key)
+    self.mcp_agent = AssistantAgent(name="MCPTools", model_client=self.model_client, tools=tools, system_message=self.SYSTEM_INSTRUCTION)
     self.sessions: dict[str, AsyncGenerator[Any, None]] = {}
 
   async def stream(self, query: str, session_id: str) -> AsyncIterable[Dict[str, Any]]:
     print(f"Running stream for session {session_id} with query: {query}")
-    self.sessions[session_id] = self.orchestrator_agent.run_stream(task=query)
+    orchestrator_agent = MagenticOneGroupChat(participants=[self.mcp_agent], model_client=self.model_client)
+    self.sessions[session_id] = orchestrator_agent.run_stream(task=query)
     
     async for event in self.sessions[session_id]:
       print(f"Event: {event}")

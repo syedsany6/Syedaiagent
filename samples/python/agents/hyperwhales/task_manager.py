@@ -112,27 +112,7 @@ class AgentTaskManager(InMemoryTaskManager):
         return None
         
     async def on_send_task(self, request: SendTaskRequest) -> SendTaskResponse:
-        """Handles the 'send task' request."""
-        validation_error = self._validate_request(request)
-        if validation_error:
-            return SendTaskResponse(id=request.id, error=validation_error.error)
-        
-        await self.upsert_task(request.params)
-        task = await self.update_store(
-            request.params.id, TaskStatus(state=TaskState.WORKING), None
-        )
-        await self.send_task_notification(task)
-
-        task_send_params: TaskSendParams = request.params
-        query = self._get_user_query(task_send_params)
-        try:
-            agent_response = self.agent.invoke(query, task_send_params.sessionId)
-        except Exception as e:
-            logger.error(f"Error invoking agent: {e}")
-            raise ValueError(f"Error invoking agent: {e}")
-        return await self._process_agent_response(
-            request, agent_response
-        )
+        raise NotImplementedError("Not implemented")
 
     async def on_send_task_subscribe(
         self, request: SendTaskStreamingRequest
