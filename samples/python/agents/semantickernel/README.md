@@ -76,7 +76,7 @@ Choose one of the following options:
 > Make sure you run `uv run .` from the following directory: `samples/python/agents/semantickernel`
 
 ```bash
-# Basic run on default port 10000
+# Basic run on default port 10020
 uv run .
 ```
 or
@@ -91,7 +91,7 @@ uv run . --host 0.0.0.0 --port 8080
 > Make sure you run `uv run hosts/cli` from the following directory: `samples/python`
 
 ```bash
-uv run hosts/cli
+uv run hosts/cli --agent http://localhost:10020
 ```
 
 ## Limitations
@@ -102,11 +102,11 @@ uv run hosts/cli
 
 ## Example Endpoints
 
-You can POST A2A requests to http://localhost:10000 with JSON-RPC specifying tasks/send or tasks/sendSubscribe. Here is a synchronous snippet:
+You can POST A2A requests to http://localhost:10020 with JSON-RPC specifying tasks/send or tasks/sendSubscribe. Here is a synchronous snippet:
 
 ### Request:
 
-POST http://localhost:10000
+POST http://localhost:10020
 Content-Type: application/json
 
 ```json

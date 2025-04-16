@@ -13,6 +13,7 @@ from common.types import (
     SendTaskResponse,
     SendTaskStreamingRequest,
     SendTaskStreamingResponse,
+    TaskArtifactUpdateEvent,
     TaskState,
     TaskStatus,
     TaskStatusUpdateEvent,
@@ -101,6 +102,7 @@ class TaskManager(InMemoryTaskManager):
                 require_input = partial["require_user_input"]
                 is_done = partial["is_task_complete"]
                 text_content = partial["content"]
+                artifact = None
 
                 new_status = TaskStatus(state=TaskState.WORKING)
                 # By default, don't end the stream
@@ -116,10 +118,7 @@ class TaskManager(InMemoryTaskManager):
                     final = True
                 elif is_done:
                     new_status.state = TaskState.COMPLETED
-                    new_status.message = Message(
-                        role="agent",
-                        parts=[{"type": "text", "text": text_content}],
-                    )
+                    artifact = Artifact(parts=[{"type": "text", "text": text_content}], index=0, append=False)
                     # End the stream if the agent is fully done
                     final = True
                 else:
@@ -127,6 +126,14 @@ class TaskManager(InMemoryTaskManager):
                     new_status.message = Message(
                         role="agent",
                         parts=[{"type": "text", "text": text_content}],
+                    )
+
+                if artifact:
+                    task_artifact_update_event = TaskArtifactUpdateEvent(
+                        id=request.params.id, artifact=artifact
+                    )
+                    await self.enqueue_events_for_sse(
+                        request.params.id, task_artifact_update_event
                     )
 
                 # Persist + notify

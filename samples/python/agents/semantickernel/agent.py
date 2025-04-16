@@ -76,7 +76,7 @@ class SemanticKernelTravelAgent:
         if not api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set.")
         
-        model_id = os.getenv("OPENAI_CHAT_MODEL_ID", "gpt-4o")
+        model_id = os.getenv("OPENAI_CHAT_MODEL_ID", "gpt-4.1")
 
         # Define a CurrencyExchangeAgent to handle currency-related tasks
         currency_exchange_agent = ChatCompletionAgent(

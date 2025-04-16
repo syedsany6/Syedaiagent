@@ -16,7 +16,7 @@ load_dotenv()
 
 @click.command()
 @click.option("--host", default="localhost")
-@click.option("--port", default=10000)
+@click.option("--port", default=10020)
 def main(host, port):
     """Starts the Semantic Kernel Agent server using A2A."""
     # Build the agent card
