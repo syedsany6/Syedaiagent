@@ -8,7 +8,7 @@ import pytest
 from jsonschema import validate, Draft7Validator, RefResolver, ValidationError
 
 # import types from a2a package
-# Assuming types are accessible, adjust import path if needed
+# TODO Don't want to sound too "pydantic" here, but would it not be better to use the full paths as per PEP8?
 from A2A.samples.python.common.types import (
     # Core Task Types
     TaskState, TextPart, FileContent, FilePart, DataPart, Message, TaskStatus,
@@ -657,6 +657,7 @@ def test_knowledge_graph_change_event(schema, resolver):
 
 
 def test_knowledge_subscription_event(schema, resolver):
+    # Success case (contains change event)
     change = KnowledgeGraphChangeEvent(
         op=PatchOperationType.REMOVE,
         statement=KGStatement(subject=KGSubject(id="ex:s"), predicate=KGPredicate(id="ex:p"), object=KGObject(id="ex:o"))
@@ -664,7 +665,11 @@ def test_knowledge_subscription_event(schema, resolver):
     instance_success = KnowledgeSubscriptionEvent(id="ks1", result=change)
     validate_instance(instance_success.model_dump(mode='json', exclude_none=True), "KnowledgeSubscriptionEvent", schema, resolver)
 
-    instance_error = KnowledgeSubscriptionEvent(id="ks1", error=KnowledgeSubscriptionError(data="Stream disconnected"))  # Allows data
+    # Error case (streamed error)
+    # FIX: Wrap the error data string in an object to match schema { type: object } or { type: null }
+    error_data_obj = {"details": "Stream disconnected"}
+    instance_error = KnowledgeSubscriptionEvent(id="ks1", error=KnowledgeSubscriptionError(data=error_data_obj))
+    # Use exclude_none=True because KnowledgeSubscriptionError allows non-null data, and we are providing it.
     validate_instance(instance_error.model_dump(mode='json', exclude_none=True), "KnowledgeSubscriptionEvent", schema, resolver)
 
 
