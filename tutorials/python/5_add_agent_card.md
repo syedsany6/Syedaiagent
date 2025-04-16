@@ -1,4 +1,4 @@
-# Agent Skills
+# Agent Card
 
 Now that we have defined our skills, we can create an Agent Card.
 

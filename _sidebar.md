@@ -10,7 +10,7 @@
      * [3. Creating a project](tutorials/python/3_create_a_project.md)
      * [4. Defining Agent Skills](tutorials/python/4_agent_skills.md)
      * [5. Adding an Agent Card](tutorials/python/5_add_agent_card.md)
-     * [6. Starting a server]()
+     * [6. Starting a server](tutorials/python/6_start_server.md)
      * [7. Interacting with your server]()
      * [8. Adding Agent Capabilities]()
      * [9. Next Steps]()
