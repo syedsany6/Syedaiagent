@@ -91,7 +91,7 @@ requires-dist = [
 [[package]]
 name = "a2a-semantic-kernel"
 version = "0.1.0"
-source = { virtual = "agents/semantickernel" }
+source = { editable = "agents/semantickernel" }
 dependencies = [
     { name = "a2a-samples" },
     { name = "semantic-kernel" },

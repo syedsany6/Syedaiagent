@@ -19,7 +19,7 @@ from common.types import (
 )
 from common.utils.push_notification_auth import PushNotificationSenderAuth
 
-from agents.semantickernel.src.semantickernel.agent import SemanticKernelTravelAgent
+from agents.semantickernel.agent import SemanticKernelTravelAgent
 
 logger = logging.getLogger(__name__)
 

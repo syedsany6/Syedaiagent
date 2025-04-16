@@ -63,34 +63,30 @@ OPENAI_CHAT_MODEL_ID="your-model-id"
 3. **Set up the Python Environment**:
 
 ```bash
-uv venv --python "3.12"
+uv python pin 3.12
+uv venv
 source .venv/bin/activate
 ```
-
-4. **Install the project in editable mode**:
-
-```bash
-uv pip install -e .
-```
-
-This will install the `a2a-semantic-kernel` package from `src/semantickernel` and resolve workspace-local dependencies like `a2a-samples`.
-
-5. **Run the agent**:
+4. **Run the agent**:
 
 Choose one of the following options:
 
+> Make sure you run `uv run .` from the following directory: `samples/python/agents/semantickernel`
+
 ```bash
 # Basic run on default port 10000
-uv run semantic-kernel-agent
+uv run .
 ```
 or
 
 ```bash
 # On custom host/port
-uv run semantic-kernel-agent --host 0.0.0.0 --port 8080
+uv run . --host 0.0.0.0 --port 8080
 ```
 
 5. **In a separate terminal, run the A2A client:
+
+> Make sure you run `uv run hosts/cli` from the following directory: `samples/python`
 
 ```bash
 uv run hosts/cli
