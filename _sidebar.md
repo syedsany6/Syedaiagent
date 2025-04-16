@@ -11,7 +11,7 @@
      * [4. Defining Agent Skills](tutorials/python/4_agent_skills.md)
      * [5. Adding an Agent Card](tutorials/python/5_add_agent_card.md)
      * [6. Starting a server](tutorials/python/6_start_server.md)
-     * [7. Interacting with your server]()
+     * [7. Interacting with your server](tutorials/python/7_interact_with_server.md)
      * [8. Adding Agent Capabilities]()
      * [9. Next Steps]()
      * [10. Using Ollama](tutorials/python/10_ollama.md)
