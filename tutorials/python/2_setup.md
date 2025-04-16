@@ -12,7 +12,7 @@ We'll be using [https://docs.astral.sh/uv/](https://docs.astral.sh/uv/getting-st
 
 The A2A libraries we'll be using require `python >= 3.12` which [uv can install](https://docs.astral.sh/uv/guides/install-python/) if you don't already have a matching version. We'll be using python 3.12.
 
-## Check
+## Check <!-- {docsify-ignore} -->
 
 Run the following command to make sure you're ready for the next step.
 
