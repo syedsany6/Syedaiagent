@@ -40,7 +40,6 @@ class AgentTaskManager(InMemoryTaskManager):
 
         try:
             async for item in self.agent.stream(query, task_send_params.sessionId):
-                print(f"Item: {item}")
                 is_task_complete = item["is_task_complete"]
                 require_user_input = item["require_user_input"]
                 artifact = None

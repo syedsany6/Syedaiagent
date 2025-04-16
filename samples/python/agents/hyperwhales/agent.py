@@ -9,11 +9,15 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_ext.tools.mcp import mcp_server_tools, McpServerParams
 from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
 from autogen_agentchat.base import TaskResult
-from typing import AsyncIterable, Dict, Any
+from typing import AsyncIterable, Dict, Any, TypedDict, AsyncGenerator
 from datetime import timezone
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+class SessionData(TypedDict):
+    generator: AsyncGenerator[BaseAgentEvent | BaseChatMessage | TaskResult, None]
+    last_accessed: datetime
 
 class HyperwhalesAgent:
   SYSTEM_INSTRUCTION = (
@@ -31,14 +35,15 @@ class HyperwhalesAgent:
   def __init__(self):
       self.model_client = None
       self.mcp_agent = None
-      self.sessions = defaultdict(dict)
+      self.sessions: Dict[str, SessionData] = defaultdict(dict)
+      self.agent_sessions: Dict[str, MagenticOneGroupChat] = defaultdict(dict)
       self.session_lock = asyncio.Lock()
       self.session_timeout = timedelta(seconds=300)
       self.max_concurrent_tasks = 10
       self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
-      asyncio.run(self.initialize())
 
   async def initialize(self, mcp_server_params: list[McpServerParams] = []):
+
       api_key = os.getenv('API_KEY')
       model = os.getenv('LLM_MODEL')
       if not api_key or not model:
@@ -55,6 +60,7 @@ class HyperwhalesAgent:
           system_message=self.SYSTEM_INSTRUCTION
       )
       asyncio.create_task(self.cleanup_sessions())
+      self._initialized = True
       logger.info("HyperwhalesAgent initialized and cleanup_sessions task scheduled")
 
   async def cleanup_sessions(self):
@@ -67,34 +73,54 @@ class HyperwhalesAgent:
                   gen = self.sessions[sid]["generator"]
                   await gen.aclose()
                   del self.sessions[sid]
+                  del self.agent_sessions[sid]
           await asyncio.sleep(60)
 
   async def process_event(self, event, session_id: str) -> Dict[str, Any]:
-      if isinstance(event, BaseAgentEvent):
-          return {"is_task_complete": False, "require_user_input": False, "content": event.model_dump_json()}
-      elif isinstance(event, TaskResult):
-          async with self.session_lock:
-              await self.sessions[session_id]["generator"].aclose()
-              del self.sessions[session_id]
-          return {"is_task_complete": True, "require_user_input": False, "content": event.stop_reason}
-      elif isinstance(event, BaseChatMessage):
-          return {"is_task_complete": False, "require_user_input": False, "content": event.model_dump_json()}
-      return {"is_task_complete": False, "require_user_input": False, "content": "Unknown event"}
+    logger.info(f"[process_event] event: {event}")
+    try:
+        if isinstance(event, BaseAgentEvent):
+            json = event.model_dump();
+            content = json.get("content")
+            return {"is_task_complete": False, "require_user_input": False, "content": content }
+        elif isinstance(event, TaskResult):
+            async with self.session_lock:
+                await self.sessions[session_id]["generator"].aclose()
+                del self.sessions[session_id]
+            return {"is_task_complete": True, "require_user_input": False, "content": event.stop_reason }
+        elif isinstance(event, BaseChatMessage):
+            json = event.model_dump();
+            content = json.get("content")
+            return {"is_task_complete": False, "require_user_input": False, "content": content }
+    except Exception as e:
+        logger.info(f"Error in process_event: {e}")
+    return {"is_task_complete": False, "require_user_input": False, "content": "Unknown event"}
 
   async def stream(self, query: str, session_id: str) -> AsyncIterable[Dict[str, Any]]:
       logger.info(f"Starting stream for session {session_id} with query: {query}")
       async with self.semaphore:
           try:
-              orchestrator_agent = MagenticOneGroupChat(participants=[self.mcp_agent], model_client=self.model_client)
+              # Check if we have an existing agent for this session
               async with self.session_lock:
+                  if session_id not in self.agent_sessions:
+                      # Create new agent for this session
+                      self.agent_sessions[session_id] = MagenticOneGroupChat(
+                          participants=[self.mcp_agent], 
+                          model_client=self.model_client
+                      )
+                  
+                  # Get the agent for this session (either existing or newly created)
+                  orchestrator_agent = self.agent_sessions[session_id]
+                  
                   self.sessions[session_id] = {
                       "generator": orchestrator_agent.run_stream(task=query),
-                      "last_accessed": datetime.utcnow()
+                      "last_accessed": datetime.now(timezone.utc)
                   }
+                  
               async with asyncio.timeout(300):
                   async for event in self.sessions[session_id]["generator"]:
                       async with self.session_lock:
-                          self.sessions[session_id]["last_accessed"] =  datetime.now(timezone.utc)
+                          self.sessions[session_id]["last_accessed"] = datetime.now(timezone.utc)
                       yield await self.process_event(event, session_id)
           except asyncio.TimeoutError:
               logger.warning(f"Stream for session {session_id} timed out")
@@ -102,6 +128,7 @@ class HyperwhalesAgent:
                   if session_id in self.sessions:
                       await self.sessions[session_id]["generator"].aclose()
                       del self.sessions[session_id]
+                      del self.agent_sessions[session_id]
               yield {"is_task_complete": True, "require_user_input": False, "content": "Task timed out"}
           except Exception as e:
               logger.error(f"Error in stream for session {session_id}: {e}")
@@ -109,6 +136,7 @@ class HyperwhalesAgent:
                   if session_id in self.sessions:
                       await self.sessions[session_id]["generator"].aclose()
                       del self.sessions[session_id]
+                      del self.agent_sessions[session_id]
               yield {"is_task_complete": True, "require_user_input": False, "content": f"Error: {str(e)}"}
           finally:
               logger.info(f"Stream for session {session_id} completed")
