@@ -72,7 +72,7 @@ sequenceDiagram
 3. Run the agent:
 
    ```bash
-   # Basic run on default port 10000
+   # Basic run on default port 10010
    uv run .
 
    # On custom host/port
@@ -83,7 +83,7 @@ sequenceDiagram
 
    ```bash
    cd samples/python
-   uv run hosts/cli
+   uv run hosts/cli --agent http://localhost:10010
    ```
 
    Download a file to parse, or link to your own file. For example:

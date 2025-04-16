@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option("--host", "host", default="localhost")
-@click.option("--port", "port", default=10000)
+@click.option("--port", "port", default=10010)
 def main(host, port):
     """Starts the Currency Agent server."""
     try:
