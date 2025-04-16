@@ -19,6 +19,7 @@ dependencies = [
     "pyjwt>=2.10.1",
     "autogen-agentchat (>=0.5.2,<0.6.0)",
     "autogen-ext[openai] (>=0.5.2,<0.6.0)",
+    "json-schema-to-pydantic>=0.2.4",
 ]
 
 [tool.hatch.build.targets.wheel]

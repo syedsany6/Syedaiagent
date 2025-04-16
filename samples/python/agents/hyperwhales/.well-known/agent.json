@@ -1,0 +1,27 @@
+{
+  "name": "Hyperwhales Agent",
+  "description": "Analyze whale trading patterns, positions, and portfolio changes over time. Provide insights and trade suggestions.",
+  "url": "",
+  "provider": {
+    "organization": "Oraichain Labs",
+    "url": "https://orai.io"
+  },
+  "version": "1.0.0",
+  "authentication": {},
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "hyperwhales",
+      "name": "Hyperwhales",
+      "description": "Analyze whale trading patterns, positions, and portfolio changes over time. Provide insights and trade suggestions.",
+      "tags": ["whales", "trading", "defi"],
+      "examples": [],
+      "outputModes": ["text/plain"]
+    }
+  ]
+}

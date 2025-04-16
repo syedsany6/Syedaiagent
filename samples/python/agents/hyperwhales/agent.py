@@ -34,10 +34,14 @@ class HyperwhalesAgent:
         tools.append(tool)    
 
     api_key = os.getenv('API_KEY')
+    model = os.getenv('LLM_MODEL')
     if not api_key:
         print("API_KEY not found in environment variables.")
         return None
-    self.model_client = OpenAIChatCompletionClient(model="o3-mini", api_key=api_key)
+    if not model:
+        print("LLM_MODEL not found in environment variables.")
+        return None
+    self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
     self.mcp_agent = AssistantAgent(name="MCPTools", model_client=self.model_client, tools=tools, system_message=self.SYSTEM_INSTRUCTION)
     self.sessions: dict[str, AsyncGenerator[Any, None]] = {}
 

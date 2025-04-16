@@ -1,7 +1,7 @@
 from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
-from task_manager import AgentTaskManager
-from agent import HyperwhalesAgent
+from agents.hyperwhales.task_manager import AgentTaskManager
+from agents.hyperwhales.agent import HyperwhalesAgent
 import click
 import os
 import logging
@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 def main(host, port):
     try:
         if not os.getenv("API_KEY"):
-                raise MissingAPIKeyError("API_KEY environment variable not set.")
+            raise MissingAPIKeyError("API_KEY environment variable not set.")
+        if not os.getenv("LLM_MODEL"):
+            raise MissingAPIKeyError("LLM_MODEL environment variable not set.")
         
         capabilities = AgentCapabilities(streaming=True)
         skill = AgentSkill(
