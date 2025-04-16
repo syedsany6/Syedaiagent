@@ -1,5 +1,3 @@
-# --- START OF UPDATED FILE common/types.py ---
-
 from datetime import datetime
 from enum import Enum
 from typing import Union, Any, Dict, List, Annotated, Optional, Literal
@@ -553,5 +551,3 @@ class A2AClientJSONError(A2AClientError):
 class MissingAPIKeyError(Exception):
     """Exception for missing API key (if used by a specific agent implementation)."""
     pass
-
-# --- End of file ---
