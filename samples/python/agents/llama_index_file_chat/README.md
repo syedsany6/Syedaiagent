@@ -110,6 +110,7 @@ sequenceDiagram
 - Only supports text-based output
 - LlamaParse is free for the first 10K credits (~3333 pages with basic settings)
 - Memory is session-based and in-memory, and therefore not persisted between server restarts
+- Inserting the entire document into the context window is not scalable for larger files. You may want to deploy a vector DB or use a cloud DB to run retrieval over one or more files for effective RAG. LlamaIndex integrates with a [ton of vector DBs and cloud DBs](https://docs.llamaindex.ai/en/stable/examples/#vector-stores).
 
 ## Examples
 
