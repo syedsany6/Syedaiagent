@@ -1,12 +1,19 @@
 import os
+import asyncio
+import logging
+from collections import defaultdict
+from datetime import datetime, timedelta
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-from autogen_ext.tools.mcp import SseServerParams, mcp_server_tools
+from autogen_ext.tools.mcp import mcp_server_tools, McpServerParams
 from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
 from autogen_agentchat.base import TaskResult
-import asyncio
-from typing import AsyncGenerator, Any, AsyncIterable, Dict
+from typing import AsyncIterable, Dict, Any
+from datetime import timezone
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class HyperwhalesAgent:
   SYSTEM_INSTRUCTION = (
@@ -16,50 +23,93 @@ class HyperwhalesAgent:
     "Your analysis helps traders decide whether to follow whale trading moves or not."
     "When you use any tool, I expect you to push its limits: fetch all the data it can provide, whether that means iterating through multiple batches, adjusting parameters like offsets, or running the tool repeatedly to cover every scenario. Don't work with small set of data for sure, fetch as much as you can. Don't stop until you're certain you've captured everything there is to know."
     "Then, analyze the data with sharp logic, explain your reasoning and bias clearly, and present me with trade suggestions that reflect your deepest insights."
+    "Always check whether you are in a loop or not, if you are, break out of it."
   )
 
   SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
   def __init__(self):
-    tools = []
-    tools_url = f"http://{"0.0.0.0"}:{"4000"}/sse"
-    print(f"Setting up tools with SSE URL: {tools_url}")
-    
-    async def setup_tools():
-        return await mcp_server_tools(SseServerParams(url=tools_url))
-    
-    # Run the async function in an event loop
-    tools_list = asyncio.run(setup_tools())
-    for tool in tools_list:
-        tools.append(tool)    
+      self.model_client = None
+      self.mcp_agent = None
+      self.sessions = defaultdict(dict)
+      self.session_lock = asyncio.Lock()
+      self.session_timeout = timedelta(seconds=300)
+      self.max_concurrent_tasks = 10
+      self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
+      asyncio.run(self.initialize())
 
-    api_key = os.getenv('API_KEY')
-    model = os.getenv('LLM_MODEL')
-    if not api_key:
-        print("API_KEY not found in environment variables.")
-        return None
-    if not model:
-        print("LLM_MODEL not found in environment variables.")
-        return None
-    self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
-    self.mcp_agent = AssistantAgent(name="MCPTools", model_client=self.model_client, tools=tools, system_message=self.SYSTEM_INSTRUCTION)
-    self.sessions: dict[str, AsyncGenerator[Any, None]] = {}
+  async def initialize(self, mcp_server_params: list[McpServerParams] = []):
+      api_key = os.getenv('API_KEY')
+      model = os.getenv('LLM_MODEL')
+      if not api_key or not model:
+          raise ValueError("API_KEY or LLM_MODEL not set")
+      self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
+      tools = []
+      for mcp_server_param in mcp_server_params:
+          server_tools = await mcp_server_tools(mcp_server_param)
+          tools.extend(server_tools)
+      self.mcp_agent = AssistantAgent(
+          name="MCPTools",
+          model_client=self.model_client,
+          tools=tools,
+          system_message=self.SYSTEM_INSTRUCTION
+      )
+      asyncio.create_task(self.cleanup_sessions())
+      logger.info("HyperwhalesAgent initialized and cleanup_sessions task scheduled")
+
+  async def cleanup_sessions(self):
+      while True:
+          async with self.session_lock:
+              now = datetime.now(timezone.utc)
+              expired = [sid for sid, data in self.sessions.items()
+                        if now - data["last_accessed"] > self.session_timeout]
+              for sid in expired:
+                  gen = self.sessions[sid]["generator"]
+                  await gen.aclose()
+                  del self.sessions[sid]
+          await asyncio.sleep(60)
+
+  async def process_event(self, event, session_id: str) -> Dict[str, Any]:
+      if isinstance(event, BaseAgentEvent):
+          return {"is_task_complete": False, "require_user_input": False, "content": event.model_dump_json()}
+      elif isinstance(event, TaskResult):
+          async with self.session_lock:
+              await self.sessions[session_id]["generator"].aclose()
+              del self.sessions[session_id]
+          return {"is_task_complete": True, "require_user_input": False, "content": event.stop_reason}
+      elif isinstance(event, BaseChatMessage):
+          return {"is_task_complete": False, "require_user_input": False, "content": event.model_dump_json()}
+      return {"is_task_complete": False, "require_user_input": False, "content": "Unknown event"}
 
   async def stream(self, query: str, session_id: str) -> AsyncIterable[Dict[str, Any]]:
-    print(f"Running stream for session {session_id} with query: {query}")
-    orchestrator_agent = MagenticOneGroupChat(participants=[self.mcp_agent], model_client=self.model_client)
-    self.sessions[session_id] = orchestrator_agent.run_stream(task=query)
-    
-    async for event in self.sessions[session_id]:
-      print(f"Event: {event}")
-      result = {}
-      if isinstance(event, BaseAgentEvent):
-          result = { "is_task_complete": False, "require_user_input": False, "content": event.model_dump_json() }
-      elif isinstance(event, TaskResult):
-          result = { "is_task_complete": True, "require_user_input": False,  "content": event.stop_reason }
-          del self.sessions[session_id]
-      elif isinstance(event, BaseChatMessage):
-          result = { "is_task_complete": False, "require_user_input": False, "content": event.model_dump_json() }
-      yield result
-
+      logger.info(f"Starting stream for session {session_id} with query: {query}")
+      async with self.semaphore:
+          try:
+              orchestrator_agent = MagenticOneGroupChat(participants=[self.mcp_agent], model_client=self.model_client)
+              async with self.session_lock:
+                  self.sessions[session_id] = {
+                      "generator": orchestrator_agent.run_stream(task=query),
+                      "last_accessed": datetime.utcnow()
+                  }
+              async with asyncio.timeout(300):
+                  async for event in self.sessions[session_id]["generator"]:
+                      async with self.session_lock:
+                          self.sessions[session_id]["last_accessed"] =  datetime.now(timezone.utc)
+                      yield await self.process_event(event, session_id)
+          except asyncio.TimeoutError:
+              logger.warning(f"Stream for session {session_id} timed out")
+              async with self.session_lock:
+                  if session_id in self.sessions:
+                      await self.sessions[session_id]["generator"].aclose()
+                      del self.sessions[session_id]
+              yield {"is_task_complete": True, "require_user_input": False, "content": "Task timed out"}
+          except Exception as e:
+              logger.error(f"Error in stream for session {session_id}: {e}")
+              async with self.session_lock:
+                  if session_id in self.sessions:
+                      await self.sessions[session_id]["generator"].aclose()
+                      del self.sessions[session_id]
+              yield {"is_task_complete": True, "require_user_input": False, "content": f"Error: {str(e)}"}
+          finally:
+              logger.info(f"Stream for session {session_id} completed")
 

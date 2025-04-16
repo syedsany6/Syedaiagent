@@ -2,9 +2,11 @@ from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
 from agents.hyperwhales.task_manager import AgentTaskManager
 from agents.hyperwhales.agent import HyperwhalesAgent
+from autogen_ext.tools.mcp import SseServerParams
 import click
 import os
 import logging
+import asyncio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,9 +43,11 @@ def main(host, port):
             capabilities=capabilities,
             skills=[skill],
         )
+        agent = HyperwhalesAgent()
+        asyncio.run(agent.initialize(mcp_server_params=[SseServerParams(url="http://0.0.0.0:4000/sse")]))
         server = A2AServer(
             agent_card=agent_card,
-            task_manager=AgentTaskManager(agent=HyperwhalesAgent()),
+            task_manager=AgentTaskManager(agent=agent),
             host=host,
             port=port,
         )
