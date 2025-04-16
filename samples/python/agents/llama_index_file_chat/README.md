@@ -86,6 +86,12 @@ sequenceDiagram
    uv run hosts/cli
    ```
 
+   Download a file to parse, or link to your own file. For example:
+
+   ```bash
+   wget https://arxiv.org/pdf/1706.03762 -O attention.pdf
+   ```
+
    And enter something like the following:
 
    ```bash

@@ -9,6 +9,8 @@ from llama_index.core.workflow import Context, Event, StartEvent, StopEvent, Wor
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_cloud_services.parse import LlamaParse
 
+## Workflow Events
+
 class LogEvent(Event):
     msg: str
 
@@ -29,6 +31,8 @@ class ChatResponseEvent(StopEvent):
     response: str
     citations: dict[int, list[str]]
 
+## Structured Outputs
+
 class Citation(BaseModel):
     """A citation to specific line(s) in the document."""
     citation_number: int = Field(description="The specific in-line citation number used in the response text.")
@@ -43,7 +47,7 @@ class ChatResponse(BaseModel):
 class ParseAndChat(Workflow):
     def __init__(self, timeout: Optional[float] = None, verbose: bool = False, **workflow_kwargs: Any):
         super().__init__(timeout=timeout, verbose=verbose, **workflow_kwargs)
-        self._llm = GoogleGenAI(model="gemini-2.0-flash", api_key=os.getenv("GOOGLE_API_KEY"))
+        self._sllm = GoogleGenAI(model="gemini-2.0-flash", api_key=os.getenv("GOOGLE_API_KEY")).as_structured_llm(ChatResponse)
         self._parser = LlamaParse(api_key=os.getenv("LLAMA_CLOUD_API_KEY"))
         self._system_prompt_template = """\
 You are a helpful assistant that can answer questions about a document, provide citations, and engage in a conversation.
@@ -111,10 +115,8 @@ When citing content from the document:
         else:
             input_messages = current_messages
 
-        from llama_index.core.prompts import ChatPromptTemplate
-        template = ChatPromptTemplate.from_messages(input_messages)
-        response_obj: ChatResponse = await self._llm.astructured_predict(ChatResponse, template)
-        # response_obj: ChatResponse = response.raw
+        response = await self._sllm.achat(input_messages)
+        response_obj: ChatResponse = response.raw
         ctx.write_event_to_stream(LogEvent(msg="LLM response received, parsing citations..."))
 
         current_messages.append(ChatMessage(role="assistant", content=response_obj.response))
