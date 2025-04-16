@@ -31,7 +31,7 @@ async function run() {
     const taskId = uuidv4();
     const sendParams: TaskSendParams = {
       id: taskId,
-      message: { role: "user", parts: [{ text: "Hello, agent!" }] },
+      message: { role: "user", parts: [{ text: "Hello, agent!", type: "text" }] },
     };
     // Method now returns Task | null directly
     const taskResult: Task | null = await client.sendTask(sendParams);
@@ -73,7 +73,7 @@ async function streamTask() {
     console.log(`\n--- Starting streaming task ${streamingTaskId} ---`);
     const streamParams: TaskSendParams = {
       id: streamingTaskId,
-      message: { role: "user", parts: [{ text: "Stream me some updates!" }] },
+      message: { role: "user", parts: [{ text: "Stream me some updates!", type: "text" }] },
     };
     const stream = client.sendTaskSubscribe(streamParams);
 

@@ -113,20 +113,38 @@ export type FileContent = FileContentBytes | FileContentUri;
 /** Represents a part of a message containing text content. */
 export interface TextPart {
   type: "text";
+
+  /**
+   * The text content.
+   */
   text: string;
   metadata?: Record<string, unknown> | null;
 }
 
 /** Represents a part of a message containing file content. */
 export interface FilePart {
+  /**
+   * Type identifier for this part.
+   */
   type: "file";
+
+  /**
+   * The file content, provided either inline or via URI.
+   */
   file: FileContent;
   metadata?: Record<string, unknown> | null;
 }
 
 /** Represents a part of a message containing structured data (JSON). */
 export interface DataPart {
+  /**
+   * Type identifier for this part.
+   */
   type: "data";
+
+  /**
+   * The structured data content as a JSON object.
+   */
   data: Record<string, unknown>;
   metadata?: Record<string, unknown> | null;
 }

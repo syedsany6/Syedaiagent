@@ -471,6 +471,7 @@
         }
       },
       "required": [
+        "jsonrpc",
         "method",
         "params"
       ],
@@ -522,6 +523,9 @@
           "default": null
         }
       },
+      "required": [
+        "jsonrpc"
+      ],
       "title": "CancelTaskResponse",
       "type": "object"
     },
@@ -691,6 +695,7 @@
         }
       },
       "required": [
+        "jsonrpc",
         "method",
         "params"
       ],
@@ -742,6 +747,9 @@
           "default": null
         }
       },
+      "required": [
+        "jsonrpc"
+      ],
       "title": "GetTaskPushNotificationResponse",
       "type": "object"
     },
@@ -778,6 +786,7 @@
         }
       },
       "required": [
+        "jsonrpc",
         "method",
         "params"
       ],
@@ -829,6 +838,9 @@
           "default": null
         }
       },
+      "required": [
+        "jsonrpc"
+      ],
       "title": "GetTaskResponse",
       "type": "object"
     },
@@ -856,7 +868,10 @@
         },
         "data": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -896,7 +911,10 @@
         },
         "data": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -936,7 +954,10 @@
         },
         "data": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -976,7 +997,10 @@
         },
         "data": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -1004,7 +1028,10 @@
         },
         "data": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -1117,7 +1144,10 @@
         },
         "result": {
           "anyOf": [
-            {},
+            {
+              "additionalProperties": {},
+              "type": "object"
+            },
             {
               "type": "null"
             }
@@ -1598,8 +1628,7 @@
             }
           ],
           "default": null,
-          "title": "History",
-          "description": "Sequence of messages exchanged during the task execution. May be truncated."
+          "title": "History"
         },
         "metadata": {
           "anyOf": [
@@ -3165,5 +3194,6 @@
     {
       "$ref": "#/$defs/JSONRPCResponse"
     }
-  ]
+  ],
+  "description": "Top-level schema defining either an A2A request or response."
 }
