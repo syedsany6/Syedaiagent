@@ -137,7 +137,7 @@ class TaskManager(InMemoryTaskManager):
                     )
 
                 # Persist + notify
-                updated_task = await self.update_store(request.params.id, new_status, None)
+                updated_task = await self.update_store(request.params.id, new_status, [artifact] if artifact else None)
                 await self.send_task_notification(updated_task)
 
                 await self.enqueue_events_for_sse(
