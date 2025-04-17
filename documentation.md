@@ -508,7 +508,7 @@ A client may choose to cancel previously submitted Tasks as shown below.
 }
 ```
 
-## Set Task Push Notifications
+## Set Task Push Notification Config
 
 Clients may configure a push notification URL for receiving an update on Task status change.
 
@@ -544,7 +544,7 @@ Clients may configure a push notification URL for receiving an update on Task st
 }
 ```
 
-## Get Task Push Notifications
+## Get Task Push Notification Config
 
 Clients may retrieve the currently configured push notification configuration for a Task using this method.
 
@@ -608,6 +608,7 @@ The Message included in the `input-required` state must include the details indi
     "status": {
       "state": "input-required",
       "message": {
+        "role":"agent",
         "parts": [{
           "type":"text",
           "text":"Select a phone type (iPhone/Android)"
