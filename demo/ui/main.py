@@ -36,12 +36,17 @@ def on_load(e: me.LoadEvent):  # pylint: disable=unused-argument
     else:
       state.current_conversation_id = ""
     
-    # Check if API key is set in environment variables
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if api_key:
+    # check if the API key is set in the environment
+    # and if the user is using Vertex AI
+    uses_vertex_ai = os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "").upper() == "TRUE"
+    api_key = os.getenv("GOOGLE_API_KEY", "")
+    
+    if uses_vertex_ai:
+        state.uses_vertex_ai = True
+    elif api_key:
         state.api_key = api_key
     else:
-        # If not set, open the API key dialog
+        # Show the API key dialog if both are not set
         state.api_key_dialog_open = True
 
 # Policy to allow the lit custom element to load

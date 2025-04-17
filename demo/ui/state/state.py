@@ -69,6 +69,7 @@ class AppState:
 
   # Added for API key management
   api_key: str = ""
+  uses_vertex_ai: bool = False
   api_key_dialog_open: bool = False
 
 @me.stateclass

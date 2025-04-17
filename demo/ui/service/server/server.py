@@ -37,9 +37,10 @@ class ConversationServer:
     
     # Get API key from environment
     api_key = os.environ.get("GOOGLE_API_KEY", "")
+    uses_vertex_ai = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "").upper() == "TRUE"
     
     if agent_manager.upper() == "ADK":
-      self.manager = ADKHostManager(api_key=api_key)
+      self.manager = ADKHostManager(api_key=api_key, uses_vertex_ai=uses_vertex_ai)
     else:
       self.manager = InMemoryFakeAgentManager()
     self._file_cache = {} # dict[str, FilePart] maps file id to message data
@@ -86,9 +87,9 @@ class ConversationServer:
         self._files,
         methods=["GET"])
     router.add_api_route(
-      "/api_key/update",
-      self._update_api_key,
-      methods=["POST"])
+        "/api_key/update",
+        self._update_api_key,
+        methods=["POST"])
 
   # Update API key in manager
   def update_api_key(self, api_key: str):

@@ -61,76 +61,77 @@ def settings_page_content():
                 )
             ):
                 # API Key Settings Section
-                with me.box(
-                    style=me.Style(
-                        display="flex",
-                        flex_direction="column",
-                        margin=me.Margin(bottom=30),
-                    )
-                ):
-                    me.text(
-                        "Google API Key",
-                        type="headline-6",
-                        style=me.Style(
-                            margin=me.Margin(bottom=15),
-                            font_family="Google Sans",
-                        ),
-                    )
-                    
+                if not app_state.uses_vertex_ai:
                     with me.box(
                         style=me.Style(
                             display="flex",
-                            flex_direction="row",
-                            gap=10,
-                            align_items="center",
-                            margin=me.Margin(bottom=5),
+                            flex_direction="column",
+                            margin=me.Margin(bottom=30),
                         )
                     ):
-                        me.input(
-                            label="API Key",
-                            value=app_state.api_key,
-                            on_blur=on_api_key_change,
-                            type="password",
-                            appearance="outline",
-                            style=me.Style(width="400px"),
-                        )
-                        
-                        me.button(
-                            "Update",
-                            type="raised",
-                            on_click=update_api_key,
+                        me.text(
+                            "Google API Key",
+                            type="headline-6",
                             style=me.Style(
-                                color=me.theme_var("primary"),
+                                margin=me.Margin(bottom=15),
+                                font_family="Google Sans",
                             ),
                         )
-                    
-                    # Success message
-                    if update_status.show_success:
+                        
                         with me.box(
                             style=me.Style(
-                                background=me.theme_var("success-container"),
-                                padding=me.Padding(top=10, bottom=10, left=10, right=10),
-                                border_radius=4,
-                                margin=me.Margin(top=10),
                                 display="flex",
                                 flex_direction="row",
+                                gap=10,
                                 align_items="center",
-                                width="400px",
+                                margin=me.Margin(bottom=5),
                             )
                         ):
-                            me.icon(
-                                "check_circle", 
-                                style=me.Style(
-                                    color=me.theme_var("on-success-container"),
-                                    margin=me.Margin(right=10),
-                                )
+                            me.input(
+                                label="API Key",
+                                value=app_state.api_key,
+                                on_blur=on_api_key_change,
+                                type="password",
+                                appearance="outline",
+                                style=me.Style(width="400px"),
                             )
-                            me.text(
-                                "API Key updated successfully",
+                            
+                            me.button(
+                                "Update",
+                                type="raised",
+                                on_click=update_api_key,
                                 style=me.Style(
-                                    color=me.theme_var("on-success-container"),
-                                )
+                                    color=me.theme_var("primary"),
+                                ),
                             )
+                        
+                        # Success message
+                        if update_status.show_success:
+                            with me.box(
+                                style=me.Style(
+                                    background=me.theme_var("success-container"),
+                                    padding=me.Padding(top=10, bottom=10, left=10, right=10),
+                                    border_radius=4,
+                                    margin=me.Margin(top=10),
+                                    display="flex",
+                                    flex_direction="row",
+                                    align_items="center",
+                                    width="400px",
+                                )
+                            ):
+                                me.icon(
+                                    "check_circle", 
+                                    style=me.Style(
+                                        color=me.theme_var("on-success-container"),
+                                        margin=me.Margin(right=10),
+                                    )
+                                )
+                                me.text(
+                                    "API Key updated successfully",
+                                    style=me.Style(
+                                        color=me.theme_var("on-success-container"),
+                                    )
+                                ) 
                 
                 # Add spacing instead of divider with style
                 with me.box(style=me.Style(margin=me.Margin(top=10, bottom=10))):
