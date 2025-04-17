@@ -52,10 +52,12 @@ The Agent2Agent (A2A) protocol facilitates communication between independent AI 
     * [Multi-Agent Web App](/demo/README.md)
     * CLI ([Python](/samples/python/hosts/cli/README.md), [JS](/samples/js/README.md))
 * 🤖 Use our [sample agents](/samples/python/agents/README.md) to see how to bring A2A to agent frameworks
-    * [Agent Developer Kit (ADK)](/samples/python/agents/google_adk/README.md)
+    * [Agent Development Kit (ADK)](/samples/python/agents/google_adk/README.md)
     * [CrewAI](/samples/python/agents/crewai/README.md)
     * [LangGraph](/samples/python/agents/langgraph/README.md)
     * [Genkit](/samples/js/src/agents/README.md)
+    * [LlamaIndex](/samples/python/agents/llama_index_file_chat/README.md)
+    * [Semantic Kernel](/samples/python/agents/semantickernel/README.md)
 * 📑 Review key topics to understand protocol details 
     * [A2A and MCP](https://google.github.io/A2A/#/topics/a2a_and_mcp.md)
     * [Agent Discovery](https://google.github.io/A2A/#/topics/agent_discovery.md)
@@ -64,10 +66,11 @@ The Agent2Agent (A2A) protocol facilitates communication between independent AI 
 
 ### **Contributing**
 
-We welcome contributions! Please see our [contributing guide](CONTRIBUTING.md) to get started.\
-Have questions? Join our community in [GitHub discussions](https://github.com/google/A2A/discussions/).\
-Help with protocol improvement feedback, in [GitHub issues](https://github.com/google/A2A/issues).\
-Want to send private feedback? use this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScS23OMSKnVFmYeqS2dP7dxY3eTyT7lmtGLUa8OJZfP4RTijQ/viewform)
+We highly value community contributions and appreciate your interest in A2A Protocol! Here's how you can get involved:
+* Get Started? Please see our [contributing guide](CONTRIBUTING.md) to get started.
+* Have questions? Join our community in [GitHub discussions](https://github.com/google/A2A/discussions).
+* Want to help with protocol improvement feedback?  Dive into [GitHub issues](https://github.com/google/A2A/issues).
+* Private Feedback? Please use this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScS23OMSKnVFmYeqS2dP7dxY3eTyT7lmtGLUa8OJZfP4RTijQ/viewform)
 
 ### **What's next**
 
