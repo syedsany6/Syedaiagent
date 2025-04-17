@@ -35,12 +35,13 @@ async def on_send_task_subscribe(
 Open up `src/my_project/task_manager.py` and add the following code. We will simply returns a direct echo response and immediately mark the task complete without any sessions or subscriptions
 
 ```python
-from typing import AsyncInterable
+from typing import AsyncIterable
 
 import google_a2a
 from google_a2a.common.server.task_manager import InMemoryTaskManager
 from google_a2a.common.types import (
   Artifact,
+  JSONRPCResponse,
   Message,
   SendTaskRequest,
   SendTaskResponse,
@@ -48,6 +49,7 @@ from google_a2a.common.types import (
   SendTaskStreamingResponse,
   Task,
   TaskState,
+  TaskStatus,
   TaskStatusUpdateEvent,
 )
 
@@ -62,9 +64,11 @@ class MyAgentTaskManager(InMemoryTaskManager):
     task_id = request.params.id
     # Our custom logic that simply marks the task as complete
     # and returns the echo text
-    task = self._update_task(
+    received_text = request.params.message.parts[0].text
+    task = await self._update_task(
       task_id=task_id,
-      response_text=request.params.message.parts[0]
+      task_state=TaskState.COMPLETED,
+      response_text=f"on_send_task received: {received_text}"
     )
 
     # Send the response
@@ -73,16 +77,18 @@ class MyAgentTaskManager(InMemoryTaskManager):
   async def on_send_task_subscribe(
     self,
     request: SendTaskStreamingRequest
-  ) -> AsyncInterable[SendTaskStreamingResponse] | JSONRPCResponse:
+  ) -> AsyncIterable[SendTaskStreamingResponse] | JSONRPCResponse:
     # Upsert a task stored by InMemoryTaskManager
     await self.upsert_task(request.params)
 
     task_id = request.params.id
     # Our custom logic that simply marks the task as complete
     # and returns the echo text
-    task = self._update_date(
+    received_text = request.params.message.parts[0].text
+    task = await self._update_task(
       task_id=task_id,
-      response_text=request.params.message.parts[0]
+      task_state=TaskState.COMPLETED,
+      response_text=f"on_send_task_subscribe received: {received_text}"
     )
 
     # Send the response
@@ -98,7 +104,8 @@ class MyAgentTaskManager(InMemoryTaskManager):
   async def _update_task(
     self,
     task_id: str,
-    response_text: str
+    task_state: TaskState,
+    response_text: str,
   ) -> Task:
     task = self.tasks[task_id]
     agent_response_parts = [
@@ -108,7 +115,7 @@ class MyAgentTaskManager(InMemoryTaskManager):
       }
     ]
     task.status = TaskStatus(
-      state=TaskState.COMPLETE,
+      state=task_state,
       message=Message(
         role="agent",
         parts=agent_response_parts,
@@ -131,7 +138,7 @@ Open up `src/my_project/__init__.py` and add the following code.
 
 ```python
 # ...
-from google_a2a.server import A2AServer
+from google_a2a.common.server import A2AServer
 from my_project.task_manager import MyAgentTaskManager
 # ...
 def main(host, port):
@@ -160,7 +167,10 @@ uv run my-project
 The output should look something like this.
 
 ```bash
-
+INFO:     Started server process [20506]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://localhost:10002 (Press CTRL+C to quit)
 ```
 
 Congratulations! Your A2A server is now running!

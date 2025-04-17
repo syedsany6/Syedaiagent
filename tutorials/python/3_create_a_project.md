@@ -25,7 +25,6 @@ The source code should now look similar to this.
 ```bash
 tree .
 .
-├── .python-version
 ├── pyproject.toml
 ├── README.md
 ├── src

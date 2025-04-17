@@ -47,13 +47,13 @@ from google_a2a.common.types import AgentSkill
 
 def main():
   skill = AgentSkill(
-    id="my-project-echo-skill"
-    name="Echo Tool"
+    id="my-project-echo-skill",
+    name="Echo Tool",
     description="Echos the input given",
     tags=["echo", "repeater"],
     examples=["I will see this echoed back to me"],
     inputModes=["text"],
-    outputModes=["text"]
+    outputModes=["text"],
   )
   print(skill)
 
@@ -73,7 +73,7 @@ uv run my-project
 The output should look something like this.
 
 ```bash
-
+id='my-project-echo-skill' name='Echo Tool' description='Echos the input given' tags=['echo', 'repeater'] examples=['I will see this echoed back to me'] inputModes=['text'] outputModes=['text']
 ```
 
 <div class="bottom-buttons" style="flex flex-row">

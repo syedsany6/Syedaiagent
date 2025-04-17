@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 import google_a2a
 from google_a2a.common.types import AgentSkill, AgentCapabilities, AgentCard
 
-logging.basicConfig(level=logging.Info)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 @click.command()
@@ -30,13 +30,13 @@ logger = logging.getLogger(__name__)
 @click.option("--port", default=10002)
 def main(host, port):
   skill = AgentSkill(
-    id="my-project-echo-skill"
-    name="Echo Tool"
+    id="my-project-echo-skill",
+    name="Echo Tool",
     description="Echos the input given",
     tags=["echo", "repeater"],
     examples=["I will see this echoed back to me"],
     inputModes=["text"],
-    outputModes=["text"]
+    outputModes=["text"],
   )
   logging.info(skill)
 
@@ -80,7 +80,7 @@ uv run my-project
 The output should look something like this.
 
 ```bash
-
+INFO:root:name='Echo Agent' description='This agent echos the input given' url='http://localhost:10002/' provider=None version='0.1.0' documentationUrl=None capabilities=AgentCapabilities(streaming=False, pushNotifications=False, stateTransitionHistory=False) authentication=None defaultInputModes=['text'] defaultOutputModes=['text'] skills=[AgentSkill(id='my-project-echo-skill', name='Echo Tool', description='Echos the input given', tags=['echo', 'repeater'], examples=['I will see this echoed back to me'], inputModes=['text'], outputModes=['text'])]
 ```
 
 <div class="bottom-buttons" style="flex flex-row">

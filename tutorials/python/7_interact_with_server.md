@@ -6,22 +6,37 @@ First we'll use Google-A2A's cli tool to send requests to our A2A server. After 
 
 Note: This will only work if you've installed google-a2a from this [pull request](https://github.com/google/A2A/pull/169) as the cli was not exposed previously.
 
+With your A2A server already running from the previous run
 ```bash
-uv run google-a2a-cli
+# This should already be running in your terminal
+$ uv run my-project
+INFO:     Started server process [20538]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://localhost:10002 (Press CTRL+C to quit)
+```
+
+Open up a new terminal in the same directory
+```bash
+source .venv/bin/activate
+uv run google-a2a-cli --agent http://localhost:10002
 ```
 
 You can then send messages to your server and pressing Enter
 
 ```bash
+=========  starting a new task ========
 
+What do you want to send to the agent? (:q or quit to exit): Hello!
 ```
 
-To exit press Ctrl-C twice
+If everything is working correctly you'll see this in the response
 
+```bash
+"message":{"role":"agent","parts":[{"type":"text","text":"on_send_task received: Hello!"}]}
+```
 
-## Writing our own cli
-
-Coming Soon!
+To exit type `:q` and press Enter
 
 
 <div class="bottom-buttons" style="flex flex-row">
