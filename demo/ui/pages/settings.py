@@ -133,11 +133,11 @@ def settings_page_content():
                                     )
                                 ) 
                 
-                # Add spacing instead of divider with style
-                with me.box(style=me.Style(margin=me.Margin(top=10, bottom=10))):
-                    me.divider()
+                    # Add spacing instead of divider with style
+                    with me.box(style=me.Style(margin=me.Margin(top=10, bottom=10))):
+                        me.divider()
                 
-                # Output Types Section (original content)
+                # Output Types Section
                 me.select(
                     label="Supported Output Types",
                     options=[
