@@ -12,9 +12,10 @@
      * [5. Adding an Agent Card](tutorials/python/5_add_agent_card.md)
      * [6. Starting a server](tutorials/python/6_start_server.md)
      * [7. Interacting with your server](tutorials/python/7_interact_with_server.md)
-     * [8. Adding Agent Capabilities]()
-     * [9. Next Steps]()
-     * [10. Using Ollama](tutorials/python/10_ollama.md)
+     * [8. Adding Agent Capabilities](tutorials/python/8_agent_capabilities.md)
+     * [9. Using a local Ollama Agent](tutorials/python/9_ollama_agent.md)
+     * [10. Connecting MCP Tools](tutorials/python/10_connecting_mcp_tools.md)
+     * [11. Next Steps](tutorials/python/10_next_steps.md)
 * Review Key Topics
   * [A2A and MCP](topics/a2a_and_mcp.md)
   * [Agent Discovery](topics/agent_discovery.md)

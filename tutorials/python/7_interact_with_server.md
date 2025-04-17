@@ -2,7 +2,7 @@
 
 First we'll use Google-A2A's cli tool to send requests to our A2A server. After trying it out, we'll write our own basic client to see how this works under the hood
 
-## Using Google-A2A's cli tool
+## Using Google-A2A's cli tool <!-- {docsify-ignore} -->
 
 Note: This will only work if you've installed google-a2a from this [pull request](https://github.com/google/A2A/pull/169) as the cli was not exposed previously.
 

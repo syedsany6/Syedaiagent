@@ -78,28 +78,7 @@ class MyAgentTaskManager(InMemoryTaskManager):
     self,
     request: SendTaskStreamingRequest
   ) -> AsyncIterable[SendTaskStreamingResponse] | JSONRPCResponse:
-    # Upsert a task stored by InMemoryTaskManager
-    await self.upsert_task(request.params)
-
-    task_id = request.params.id
-    # Our custom logic that simply marks the task as complete
-    # and returns the echo text
-    received_text = request.params.message.parts[0].text
-    task = await self._update_task(
-      task_id=task_id,
-      task_state=TaskState.COMPLETED,
-      response_text=f"on_send_task_subscribe received: {received_text}"
-    )
-
-    # Send the response
-    yield SendTaskStreamingResponse(
-      id=request.id,
-      result=TaskStatusUpdateEvent(
-        id=request.params.id,
-        status=task.status,
-        final=True,
-      )
-    )
+    pass
 
   async def _update_task(
     self,
