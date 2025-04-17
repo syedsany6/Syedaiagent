@@ -36,7 +36,6 @@ class HyperwhalesAgent:
       self.model_client = None
       self.mcp_agent = None
       self.sessions: Dict[str, SessionData] = defaultdict(dict)
-      self.agent_sessions: Dict[str, MagenticOneGroupChat] = defaultdict(dict)
       self.session_lock = asyncio.Lock()
       self.session_timeout = timedelta(seconds=300)
       self.max_concurrent_tasks = 10
@@ -73,7 +72,6 @@ class HyperwhalesAgent:
                   gen = self.sessions[sid]["generator"]
                   await gen.aclose()
                   del self.sessions[sid]
-                  del self.agent_sessions[sid]
           await asyncio.sleep(60)
 
   async def process_event(self, event, session_id: str) -> Dict[str, Any]:
@@ -102,15 +100,11 @@ class HyperwhalesAgent:
           try:
               # Check if we have an existing agent for this session
               async with self.session_lock:
-                  if session_id not in self.agent_sessions:
-                      # Create new agent for this session
-                      self.agent_sessions[session_id] = MagenticOneGroupChat(
-                          participants=[self.mcp_agent], 
-                          model_client=self.model_client
-                      )
-                  
                   # Get the agent for this session (either existing or newly created)
-                  orchestrator_agent = self.agent_sessions[session_id]
+                  orchestrator_agent = MagenticOneGroupChat(
+                    participants=[self.mcp_agent], 
+                    model_client=self.model_client
+                  )
                   
                   self.sessions[session_id] = {
                       "generator": orchestrator_agent.run_stream(task=query),
@@ -128,7 +122,6 @@ class HyperwhalesAgent:
                   if session_id in self.sessions:
                       await self.sessions[session_id]["generator"].aclose()
                       del self.sessions[session_id]
-                      del self.agent_sessions[session_id]
               yield {"is_task_complete": True, "require_user_input": False, "content": "Task timed out"}
           except Exception as e:
               logger.error(f"Error in stream for session {session_id}: {e}")
@@ -136,7 +129,6 @@ class HyperwhalesAgent:
                   if session_id in self.sessions:
                       await self.sessions[session_id]["generator"].aclose()
                       del self.sessions[session_id]
-                      del self.agent_sessions[session_id]
               yield {"is_task_complete": True, "require_user_input": False, "content": f"Error: {str(e)}"}
           finally:
               logger.info(f"Stream for session {session_id} completed")
