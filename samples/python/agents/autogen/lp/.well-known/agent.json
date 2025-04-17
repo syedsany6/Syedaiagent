@@ -1,0 +1,27 @@
+{
+  "name": "Raydium LP Agent",
+  "description": "Analyze Raydium LP pools, and give suggestions for users",
+  "url": "",
+  "provider": {
+    "organization": "Oraichain Labs",
+    "url": "https://orai.io"
+  },
+  "version": "1.0.0",
+  "authentication": {},
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "RaydiumLPAgent",
+      "name": "Raydium LP Agent",
+      "description": "Analyze Raydium LP pools, and give suggestions for users",
+      "tags": ["raydium", "lp", "defi"],
+      "examples": [],
+      "outputModes": ["text/plain"]
+    }
+  ]
+}

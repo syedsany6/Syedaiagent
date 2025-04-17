@@ -1,7 +1,7 @@
 from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
-from agents.hyperwhales.task_manager import AgentTaskManager
-from agents.hyperwhales.agent import HyperwhalesAgent
+from agents.autogen.hyperwhales.task_manager import AgentTaskManager
+from agents.autogen.hyperwhales.agent import HyperwhalesAgent
 from autogen_ext.tools.mcp import SseServerParams
 import click
 import os
@@ -24,7 +24,7 @@ def main(host, port):
             raise MissingAPIKeyError("API_KEY environment variable not set.")
         if not os.getenv("LLM_MODEL"):
             raise MissingAPIKeyError("LLM_MODEL environment variable not set.")
-        
+
         capabilities = AgentCapabilities(streaming=True)
         skill = AgentSkill(
             id="hyperwhales",
@@ -44,7 +44,13 @@ def main(host, port):
             skills=[skill],
         )
         agent = HyperwhalesAgent()
-        asyncio.run(agent.initialize(mcp_server_params=[SseServerParams(url="http://0.0.0.0:4000/sse")]))
+        asyncio.run(
+            agent.initialize(
+                mcp_server_params=[
+                    SseServerParams(url="http://15.235.225.246:4010/sse")
+                ]
+            )
+        )
         server = A2AServer(
             agent_card=agent_card,
             task_manager=AgentTaskManager(agent=agent),
@@ -58,7 +64,7 @@ def main(host, port):
     except Exception as e:
         logger.error(f"An error occurred during server startup: {e}")
         exit(1)
-    
+
+
 if __name__ == "__main__":
     main()
-

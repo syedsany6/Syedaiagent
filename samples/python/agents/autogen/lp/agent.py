@@ -3,6 +3,7 @@ import asyncio
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
+from agents.autogen.lp.memory_manager import MemoryManager
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient
@@ -26,15 +27,14 @@ class SessionData(TypedDict):
     last_accessed: datetime
 
 
-class HyperwhalesAgent:
+class RaydiumLpAgent:
     SYSTEM_INSTRUCTION = (
-        "You are a Hyperwhales agent who is an expert analyst specializing in detecting whale trading patterns with years of"
-        "experience understanding deeply crypto trading behavior, on-chain metrics, and derivatives markets, you have developed a keen understanding of whale trading strategies."
-        "You can identify patterns in whale positions, analyze their portfolio changes over time, and evaluate the potential reasons behind their trading decisions."
-        "Your analysis helps traders decide whether to follow whale trading moves or not."
-        "When you use any tool, I expect you to push its limits: fetch all the data it can provide, whether that means iterating through multiple batches, adjusting parameters like offsets, or running the tool repeatedly to cover every scenario. Don't work with small set of data for sure, fetch as much as you can. Don't stop until you're certain you've captured everything there is to know."
-        "Then, analyze the data with sharp logic, explain your reasoning and bias clearly, and present me with trade suggestions that reflect your deepest insights."
-        "Always check whether you are in a loop or not, if you are, break out of it."
+        "You're an expert in DeFi, specifically in LP farming on AMM v3. With years of experience, analyze and identify high, medium, and low-risk concentrated LP pools on Raydium."
+        "Your analysis must cover all pools, retrieving historical price data for all tokens on Raydium. From this data, establish various selection criteria for adding liquidity."
+        "Analyze as many factors as possible, including: APR, Trading Volume, Price Volatility, TVL, Pair Correlation. Use technical indicators such as:  Moving Averages (MA), Bollinger Bands, Support & Resistance, RSI, liquidity depth... Assess risks such as Impermanent Loss. Two critical additional factors are the market trend of each token and ensuring correlation within the pool remains at an optimal level."
+        "In your report. The selected token must be in an uptrend or neutral, with a high correlation coefficient. Please provide a detailed analysis of market trends and the correlation coefficient in the report. "
+        "For selected pools, provide insights on: Price range for LP allocation, Risk management strategies, Most importantly, justify your decisions—explain which indicators led to your conclusions.  Think thoroughly and comprehensively before each step of analysis and decision-making."
+        "When using analytical tools, push their limits—fetch all available data, whether it requires batch iterations or multiple runs. Don't work with a small dataset; gather as much data as possible. Don't stop until you're certain you've extracted every relevant detail. Then, apply sharp logic, clearly explain your reasoning and biases, and present trade recommendations based on deep insights."
     )
 
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
@@ -48,6 +48,7 @@ class HyperwhalesAgent:
         self.session_timeout = timedelta(seconds=self.timeout)
         self.max_concurrent_tasks = 10
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
+        self.memory_manager = MemoryManager()
 
     async def initialize(self, mcp_server_params: list[McpServerParams] = []):
         api_key = os.getenv("API_KEY")
@@ -55,17 +56,12 @@ class HyperwhalesAgent:
         if not api_key or not model:
             raise ValueError("API_KEY or LLM_MODEL not set")
         self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
-        tools = []
+        self.tools = []
         for mcp_server_param in mcp_server_params:
             server_tools = await mcp_server_tools(mcp_server_param)
-            tools.extend(server_tools)
-        self.mcp_agent = AssistantAgent(
-            name="MCPTools",
-            model_client=self.model_client,
-            tools=tools,
-        )
+            self.tools.extend(server_tools)
         asyncio.create_task(self.cleanup_sessions())
-        logger.info("HyperwhalesAgent initialized and cleanup_sessions task scheduled")
+        logger.info("RaydiumLpAgent initialized and cleanup_sessions task scheduled")
 
     async def cleanup_sessions(self):
         while True:
@@ -80,6 +76,7 @@ class HyperwhalesAgent:
                     gen = self.sessions[sid]["generator"]
                     await gen.aclose()
                     del self.sessions[sid]
+                    self.memory_manager.delete_session(sid)
             await asyncio.sleep(60)
 
     async def process_event(self, event, session_id: str) -> Dict[str, Any]:
@@ -98,6 +95,19 @@ class HyperwhalesAgent:
                 async with self.session_lock:
                     await self.sessions[session_id]["generator"].aclose()
                     del self.sessions[session_id]
+                    logger.info(
+                        f"Adding memory {event.messages[-1].content} for session {session_id}"
+                    )
+                    if "content" in event.messages[-1]:
+                        self.memory_manager.add_memory(
+                            session_id,
+                            [
+                                {
+                                    "role": "assistant",
+                                    "content": event.messages[-1].content,
+                                },
+                            ],
+                        )
                 return {
                     "is_task_complete": True,
                     "require_user_input": False,
@@ -158,15 +168,37 @@ class HyperwhalesAgent:
             try:
                 # Check if we have an existing agent for this session
                 async with self.session_lock:
-                    orchestrator_agent = MagenticOneGroupChat(
-                        participants=[self.mcp_agent], model_client=self.model_client
+                    mcp_agent = AssistantAgent(
+                        name="MCPTools",
+                        model_client=self.model_client,
+                        tools=self.tools,
+                        system_message=self.SYSTEM_INSTRUCTION,
                     )
-
+                    orchestrator_agent = MagenticOneGroupChat(
+                        participants=[mcp_agent], model_client=self.model_client
+                    )
+                    relevant_memories = self.memory_manager.relevant_memories(
+                        session_id=session_id, query=query
+                    )
+                    logger.info(
+                        f"Relevant memories: {relevant_memories} for session {session_id} at query {query}"
+                    )
+                    task = query
+                    if len(relevant_memories) > 0:
+                        flatten_relevant_memories = "\n".join(
+                            [m["memory"] for m in relevant_memories]
+                        )
+                        task = f"Answer the user question considering the memories. Keep answers clear and concise. Memories:{flatten_relevant_memories}\n\nQuestion: {query}"
                     self.sessions[session_id] = {
-                        "generator": orchestrator_agent.run_stream(task=query),
+                        "generator": orchestrator_agent.run_stream(task=task),
                         "last_accessed": datetime.now(timezone.utc),
                     }
-
+                    self.memory_manager.add_memory(
+                        session_id,
+                        [
+                            {"role": "user", "content": query},
+                        ],
+                    )
                 async with asyncio.timeout(self.timeout):
                     async for event in self.sessions[session_id]["generator"]:
                         async with self.session_lock:
