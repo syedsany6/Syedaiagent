@@ -44,13 +44,13 @@ Click on the task list to see all the A2A task updates from the remote agents
 
    **Option A: Google AI Studio API Key**
    ```bash
-   echo "GOOGLE_API_KEY=your_api_key_here" > .env
+   echo "GOOGLE_API_KEY=your_api_key_here" >> .env
    ```
    Or enter it directly in the UI when prompted.
 
    **Option B: Google Cloud Vertex AI**
    ```bash
-    echo "GOOGLE_GENAI_USE_VERTEXAI=TRUE" > .env
+    echo "GOOGLE_GENAI_USE_VERTEXAI=TRUE" >> .env
     echo "GOOGLE_CLOUD_PROJECT=your_project_id" >> .env
     echo "GOOGLE_CLOUD_LOCATION=your_location" >> .env
    ```
