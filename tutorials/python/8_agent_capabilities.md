@@ -76,6 +76,8 @@ class MyAgentTaskManager(InMemoryTaskManager):
     )
 ```
 
+Restart your A2A server to pickup the new changes and then rerun the cli
+
 ```bash
 $ uv run google-a2a-cli --agent http://localhost:10002
 =========  starting a new task ========
@@ -174,7 +176,7 @@ class MyAgentTaskManager(InMemoryTaskManager):
     )
 ```
 
-Now if we run, we can see the task will keep running until we tell the agent `N`
+Now after restarting the server and running the cli, we can see the task will keep running until we tell the agent `N`
 
 ```bash
 $ uv run google-a2a-cli --agent http://localhost:10002
