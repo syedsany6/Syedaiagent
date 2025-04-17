@@ -47,6 +47,8 @@ sequenceDiagram
 - **Conversational Memory**: Maintains context across interactions in the same session
 - **LlamaParse Integration**: Uses LlamaParse to parse files accurately
 
+**NOTE:** This sample agent accepts multimodal inputs, but at the time of writing, the sample UI only supports text inputs. The UI will become multimodal in the future to handle this and other use cases.
+
 ## Prerequisites
 
 - Python 3.12 or higher
