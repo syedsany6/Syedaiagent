@@ -39,8 +39,8 @@ def main(host, port):
             description="Parses a file and then chats with a user using the parsed content as context.",
             url=f"http://{host}:{port}/",
             version="1.0.0",
-            defaultInputModes=LlamaIndexTaskManager.SUPPORTED_CONTENT_TYPES,
-            defaultOutputModes=LlamaIndexTaskManager.SUPPORTED_CONTENT_TYPES,
+            defaultInputModes=LlamaIndexTaskManager.SUPPORTED_INPUT_TYPES,
+            defaultOutputModes=LlamaIndexTaskManager.SUPPORTED_OUTPUT_TYPES,
             capabilities=capabilities,
             skills=[skill],
         )

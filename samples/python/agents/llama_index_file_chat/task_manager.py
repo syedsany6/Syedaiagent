@@ -35,7 +35,15 @@ from llama_index.core.workflow import Context
 logger = logging.getLogger(__name__)
 
 class LlamaIndexTaskManager(InMemoryTaskManager):
-    SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
+    # Technically supports basically anything, but we'll limit to some common types
+    SUPPORTED_INPUT_TYPES = [
+        "text/plain",
+        "application/pdf", 
+        "application/msword",
+        "image/png",
+        "image/jpeg",
+    ]
+    SUPPORTED_OUTPUT_TYPES = ["text/plain"]
 
     def __init__(self, agent: ParseAndChat, notification_sender_auth: PushNotificationSenderAuth):
         super().__init__()
