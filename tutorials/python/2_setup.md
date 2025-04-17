@@ -27,5 +27,5 @@ If you see something similar to the following, you are ready to proceed!
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/1_introduction.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/3_create_a_project.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/3_create_a_project.md?id=creating-a-project" class="next-button">Next</a>
 </div>

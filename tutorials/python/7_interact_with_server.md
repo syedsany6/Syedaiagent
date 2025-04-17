@@ -4,7 +4,7 @@ First we'll use Google-A2A's cli tool to send requests to our A2A server. After 
 
 ## Using Google-A2A's cli tool <!-- {docsify-ignore} -->
 
-Note: This will only work if you've installed google-a2a from this [pull request](https://github.com/google/A2A/pull/169) as the cli was not exposed previously.
+
 
 With your A2A server already running from the previous run
 ```bash
@@ -21,6 +21,10 @@ Open up a new terminal in the same directory
 source .venv/bin/activate
 uv run google-a2a-cli --agent http://localhost:10002
 ```
+
+Note: This will only work if you've installed google-a2a from this [pull request](https://github.com/google/A2A/pull/169) as the cli was not exposed previously.
+
+Otherwise you'll have to checkout the [Google/A2A repository](https://github.com/google/A2A/) directly, navigate to the `samples/python` repository and run the cli directly
 
 You can then send messages to your server and pressing Enter
 
@@ -41,5 +45,5 @@ To exit type `:q` and press Enter
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/6_start_server.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/8_agent_capabilities.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/8_agent_capabilities.md?id=adding-agent-capabilities" class="next-button">Next</a>
 </div>

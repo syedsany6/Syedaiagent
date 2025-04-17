@@ -78,5 +78,5 @@ id='my-project-echo-skill' name='Echo Tool' description='Echos the input given' 
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/3_create_a_project.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/5_add_agent_card.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/5_add_agent_card.md?id=agent-card" class="next-button">Next</a>
 </div>

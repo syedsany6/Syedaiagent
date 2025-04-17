@@ -85,5 +85,5 @@ INFO:root:name='Echo Agent' description='This agent echos the input given' url='
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/4_agent_skills.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/6_start_server.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/6_start_server.md?id=a2a-server" class="next-button">Next</a>
 </div>

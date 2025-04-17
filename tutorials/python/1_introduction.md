@@ -11,6 +11,6 @@ In this tutorial, you will build a simple echo A2A server using Python. This bar
 
 
 <div class="bottom-buttons" style="flex flex-row">
-  <span class=""></span>
-  <a href="#/tutorials/python/2_setup.md" class="next-button">Next</a>
+  <span></span>
+  <a href="#/tutorials/python/2_setup.md?id=setup-your-environment" class="next-button">Next</a>
 </div>

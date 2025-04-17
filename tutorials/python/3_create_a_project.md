@@ -78,5 +78,5 @@ Hello from my-project!
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/2_setup.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/4_agent_skills.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/4_agent_skills.md?id=agent-skills" class="next-button">Next</a>
 </div>

@@ -147,5 +147,5 @@ Congratulations! You now have an A2A server generating responses using an AI mod
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/8_agent_capabilities.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/10_connecting_mcp_tools.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/10_next_steps.md?id=next-steps" class="next-button">Next</a>
 </div>

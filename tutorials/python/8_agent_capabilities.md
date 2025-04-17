@@ -1,6 +1,6 @@
 # Adding Agent Capabilities
 
-Now that we have a basic A2A server running, let's add some more functionality. We'll explore each part of what A2A has to offer.
+Now that we have a basic A2A server running, let's add some more functionality. We'll explore how A2A can work asynchronously and stream responses.
 
 ## Streaming <!-- {docsify-ignore} -->
 
@@ -204,5 +204,5 @@ If you're interested, check out the [documentation](/documentation.md?id=sample-
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/7_interact_with_server.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/9_ollama_agent.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/9_ollama_agent.md?id=using-a-local-ollama-model" class="next-button">Next</a>
 </div>

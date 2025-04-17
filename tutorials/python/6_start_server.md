@@ -156,5 +156,5 @@ Congratulations! Your A2A server is now running!
 
 <div class="bottom-buttons" style="flex flex-row">
   <a href="#/tutorials/python/5_add_agent_card.md" class="back-button">Back</a>
-  <a href="#/tutorials/python/7_interact_with_server.md" class="next-button">Next</a>
+  <a href="#/tutorials/python/7_interact_with_server.md?id=interacting-with-your-a2a-server" class="next-button">Next</a>
 </div>
