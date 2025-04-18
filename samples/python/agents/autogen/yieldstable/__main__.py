@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option("--host", default="localhost")
-@click.option("--port", default=10001)
+@click.option("--port", default=10002)
 def main(host, port):
     try:
         if not os.getenv("API_KEY"):
@@ -27,15 +27,15 @@ def main(host, port):
 
         capabilities = AgentCapabilities(streaming=True)
         skill = AgentSkill(
-            id="raydium-lp",
-            name="RaydiumLpAgent",
-            description="Analyze Raydium LP pools, and give suggestions for users",
-            tags=["raydium", "lp", "defi"],
+            id="YieldStable",
+            name="YieldStableAgent",
+            description="Analyze trades on defillama and provide insights on the best stablecoin farming strategies",
+            tags=["yieldstable"],
             examples=["Find me some trades now based on whales data and history"],
         )
         agent_card = AgentCard(
-            name="RaydiumLpAgent",
-            description="Analyze Raydium LP pools, and give suggestions for users",
+            name="YieldStableAgent",
+            description="Analyze trades on defillama and provide insights on the best stablecoin farming strategies",
             url=f"http://{host}:{port}/",
             version="1.0.0",
             defaultInputModes=["text", "text/plain"],
@@ -44,14 +44,16 @@ def main(host, port):
             skills=[skill],
         )
         agent = Agent(
-            label="RaydiumLpAgent",
-            system_instruction="You're an expert in DeFi, specifically in LP farming on AMM v3. With years of experience, analyze and identify high, medium, and low-risk concentrated LP pools on Raydium. Your analysis must cover all pools, retrieving historical price data for all tokens on Raydium. From this data, establish various selection criteria for adding liquidity. Analyze as many factors as possible, including: APR, Trading Volume, Price Volatility, TVL, Pair Correlation. Use technical indicators such as:  Moving Averages (MA), Bollinger Bands, Support & Resistance, RSI, liquidity depth... Assess risks such as Impermanent Loss. Two critical additional factors are the market trend of each token and ensuring correlation within the pool remains at an optimal level.In your report. The selected token must be in an uptrend or neutral, with a high correlation coefficient. Please provide a detailed analysis of market trends and the correlation coefficient in the report.",
+            label="YieldStableAgent",
+            system_instruction="You are an expert AI Stablecoin Yield Consultant. Your role is to research, verify, and recommend highest-yield stablecoin farming strategies based on user preferences, investment horizon, and risk tolerance—using tools such as yield aggregators (DefiLlama preferred), web search, and social sentiment.",
             supported_content_types=["text", "text/plain"],
         )
         asyncio.run(
             agent.initialize(
                 mcp_server_params=[
-                    SseServerParams(url="http://15.235.225.246:8083/sse")
+                    # SseServerParams(url="http://15.235.225.246:8054/sse"),
+                    SseServerParams(url="http://15.235.225.246:5000/sse"),
+                    # SseServerParams(url="http://15.235.225.246:8058/sse"),
                 ]
             )
         )

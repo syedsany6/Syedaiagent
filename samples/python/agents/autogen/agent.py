@@ -3,7 +3,7 @@ import asyncio
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
-from agents.autogen.lp.memory_manager import MemoryManager
+from agents.autogen.memory_manager import MemoryManager
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient
@@ -27,19 +27,16 @@ class SessionData(TypedDict):
     last_accessed: datetime
 
 
-class RaydiumLpAgent:
-    SYSTEM_INSTRUCTION = (
-        "You're an expert in DeFi, specifically in LP farming on AMM v3. With years of experience, analyze and identify high, medium, and low-risk concentrated LP pools on Raydium."
-        "Your analysis must cover all pools, retrieving historical price data for all tokens on Raydium. From this data, establish various selection criteria for adding liquidity."
-        "Analyze as many factors as possible, including: APR, Trading Volume, Price Volatility, TVL, Pair Correlation. Use technical indicators such as:  Moving Averages (MA), Bollinger Bands, Support & Resistance, RSI, liquidity depth... Assess risks such as Impermanent Loss. Two critical additional factors are the market trend of each token and ensuring correlation within the pool remains at an optimal level."
-        "In your report. The selected token must be in an uptrend or neutral, with a high correlation coefficient. Please provide a detailed analysis of market trends and the correlation coefficient in the report. "
-        "For selected pools, provide insights on: Price range for LP allocation, Risk management strategies, Most importantly, justify your decisions—explain which indicators led to your conclusions.  Think thoroughly and comprehensively before each step of analysis and decision-making."
-        "When using analytical tools, push their limits—fetch all available data, whether it requires batch iterations or multiple runs. Don't work with a small dataset; gather as much data as possible. Don't stop until you're certain you've extracted every relevant detail. Then, apply sharp logic, clearly explain your reasoning and biases, and present trade recommendations based on deep insights."
-    )
-
-    SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
-
-    def __init__(self):
+class Agent:
+    def __init__(
+        self,
+        label: str,
+        system_instruction: str,
+        supported_content_types: list[str] = ["text", "text/plain"],
+    ):
+        self.LABEL = label
+        self.SYSTEM_INSTRUCTION = system_instruction
+        self.SUPPORTED_CONTENT_TYPES = supported_content_types
         self.model_client = None
         self.mcp_agent = None
         self.sessions: Dict[str, SessionData] = defaultdict(dict)
@@ -48,7 +45,7 @@ class RaydiumLpAgent:
         self.session_timeout = timedelta(seconds=self.timeout)
         self.max_concurrent_tasks = 10
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
-        self.memory_manager = MemoryManager()
+        self.memory_manager = MemoryManager(label)
 
     async def initialize(self, mcp_server_params: list[McpServerParams] = []):
         api_key = os.getenv("API_KEY")
@@ -61,7 +58,7 @@ class RaydiumLpAgent:
             server_tools = await mcp_server_tools(mcp_server_param)
             self.tools.extend(server_tools)
         asyncio.create_task(self.cleanup_sessions())
-        logger.info("RaydiumLpAgent initialized and cleanup_sessions task scheduled")
+        logger.info(f"{self.LABEL} initialized and cleanup_sessions task scheduled")
 
     async def cleanup_sessions(self):
         while True:
@@ -117,6 +114,7 @@ class RaydiumLpAgent:
                 }
             elif isinstance(event, BaseChatMessage):
                 content, images = self.extract_message_content(event)
+                print(f"content: {content}", f"images: {images}")
                 model_usage = event.model_dump().get("model_usage", None)
                 return {
                     "is_task_complete": False,
@@ -169,7 +167,7 @@ class RaydiumLpAgent:
                 # Check if we have an existing agent for this session
                 async with self.session_lock:
                     mcp_agent = AssistantAgent(
-                        name="MCPTools",
+                        name=self.LABEL,
                         model_client=self.model_client,
                         tools=self.tools,
                         system_message=self.SYSTEM_INSTRUCTION,
