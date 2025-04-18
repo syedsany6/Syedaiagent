@@ -50,9 +50,7 @@ def main(host, port):
         )
         asyncio.run(
             agent.initialize(
-                mcp_server_params=[
-                    SseServerParams(url="http://15.235.225.246:4010/sse")
-                ]
+                mcp_server_params=[SseServerParams(url="http://0.0.0.0:4000/sse")]
             )
         )
         server = A2AServer(

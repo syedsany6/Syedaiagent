@@ -33,6 +33,8 @@ class Agent:
         label: str,
         system_instruction: str,
         supported_content_types: list[str] = ["text", "text/plain"],
+        timeout: int = 900,
+        max_concurrent_tasks: int = 10,
     ):
         self.LABEL = label
         self.SYSTEM_INSTRUCTION = system_instruction
@@ -41,9 +43,9 @@ class Agent:
         self.mcp_agent = None
         self.sessions: Dict[str, SessionData] = defaultdict(dict)
         self.session_lock = asyncio.Lock()
-        self.timeout = 900
+        self.timeout = timeout
         self.session_timeout = timedelta(seconds=self.timeout)
-        self.max_concurrent_tasks = 10
+        self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
         self.memory_manager = MemoryManager(label)
 
@@ -105,12 +107,25 @@ class Agent:
                                 },
                             ],
                         )
+
+                # get last message in event.messages
+
+                content = self.extract_task_result_content(event)
+                images = []
+                if len(event.messages) > 0:
+                    last_message = event.messages[-1]
+                    content_text, content_images = self.extract_message_content(
+                        last_message
+                    )
+                    content = content_text
+                    images = content_images
+
                 return {
                     "is_task_complete": True,
                     "require_user_input": False,
                     "model_usage": None,
-                    "content": self.extract_task_result_content(event),
-                    "images": [],
+                    "content": content,
+                    "images": images,
                 }
             elif isinstance(event, BaseChatMessage):
                 content, images = self.extract_message_content(event)
