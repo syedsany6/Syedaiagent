@@ -7,7 +7,7 @@ This agent takes text requests from the client and, if any details are missing, 
 ## Prerequisites
 
 - Python 3.9 or higher
-- UV
+- [UV](https://docs.astral.sh/uv/)
 - Access to an LLM and API Key
 
 
@@ -27,6 +27,7 @@ This agent takes text requests from the client and, if any details are missing, 
     ```bash
     uv run .
     ```
+
 5. In a separate terminal, run the A2A client:
     ```
     # Connect to the agent (specify the agent URL with correct port)
