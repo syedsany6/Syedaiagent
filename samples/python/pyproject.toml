@@ -20,19 +20,16 @@ dependencies = [
 packages = ["common", "hosts"]
 
 [tool.uv.workspace]
-<<<<<<< HEAD
 members = [
     "agents/crewai",
     "agents/google_adk",
     "agents/langgraph",
+    "agents/marvin",
     "hosts/cli",
     "hosts/multiagent",
     "agents/llama_index_file_chat",
     "agents/semantickernel",
 ]
-=======
-members = ["agents/crewai", "agents/marvin"]
->>>>>>> 1674bc0 (add marvin example)
 
 [build-system]
 requires = ["hatchling"]
