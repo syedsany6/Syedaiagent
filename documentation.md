@@ -949,17 +949,20 @@ Both the client or the agent can request structured output from the other party.
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "sessionId": "c295ea44-7543-4f78-b524-7a38915ad6e4",
     "status": {
-      "state": "working",
-      "message": {
-        "role": "agent",
-        "parts": [{
-            "type":"text",
-            "text":"[{\"ticketNumber\":\"REQ12312\",\"description\":\"request for VPN access\"},{\"ticketNumber\":\"REQ23422\",\"description\":\"Add to DL - team-gcp-onboarding\"}]"
-        }],
-        "metadata": {}
-      }
+      "state": "completed",
+      "timestamp": "2025-04-17T17:47:09.680794"
     },
-    "metadata": {}
+    "artifacts": [
+      {
+        "parts": [
+          {
+            "type": "text",
+            "text": "[{\"ticketNumber\":\"REQ12312\",\"description\":\"request for VPN access\"},{\"ticketNumber\":\"REQ23422\",\"description\":\"Add to DL - team-gcp-onboarding\"}]"
+          }
+        ],
+        "index": 0
+      }
+    ]
   }
 }
 ```
