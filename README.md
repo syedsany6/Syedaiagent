@@ -1,5 +1,5 @@
 ![image info](images/A2A_banner.png)
-[![Apache License](https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg)](./LICENSE)
+[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 **_An open protocol enabling communication and interoperability between opaque agentic applications._**
 
