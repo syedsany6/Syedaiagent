@@ -214,14 +214,14 @@ interface TaskStatus {
 }
 // sent by server during sendSubscribe or subscribe requests
 interface TaskStatusUpdateEvent {
-  id: string;
+  id: string; //Task id
   status: TaskStatus;
   final: boolean; //indicates the end of the event stream
   metadata?: Record<string, any>;
 }
 // sent by server during sendSubscribe or subscribe requests
 interface TaskArtifactUpdateEvent {
-  id: string;
+  id: string; //Task id
   artifact: Artifact;
   metadata?: Record<string, any>;
 }
@@ -498,7 +498,7 @@ A client may choose to cancel previously submitted Tasks as shown below.
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "sessionId": "c295ea44-7543-4f78-b524-7a38915ad6e4",
     "status": {
       "state": "canceled"
@@ -641,7 +641,7 @@ The Message included in the `input-required` state must include the details indi
   "jsonrpc": "2.0",
   "id": 2,
   "result": {
-    "id": 1,
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "sessionId": "c295ea44-7543-4f78-b524-7a38915ad6e4",
     "status": {
       "state": "completed"
@@ -695,7 +695,7 @@ data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "status": {
       "state": "working",
       "timestamp":"2025-04-02T16:59:25.331844"
@@ -708,7 +708,7 @@ data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,    
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",    
     "artifact": [
       "parts": [
         {"type":"text", "text": "<section 1...>"}
@@ -723,7 +723,7 @@ data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,  
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",  
     "artifact": [
       "parts": [
         {"type":"text", "text": "<section 2...>"}
@@ -813,7 +813,7 @@ data: {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "id": 1,
+    "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
     "status": {
       "state": "completed",
       "timestamp":"2025-04-02T16:59:35.331844"
