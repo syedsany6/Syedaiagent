@@ -15,7 +15,7 @@ The agent receives text, attempts to extract contact details (name, email, phone
 
 ## Prerequisites
 
--   Python 3.12 or higher
+-   Python 3.12+
 -   [uv](https://docs.astral.sh/uv/getting-started/installation/)
 -   `OPENAI_API_KEY` (or other LLM provider creds supported by pydantic-ai)
 
@@ -23,7 +23,7 @@ The agent receives text, attempts to extract contact details (name, email, phone
 
 1.  Navigate to the Python samples directory:
     ```bash
-    cd samples/python
+    cd samples/python/agents/marvin
     ```
 
 2.  Set an LLM provider API key:
@@ -40,20 +40,24 @@ The agent receives text, attempts to extract contact details (name, email, phone
 
 4.  Run the Marvin agent server:
     ```bash
-    # Default host/port (localhost:10001)
-    MARVIN_DATABASE_URL=sqlite+aiosqlite://test.db MARVIN_LOG_LEVEL=DEBUG uv run agents/marvin
+    # Default host/port (localhost:10030)
+    MARVIN_DATABASE_URL=sqlite+aiosqlite:///test.db MARVIN_LOG_LEVEL=DEBUG uv run .
 
     # Custom host/port
-    # uv run agents/marvin --host 0.0.0.0 --port 8080
+    # uv run . --host 0.0.0.0 --port 8080
     ```
 
-    Without `MARVIN_DATABASE_URL` set, multi-turn state will not be persisted by Marvin due
-    to some interaction with the A2A protocol that I don't fully understand yet.
+    Without `MARVIN_DATABASE_URL` set, conversation history will not be persisted by session id.
 
-5.  In a separate terminal, run an A2A client (e.g., the sample CLI):
-    ```bash
-    # Ensure the environment is active (source .venv/bin/activate)
-    uv run hosts/cli --agent http://localhost:10001 # Use the correct agent URL/port
+5.  In a separate terminal, run an A2A [client](/samples/python/hosts/README.md) (e.g., the sample CLI):
+    ```bash    
+    # from samples/python/agents/marvin
+    cd ../..
+
+    # from root
+    cd samples/python
+
+    uv run hosts/cli --agent http://localhost:10030
     ```
 
 

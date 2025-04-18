@@ -31,7 +31,7 @@ class ContactInfo(BaseModel):
 
 @click.command()
 @click.option("--host", "host", default="localhost")
-@click.option("--port", "port", default=10001)
+@click.option("--port", "port", default=10030)
 @click.option("--result-type", "result_type", default="ContactInfo")
 @click.option(
     "--instructions",
