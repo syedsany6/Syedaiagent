@@ -8,6 +8,10 @@ import {
 import * as schema from "../../schema.js"; // Import schema for types
 import { ai } from "./genkit.js";
 import { CodeMessage } from "./code-format.js"; // CodeMessageSchema might not be needed here
+import {config} from "dotenv"
+
+// Load .env file
+config();
 
 if (!process.env.GEMINI_API_KEY) {  
   console.error("GEMINI_API_KEY environment variable not set.")
@@ -35,7 +39,7 @@ async function* coderAgent({
       state: "failed",
       message: {
         role: "agent",
-        parts: [{ text: "No input message found." }],
+        parts: [{ type: "text", text: "No input message found." }],
       },
     };
     return;
