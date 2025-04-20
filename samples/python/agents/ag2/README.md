@@ -83,7 +83,7 @@ sequenceDiagram
    a) Run the CLI client (from the samples/python directory):
    ```bash
    cd samples/python
-   uv run hosts/cli
+   uv run hosts/cli --agent http://localhost:10003
    ```
    
    b) Use the demo web UI (uses google gemini-2.0-flash-001):
