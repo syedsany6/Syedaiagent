@@ -15,14 +15,14 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
-// Check for Lemn API key
-if (!process.env.LEMN_API_KEY) {
-  console.error("LEMN_API_KEY environment variable not set.");
+// Check for Lemon API key
+if (!process.env.Lemon_API_KEY) {
+  console.error("Lemon_API_KEY environment variable not set.");
   process.exit(1);
 }
 
 // Configuration
-const apiBaseUrl = process.env.LEMN_API_URL || "https://app.xn--lemn-sqa.com/api";
+const apiBaseUrl = process.env.Lemon_API_URL || "https://app.xn--Lemon-sqa.com/api";
 
 interface EmailResponse {
   id?: string;
@@ -122,7 +122,7 @@ async function sendEmail(emailData: EmailMessage): Promise<EmailResponse> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Auth-APIKey': process.env.LEMN_API_KEY
+        'X-Auth-APIKey': process.env.Lemon_API_KEY
       },
       body: JSON.stringify({
         fromname: emailData.fromname,
@@ -152,11 +152,11 @@ async function sendEmail(emailData: EmailMessage): Promise<EmailResponse> {
 // --- Server Setup ---
 
 const emailAgentCard: schema.AgentCard = {
-  name: "Lemn Email Agent",
-  description: "An agent that sends emails via Lemn API based on natural language instructions.",
+  name: "Lemon Email Agent",
+  description: "An agent that sends emails via Lemon API based on natural language instructions.",
   url: "http://localhost:41242", // Default port used in the script
   provider: {
-    organization: "Lemn A2A",
+    organization: "Lemon A2A",
   },
   version: "0.0.1",
   capabilities: {
@@ -171,8 +171,8 @@ const emailAgentCard: schema.AgentCard = {
     {
       id: "email_sending",
       name: "Email Sending",
-      description: "Sends emails via Lemn API based on user requests and instructions.",
-      tags: ["email", "communication", "lemn"],
+      description: "Sends emails via Lemon API based on user requests and instructions.",
+      tags: ["email", "communication", "Lemon"],
       examples: [
         "Send a welcome email to john@example.com",
         "Draft an invoice confirmation email to client@company.com",

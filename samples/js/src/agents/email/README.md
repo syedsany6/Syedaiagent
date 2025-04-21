@@ -1,6 +1,6 @@
-# Lemn Email Agent
+# Lemon Email Agent
 
-This is an A2A agent that sends emails via the Lemn API. It can process natural language requests to create and send emails through the Lemn API.
+This is an A2A agent that sends emails via the Lemon API(lemon.email). It can process natural language requests to create and send emails through the Lemon API.
 
 ## Setup
 
@@ -12,7 +12,7 @@ npm install
 2. Set required environment variables:
 ```bash
 export GEMINI_API_KEY=<your_gemini_api_key>
-export LEMN_API_KEY=<your_lemn_api_key>
+export Lemon_API_KEY=<your_Lemon_api_key>
 ```
 
 3. Start the agent:
@@ -30,11 +30,11 @@ You can interact with this agent via the A2A protocol. Simply send requests with
 - "Draft an invoice confirmation email to client@company.com"
 - "Send a password reset notification to user@domain.com"
 
-The agent will handle generating appropriate email content and sending it through the Lemn API.
+The agent will handle generating appropriate email content and sending it through the Lemon API.
 
 ## Notes
 
-- The agent uses the Lemn REST API directly
+- The agent uses the Lemon REST API directly
 - If no sender email is specified in the request, the default sender email `mail@member-notification.com` will be used
 - All emails will be tagged with 'a2a-agent' by default unless a specific tag is provided
 
