@@ -1,0 +1,33 @@
+{
+  "portfolio_limits": {
+    "max_allocation_per_asset_percent": 20,
+    "max_total_exposure_percent": 80,
+    "max_leverage": 2.0
+  },
+  "risk_thresholds": {
+    "max_daily_drawdown_percent": 5,
+    "max_weekly_drawdown_percent": 15,
+    "value_at_risk_confidence": 0.95,
+    "max_value_at_risk_percent": 10,
+    "volatility_multiplier": 1.5
+  },
+  "stop_loss": {
+    "enable_automatic_stop_loss": true,
+    "default_stop_loss_percent": 5,
+    "trailing_stop_loss_percent": 7
+  },
+  "circuit_breakers": {
+    "market_crash_threshold_percent": 15,
+    "auto_reduce_positions": true,
+    "position_reduction_percent": 50
+  },
+  "a2a": {
+    "market_analysis_agent": "http://market-analysis-agent:8001",
+    "trade_execution_agent": "http://trade-execution-agent:8002",
+    "reporting_analytics_agent": "http://reporting-analytics-agent:8004"
+  },
+  "alert_thresholds": {
+    "high_risk_score": 80,
+    "critical_risk_score": 90
+  }
+}

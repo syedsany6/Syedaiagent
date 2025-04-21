@@ -1,0 +1,57 @@
+{
+  "database": {
+    "type": "postgresql",
+    "host": "db",
+    "port": 5432,
+    "username": "portfolio_manager",
+    "password": "asdf123",
+    "database": "crypto_portfolio"
+  },
+  "reports": {
+    "daily_report": {
+      "enabled": true,
+      "time": "00:00:00",
+      "timezone": "UTC",
+      "format": ["json", "pdf"]
+    },
+    "weekly_report": {
+      "enabled": true,
+      "day": "Monday",
+      "time": "00:00:00",
+      "timezone": "UTC",
+      "format": ["json", "pdf"]
+    },
+    "monthly_report": {
+      "enabled": true,
+      "day": 1,
+      "time": "00:00:00",
+      "timezone": "UTC",
+      "format": ["json", "pdf"]
+    }
+  },
+  "metrics": {
+    "include_total_return": true,
+    "include_daily_returns": true,
+    "include_drawdowns": true,
+    "include_volatility": true,
+    "include_sharpe_ratio": true,
+    "include_trade_statistics": true,
+    "include_asset_allocation": true
+  },
+  "storage": {
+    "report_retention_days": 365,
+    "data_retention_days": 730
+  },
+  "a2a": {
+    "market_analysis_agent": "http://market-analysis-agent:8001",
+    "trade_execution_agent": "http://trade-execution-agent:8002",
+    "risk_management_agent": "http://risk-management-agent:8003"
+  },
+  "export": {
+    "enable_email_delivery": false,
+    "email_recipients": [],
+    "enable_s3_upload": false,
+    "s3_bucket": "",
+    "s3_prefix": "reports/"
+  }
+}

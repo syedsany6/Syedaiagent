@@ -1,0 +1,129 @@
+{
+  "name": "Risk Management Agent",
+  "description": "Monitors the portfolio's overall risk exposure, assesses risk associated with potential trades, and triggers actions to mitigate risk.",
+  "version": "1.0.0",
+  "author": "Smart Crypto Portfolio Manager Team",
+  "contact": "example@smartcrypto.com",
+  "capabilities": [
+    {
+      "name": "assess_trade_risk",
+      "description": "Assesses the risk of a proposed trade in the context of the current portfolio",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "crypto_pair": {
+            "type": "string",
+            "description": "The cryptocurrency trading pair (e.g., BTC/USD)"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Whether the trade is a buy or sell"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The quantity to buy or sell"
+          },
+          "price": {
+            "type": "number",
+            "description": "The expected execution price"
+          }
+        },
+        "required": ["crypto_pair", "action", "quantity", "price"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "risk_score": {
+            "type": "number",
+            "description": "The risk score (0-100, higher means more risk)"
+          },
+          "approval": {
+            "type": "boolean",
+            "description": "Whether the trade is approved from a risk perspective"
+          },
+          "max_recommended_quantity": {
+            "type": "number",
+            "description": "The maximum recommended quantity to trade to stay within risk limits"
+          },
+          "reasons": {
+            "type": "array",
+            "description": "Reasons for the risk assessment",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "monitor_portfolio_risk",
+      "description": "Monitors the overall portfolio risk and generates alerts if thresholds are exceeded",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "description": "Risk metrics to include",
+            "items": {
+              "type": "string",
+              "enum": ["value_at_risk", "sharpe_ratio", "exposure", "volatility", "correlation"]
+            }
+          },
+          "threshold_overrides": {
+            "type": "object",
+            "description": "Optional overrides for risk thresholds",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "overall_risk_level": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "extreme"],
+            "description": "The overall risk level of the portfolio"
+          },
+          "metrics": {
+            "type": "object",
+            "description": "The calculated risk metrics",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "alerts": {
+            "type": "array",
+            "description": "Risk alerts if thresholds are exceeded",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "description": "The risk metric that triggered the alert"
+                },
+                "value": {
+                  "type": "number",
+                  "description": "The current value of the metric"
+                },
+                "threshold": {
+                  "type": "number",
+                  "description": "The threshold that was exceeded"
+                },
+                "recommendation": {
+                  "type": "string",
+                  "description": "Recommended action to mitigate the risk"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "endpoint": "http://localhost:8003/api/v1/tasks",
+  "supported_protocols": ["a2a/v1"]
+}

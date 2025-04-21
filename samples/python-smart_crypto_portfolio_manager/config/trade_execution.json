@@ -1,0 +1,42 @@
+{
+  "default_exchange": "binance",
+  "exchanges": [
+    {
+      "name": "binance",
+      "api_key": "YOUR_API_KEY_HERE",
+      "api_secret": "YOUR_API_SECRET_HERE",
+      "is_enabled": true,
+      "rate_limits": {
+        "max_requests_per_minute": 1200,
+        "max_orders_per_minute": 50
+      }
+    },
+    {
+      "name": "coinbase",
+      "api_key": "YOUR_API_KEY_HERE",
+      "api_secret": "YOUR_API_SECRET_HERE",
+      "is_enabled": true,
+      "rate_limits": {
+        "max_requests_per_minute": 300,
+        "max_orders_per_minute": 30
+      }
+    }
+  ],
+  "order_defaults": {
+    "default_order_type": "limit",
+    "price_deviation_percent": 0.5,
+    "max_slippage_percent": 1.0,
+    "auto_retry_attempts": 3,
+    "retry_delay_seconds": 1
+  },
+  "a2a": {
+    "market_analysis_agent": "http://market-analysis-agent:8001",
+    "risk_management_agent": "http://risk-management-agent:8003",
+    "reporting_analytics_agent": "http://reporting-analytics-agent:8004"
+  },
+  "security": {
+    "require_approval_above_usd": 10000,
+    "approval_timeout_seconds": 300,
+    "max_order_value_usd": 50000
+  }
+}
