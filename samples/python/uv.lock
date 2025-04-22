@@ -108,6 +108,9 @@ dependencies = [
     { name = "httpx-sse" },
     { name = "json-schema-to-pydantic" },
     { name = "jwcrypto" },
+    { name = "mem0ai" },
+    { name = "ollama" },
+    { name = "psycopg2-binary" },
     { name = "pydantic" },
     { name = "pyjwt" },
     { name = "sse-starlette" },
@@ -132,6 +135,9 @@ requires-dist = [
     { name = "httpx-sse", specifier = ">=0.4.0" },
     { name = "json-schema-to-pydantic", specifier = ">=0.2.4" },
     { name = "jwcrypto", specifier = ">=1.5.6" },
+    { name = "mem0ai", specifier = ">=0.1.93" },
+    { name = "ollama", specifier = ">=0.4.8" },
+    { name = "psycopg2-binary", specifier = "==2.9.10" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pyjwt", specifier = ">=2.10.1" },
     { name = "sse-starlette", specifier = ">=2.2.1" },
@@ -2468,7 +2474,7 @@ wheels = [
 
 [[package]]
 name = "mem0ai"
-version = "0.1.91"
+version = "0.1.93"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "openai" },
@@ -2479,9 +2485,9 @@ dependencies = [
     { name = "qdrant-client" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/68/c054e1cd5fa46fcdc86d3519aacef6c9ed175fa4d0bb6a0ea756845a5c9c/mem0ai-0.1.91.tar.gz", hash = "sha256:cfaca72fc20693dd5b874179bf62c0447ed48e89c7f79121fb615bc4ff6460cf", size = 87689 }
+sdist = { url = "https://files.pythonhosted.org/packages/94/e5/95e920e4f74f46a8dea3f0f45fa65a2e7bce8cdbe9fc084fb03c02c9ebf3/mem0ai-0.1.93.tar.gz", hash = "sha256:0c27e8dfb10235f18bf6e1bb007801750664d4c52cafa38e984a0f36b670ec62", size = 88253 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/79/47/f8f82ddee6803ea4f08712c8cff7133f101de1202272dc470983f9804251/mem0ai-0.1.91-py3-none-any.whl", hash = "sha256:35652c344290ff478818c5c6ca6715e6302becafcdb22c305d12ce02f1d00428", size = 135991 },
+    { url = "https://files.pythonhosted.org/packages/35/e9/ead222a9e11f224f07b7037ebceddfdab6dac4014e37f5a3560f5adb269b/mem0ai-0.1.93-py3-none-any.whl", hash = "sha256:7b8a5fb692fd0db67404f093304b05821eff88f360bba245750c597ae6c72cd3", size = 136765 },
 ]
 
 [[package]]
@@ -2718,6 +2724,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6d/fa/fbf4001037904031639e6bfbfc02badfc7e12f137a8afa254df6c4c8a670/oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918", size = 177352 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/80/cab10959dc1faead58dc8384a781dfbf93cb4d33d50988f7a69f1b7c9bbe/oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca", size = 151688 },
+]
+
+[[package]]
+name = "ollama"
+version = "0.4.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e2/64/709dc99030f8f46ec552f0a7da73bbdcc2da58666abfec4742ccdb2e800e/ollama-0.4.8.tar.gz", hash = "sha256:1121439d49b96fa8339842965d0616eba5deb9f8c790786cdf4c0b3df4833802", size = 12972 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/3f/164de150e983b3a16e8bf3d4355625e51a357e7b3b1deebe9cc1f7cb9af8/ollama-0.4.8-py3-none-any.whl", hash = "sha256:04312af2c5e72449aaebac4a2776f52ef010877c554103419d3f36066fe8af4c", size = 13325 },
 ]
 
 [[package]]

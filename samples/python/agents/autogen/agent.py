@@ -35,6 +35,7 @@ class Agent:
         supported_content_types: list[str] = ["text", "text/plain"],
         timeout: int = 900,
         max_concurrent_tasks: int = 10,
+        in_mem_vector_store: bool = False,
     ):
         self.LABEL = label
         self.SYSTEM_INSTRUCTION = system_instruction
@@ -47,7 +48,7 @@ class Agent:
         self.session_timeout = timedelta(seconds=self.timeout)
         self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
-        self.memory_manager = MemoryManager(label)
+        self.memory_manager = MemoryManager(label, in_mem_vector_store)
 
     async def initialize(self, mcp_server_params: list[McpServerParams] = []):
         api_key = os.getenv("API_KEY")

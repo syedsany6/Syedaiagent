@@ -1,16 +1,16 @@
 from mem0 import Memory
+from qdrant_client import QdrantClient
 
 
 class MemoryManager:
-    def __init__(self, name: str):
+    def __init__(self, name: str, in_mem_vector_store: bool = False):
         self.memory = Memory.from_config(
             {
                 "vector_store": {
                     "provider": "qdrant",
                     "config": {
                         "collection_name": name,
-                        "host": "localhost",
-                        "port": 6333,
+                        "client": QdrantClient(":memory:") if in_mem_vector_store else QdrantClient(host="localhost", port=6333),
                         "embedding_model_dims": 768,  # Change this according to your local model's dimensions
                     },
                 },
@@ -19,7 +19,7 @@ class MemoryManager:
                     "config": {
                         "model": "qwen2.5-coder:32b",
                         "temperature": 0,
-                        "max_tokens": 2000,
+                        "max_tokens": 40000,
                         "ollama_base_url": "https://ollama.orai.network",
                     },
                 },

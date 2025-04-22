@@ -20,6 +20,9 @@ dependencies = [
     "autogen-agentchat (>=0.5.3,<0.6.0)",
     "autogen-ext[openai] (>=0.5.3,<0.6.0)",
     "json-schema-to-pydantic>=0.2.4",
+    "mem0ai>=0.1.93",
+    "psycopg2-binary==2.9.10",
+    "ollama>=0.4.8",
 ]
 
 [tool.hatch.build.targets.wheel]
