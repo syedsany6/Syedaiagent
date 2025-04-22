@@ -1,0 +1,22 @@
+[project]
+name = "a2a-sample-agent-autogen"
+version = "0.1.0"
+description = "Sample Autogen-based Expense Reimbursement agent hosted as an A2A server." 
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mem0ai>=0.1.93",
+    "psycopg2-binary==2.9.10",
+    "ollama>=0.4.8",
+    "litellm>=1.60.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.uv.sources]
+a2a-samples = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

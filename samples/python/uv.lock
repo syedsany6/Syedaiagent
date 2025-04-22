@@ -10,6 +10,7 @@ resolution-markers = [
 [manifest]
 members = [
     "a2a-sample-agent-adk",
+    "a2a-sample-agent-autogen",
     "a2a-sample-agent-langgraph",
     "a2a-sample-client-cli",
     "a2a-sample-client-multiagent",
@@ -38,6 +39,25 @@ requires-dist = [
     { name = "google-adk", specifier = ">=0.0.3" },
     { name = "google-genai", specifier = ">=1.9.0" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+]
+
+[[package]]
+name = "a2a-sample-agent-autogen"
+version = "0.1.0"
+source = { editable = "agents/autogen" }
+dependencies = [
+    { name = "litellm" },
+    { name = "mem0ai" },
+    { name = "ollama" },
+    { name = "psycopg2-binary" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "litellm", specifier = ">=1.60.0" },
+    { name = "mem0ai", specifier = ">=0.1.93" },
+    { name = "ollama", specifier = ">=0.4.8" },
+    { name = "psycopg2-binary", specifier = "==2.9.10" },
 ]
 
 [[package]]
@@ -113,9 +133,6 @@ dependencies = [
     { name = "httpx-sse" },
     { name = "json-schema-to-pydantic" },
     { name = "jwcrypto" },
-    { name = "mem0ai" },
-    { name = "ollama" },
-    { name = "psycopg2-binary" },
     { name = "pydantic" },
     { name = "pyjwt" },
     { name = "sse-starlette" },
@@ -140,9 +157,6 @@ requires-dist = [
     { name = "httpx-sse", specifier = ">=0.4.0" },
     { name = "json-schema-to-pydantic", specifier = ">=0.2.4" },
     { name = "jwcrypto", specifier = ">=1.5.6" },
-    { name = "mem0ai", specifier = ">=0.1.93" },
-    { name = "ollama", specifier = ">=0.4.8" },
-    { name = "psycopg2-binary", specifier = "==2.9.10" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pyjwt", specifier = ">=2.10.1" },
     { name = "sse-starlette", specifier = ">=2.2.1" },

@@ -13,7 +13,7 @@ brew install postgresql
 
 ```bash
 # enter A2A sample dirs
-cd samples/pyton
+cd samples/python
 
 uv venv --python 3.12
 source .venv/bin/activate  # On Unix/macOS
@@ -22,7 +22,10 @@ source .venv/bin/activate  # On Unix/macOS
 2. Install deps
 
 ```bash
+# install deps for the overall workspace
 uv pip install -r pyproject.toml
+# install deps for autogen workspace member
+uv pip install -e agents/autogen
 ```
 
 3. Create an .env file
