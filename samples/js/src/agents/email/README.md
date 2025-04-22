@@ -12,7 +12,7 @@ npm install
 2. Set required environment variables:
 ```bash
 export GEMINI_API_KEY=<your_gemini_api_key>
-export Lemon_API_KEY=<your_Lemon_api_key>
+export LEMON_API_KEY=<your_Lemon_api_key>
 ```
 
 3. Start the agent:

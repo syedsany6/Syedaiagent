@@ -77,12 +77,81 @@ function parseEmailData(text: string): EmailMessageData {
     }
     
     // Extract email fields from text format
-    const fromMatch = text.match(/From:[\s\n]*(.*?)[\s\n]*<(.*?)>/i);
-    const toMatch = text.match(/To:[\s\n]*(.*?)[\s\n]*<(.*?)>/i);
+    // More flexible regex patterns that can handle variations in formatting
+    const fromMatch = text.match(/From:[\s\n]*(.*?)(?:<(.*?)>)?(?:\n|$)/i);
+    const toMatch = text.match(/To:[\s\n]*(.*?)(?:<(.*?)>)?(?:\n|$)/i);
     const subjectMatch = text.match(/Subject:[\s\n]*(.*?)(?:\n|$)/i);
     
-    // Extract body - everything after first blank line
-    const bodyStart = text.indexOf("\n\n");
+    // Extract email addresses directly if the format doesn't include angle brackets
+    const extractEmail = (str?: string): string | undefined => {
+      if (!str) return undefined;
+      
+      const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+      const match = str.match(emailRegex);
+      return match ? match[0] : str;
+    };
+    
+    let fromName = fromMatch?.[1]?.trim() || "Default Sender";
+    let fromEmail = fromMatch?.[2]?.trim();
+    
+    if (!fromEmail && fromMatch?.[1]) {
+      // Check if the "From" field contains an email without angle brackets
+      fromEmail = extractEmail(fromMatch[1]);
+      if (fromEmail && fromEmail !== fromMatch[1]) {
+        // If we extracted an email, the rest might be the name
+        fromName = fromMatch[1].replace(fromEmail, "").trim();
+      }
+    }
+    
+    let toName = toMatch?.[1]?.trim() || "";
+    let toEmail = toMatch?.[2]?.trim();
+    
+    if (!toEmail && toMatch?.[1]) {
+      // Check if the "To" field contains an email without angle brackets
+      toEmail = extractEmail(toMatch[1]);
+      if (toEmail && toEmail !== toMatch[1]) {
+        // If we extracted an email, the rest might be the name
+        toName = toMatch[1].replace(toEmail, "").trim();
+      }
+    }
+    
+    // If we still don't have a recipient email, look for any email in the entire text
+    if (!toEmail) {
+      const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+      const allEmails = text.match(emailRegex) || [];
+      
+      // Skip the fromEmail if we already identified it
+      if (allEmails.length > 0) {
+        if (!fromEmail || allEmails[0] !== fromEmail) {
+          toEmail = allEmails[0];
+        } else if (allEmails.length > 1) {
+          toEmail = allEmails[1];
+        }
+      }
+    }
+    
+    // Extract body - everything after first blank line or after the headers
+    let bodyStart = text.indexOf("\n\n");
+    if (bodyStart === -1) {
+      // No blank line found, look for the end of the headers
+      const headerSections = [
+        text.indexOf("\nFrom:"),
+        text.indexOf("\nTo:"),
+        text.indexOf("\nSubject:"),
+        text.indexOf("\nTag:"),
+        text.indexOf("\nVariables:")
+      ].filter(pos => pos !== -1);
+      
+      const lastHeader = Math.max(...headerSections);
+      const nextLineBreak = text.indexOf("\n", lastHeader + 1);
+      
+      if (nextLineBreak !== -1) {
+        bodyStart = nextLineBreak;
+      } else {
+        bodyStart = text.length;
+      }
+    }
+    
     const body = bodyStart !== -1 ? text.substring(bodyStart + 2).trim() : "";
     
     // Extract tag if present
@@ -108,10 +177,10 @@ function parseEmailData(text: string): EmailMessageData {
     }
     
     return {
-      fromname: fromMatch ? fromMatch[1].trim() : "Default Sender",
-      fromemail: fromMatch ? fromMatch[2].trim() : "mail@member-notification.com",
-      to: toMatch ? toMatch[2].trim() : "recipient@example.com",
-      toname: toMatch ? toMatch[1].trim() : undefined,
+      fromname: fromName,
+      fromemail: fromEmail || "mail@member-notification.com",
+      to: toEmail,
+      toname: toName || undefined,
       subject: subjectMatch ? subjectMatch[1].trim() : "No Subject",
       body: body || "Empty email body",
       tag: tagMatch ? tagMatch[1].trim() : undefined,

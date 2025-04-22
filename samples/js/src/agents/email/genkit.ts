@@ -1,10 +1,11 @@
 import { genkit } from "genkit/beta";
 import { defineEmailFormat } from "./email-format.js";
-import { gemini20Flash, googleAI } from "@genkit-ai/googleai";
+import { gemini15Flash, googleAI } from "@genkit-ai/googleai";
 
+// Using a smaller/cheaper model as suggested by the reviewer
 export const ai = genkit({
   plugins: [googleAI()],
-  model: gemini20Flash.withConfig({ version: "gemini-2.5-pro-exp-03-25" }),
+  model: gemini15Flash, // Using the base model without specifying the more expensive version
 });
 
 defineEmailFormat(ai);
