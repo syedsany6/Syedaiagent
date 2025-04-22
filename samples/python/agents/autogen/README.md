@@ -12,6 +12,9 @@ brew install postgresql
 1. Create venv and activate
 
 ```bash
+# enter A2A sample dirs
+cd samples/pyton
+
 uv venv --python 3.12
 source .venv/bin/activate  # On Unix/macOS
 ```
@@ -20,6 +23,20 @@ source .venv/bin/activate  # On Unix/macOS
 
 ```bash
 uv pip install -r pyproject.toml
+```
+
+3. Create an .env file
+
+```bash
+cp .env.example .env
+```
+
+Then, fill the .env with your keys and appropriate MCP servers:
+
+```bash
+LLM_MODEL=o3-mini
+API_KEY=sk-proj-H30rO7vd...
+MCP_SERVER_URL=http://localhost:4000/sse
 ```
 
 # Start A2A server
