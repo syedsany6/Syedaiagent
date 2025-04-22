@@ -709,14 +709,14 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",    
-    "artifact": [
+    "artifact": {
       "parts": [
         {"type":"text", "text": "<section 1...>"}
       ],
       "index": 0,
       "append": false,      
       "lastChunk": false
-    ]
+    }
   }
 }
 data: {
@@ -724,14 +724,14 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",  
-    "artifact": [
+    "artifact": {
       "parts": [
         {"type":"text", "text": "<section 2...>"}
       ],
       "index": 0,
       "append": true,      
       "lastChunk": false
-    ]
+    }
   }
 }
 data: {
@@ -739,14 +739,14 @@ data: {
   "id": 1,
   "result": {
     "id": 1,    
-    "artifact": [
+    "artifact": {
       "parts": [
         {"type":"text", "text": "<section 3...>"}
       ],
       "index": 0,
       "append": true,
       "lastChunk": true
-    ]
+    }
   }
 }
 
@@ -783,14 +783,14 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
-    "artifact":[
+    "artifact": {
       "parts": [
         {"type":"text", "text": "<section 2...>"}
       ],
       "index": 0,
       "append": true,
       "lastChunk":false
-    ]
+    }
   }
 }
 data: {
@@ -798,14 +798,14 @@ data: {
   "id": 1,
   "result": {
     "id": "de38c76d-d54c-436c-8b9f-4c2703648d64",
-    "artifact":[
+    "artifact": {
       "parts": [
         {"type":"text", "text": "<section 3...>"}
       ],
       "index": 0,
       "append": true,
       "lastChunk": true
-    ]   
+    }
   }
 }
 
