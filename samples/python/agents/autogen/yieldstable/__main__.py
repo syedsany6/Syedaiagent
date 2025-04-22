@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 @click.option("--host", default="0.0.0.0")
 @click.option("--port", default=10002)
 def main(host, port):
+    url = os.getenv('DOMAIN_URL', f'http://{host}:{port}/')
+    print(f"URL: {url}")
     try:
         if not os.getenv("API_KEY"):
             raise MissingAPIKeyError("API_KEY environment variable not set.")
@@ -36,7 +38,7 @@ def main(host, port):
         agent_card = AgentCard(
             name="YieldStableAgent",
             description="Analyze trades on defillama and provide insights on the best stablecoin farming strategies",
-            url=f"http://{host}:{port}/",
+            url=url,
             version="1.0.0",
             defaultInputModes=["text", "text/plain"],
             defaultOutputModes=["text", "text/plain"],

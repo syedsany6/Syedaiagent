@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 @click.option("--host", default="0.0.0.0")
 @click.option("--port", default=10000)
 def main(host, port):
+    url = os.getenv('DOMAIN_URL', f'http://{host}:{port}/')
+    print(f"URL: {url}")
     try:
         if not os.getenv("API_KEY"):
             raise MissingAPIKeyError("API_KEY environment variable not set.")
@@ -36,7 +38,7 @@ def main(host, port):
         agent_card = AgentCard(
             name="Hyperwhales",
             description="Analyze whale trading patterns, positions, and portfolio changes over time. Provide insights and trade suggestions.",
-            url=f"http://{host}:{port}/",
+            url=url,
             version="1.0.0",
             defaultInputModes=["text", "text/plain"],
             defaultOutputModes=["text", "text/plain"],
