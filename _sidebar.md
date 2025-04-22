@@ -2,6 +2,7 @@
 
 * [Home](/)
 * [Blog Post](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/)
+* [A2A Community](community.md)
 * [Technical Documentation](documentation.md)
 * Review Key Topics
   * [A2A and MCP](topics/a2a_and_mcp.md)
