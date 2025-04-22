@@ -3,10 +3,12 @@ import asyncio
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
+import re
 from agents.autogen.memory_manager import MemoryManager
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient
+from autogen_ext.models.anthropic import AnthropicChatCompletionClient
 from autogen_ext.tools.mcp import mcp_server_tools, McpServerParams
 from autogen_agentchat.messages import (
     BaseAgentEvent,
@@ -15,8 +17,10 @@ from autogen_agentchat.messages import (
 )
 from autogen_agentchat.base import TaskResult
 from autogen_core import Image
+from autogen_core.models import RequestUsage
 from typing import AsyncIterable, Dict, Any, TypedDict, AsyncGenerator, Tuple, List
 from datetime import timezone
+from litellm import completion_cost
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,6 +47,10 @@ class Agent:
         self.model_client = None
         self.mcp_agent = None
         self.sessions: Dict[str, SessionData] = defaultdict(dict)
+        # Track cumulative token metrics per session
+        self.session_token_metrics: Dict[str, Dict[str, int]] = defaultdict(
+            lambda: {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "accumulated_cost": 0}
+        )
         self.session_lock = asyncio.Lock()
         self.timeout = timeout
         self.session_timeout = timedelta(seconds=self.timeout)
@@ -55,35 +63,46 @@ class Agent:
         model = os.getenv("LLM_MODEL")
         if not api_key or not model:
             raise ValueError("API_KEY or LLM_MODEL not set")
-        self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
+        if re.match(r"^claude", model):
+            self.model_client = AnthropicChatCompletionClient(model=model, api_key=api_key)
+        else:
+            self.model_client = OpenAIChatCompletionClient(model=model, api_key=api_key)
+        # FIXME: This is a hack to get the model name. With autogen, there could be multiple models in the config.
+        self.model_name = model
         self.tools = []
         for mcp_server_param in mcp_server_params:
             server_tools = await mcp_server_tools(mcp_server_param)
             self.tools.extend(server_tools)
         asyncio.create_task(self.cleanup_sessions())
         logger.info(f"{self.LABEL} initialized and cleanup_sessions task scheduled")
-
-    async def cleanup_sessions(self):
-        while True:
-            async with self.session_lock:
-                now = datetime.now(timezone.utc)
-                expired = [
-                    sid
-                    for sid, data in self.sessions.items()
-                    if now - data["last_accessed"] > self.session_timeout
-                ]
-                for sid in expired:
-                    gen = self.sessions[sid]["generator"]
-                    await gen.aclose()
-                    del self.sessions[sid]
-                    self.memory_manager.delete_session(sid)
-            await asyncio.sleep(60)
+        
+    def accumulate_token_metrics(self, session_id: str, model_usage: RequestUsage):
+        self.session_token_metrics[session_id]["prompt_tokens"] += model_usage.prompt_tokens
+        self.session_token_metrics[session_id]["completion_tokens"] += model_usage.completion_tokens
+        self.session_token_metrics[session_id]["total_tokens"] += model_usage.prompt_tokens + model_usage.completion_tokens
+        calc_cost_request = {
+            "model": self.model_name,
+            "usage": {
+                "prompt_tokens": model_usage.prompt_tokens,
+                "completion_tokens": model_usage.completion_tokens,
+                "total_tokens": model_usage.prompt_tokens + model_usage.completion_tokens
+            }
+        }
+        self.session_token_metrics[session_id]["accumulated_cost"] += completion_cost(calc_cost_request)
+        logger.info(
+            f"Token Metrics for session {session_id}: Prompt Tokens={model_usage.prompt_tokens}, "
+            f"Completion Tokens={model_usage.completion_tokens}, "
+            f"Cumulative Total={self.session_token_metrics[session_id]['total_tokens']}"
+            f"Accumulated Cost=${self.session_token_metrics[session_id]['accumulated_cost']:.6f}"
+        )
 
     async def process_event(self, event, session_id: str) -> Dict[str, Any]:
         try:
             if isinstance(event, BaseAgentEvent):
                 content, images = self.extract_message_content(event)
-                model_usage = event.model_dump().get("model_usage", None)
+                model_usage = event.models_usage
+                if model_usage:
+                    self.accumulate_token_metrics(session_id, model_usage)
                 return {
                     "is_task_complete": False,
                     "require_user_input": False,
@@ -93,23 +112,32 @@ class Agent:
                 }
             elif isinstance(event, TaskResult):
                 async with self.session_lock:
+                    logger.info(f"TaskResult event model usages in all messages: {[msg.models_usage for msg in event.messages]}")
                     await self.sessions[session_id]["generator"].aclose()
                     del self.sessions[session_id]
+                    # Log final aggregated token metrics
                     logger.info(
-                        f"Adding memory {event.messages[-1].content} for session {session_id}"
+                        f"Final Model Usage for session {session_id}: "
+                        f"Prompt Tokens={self.session_token_metrics[session_id]['prompt_tokens']}, "
+                        f"Completion Tokens={self.session_token_metrics[session_id]['completion_tokens']}, "
+                        f"Total Tokens={self.session_token_metrics[session_id]['total_tokens']}, "
+                        f"Estimated Cost=${self.session_token_metrics[session_id]['accumulated_cost']:.6f}"
                     )
-                    if "content" in event.messages[-1]:
-                        self.memory_manager.add_memory(
-                            session_id,
+                    del self.session_token_metrics[session_id]
+                    logger.info(
+                        f"Adding memory {event.messages} for session {session_id}"
+                    )
+                    for message in event.messages:
+                        if "content" in message.to_text():
+                            self.memory_manager.add_memory(
+                                session_id,
                             [
                                 {
                                     "role": "assistant",
-                                    "content": event.messages[-1].content,
+                                    "content": message.to_text(),
                                 },
                             ],
                         )
-
-                # get last message in event.messages
 
                 content = self.extract_task_result_content(event)
                 images = []
@@ -130,8 +158,11 @@ class Agent:
                 }
             elif isinstance(event, BaseChatMessage):
                 content, images = self.extract_message_content(event)
+                model_usage = event.models_usage
+                if model_usage:
+                    self.accumulate_token_metrics(session_id, model_usage)
+                    
                 print(f"content: {content}", f"images: {images}")
-                model_usage = event.model_dump().get("model_usage", None)
                 return {
                     "is_task_complete": False,
                     "require_user_input": False,
@@ -140,7 +171,7 @@ class Agent:
                     "images": images,
                 }
         except Exception as e:
-            logger.info(f"Error in process_event: {e}")
+            logger.error(f"Error in process_event: {e}")
         return {
             "is_task_complete": False,
             "require_user_input": False,
@@ -148,6 +179,31 @@ class Agent:
             "content": "Unknown event",
             "images": [],
         }
+
+    async def cleanup_sessions(self):
+        while True:
+            async with self.session_lock:
+                now = datetime.now(timezone.utc)
+                expired = [
+                    sid
+                    for sid, data in self.sessions.items()
+                    if now - data["last_accessed"] > self.session_timeout
+                ]
+                for sid in expired:
+                    gen = self.sessions[sid]["generator"]
+                    await gen.aclose()
+                    # Log final aggregated token metrics for expired session
+                    logger.info(
+                        f"Final Model Usage for expired session {sid}: "
+                        f"Prompt Tokens={self.session_token_metrics[sid]['prompt_tokens']}, "
+                        f"Completion Tokens={self.session_token_metrics[sid]['completion_tokens']}, "
+                        f"Total Tokens={self.session_token_metrics[sid]['total_tokens']}, "
+                        f"Estimated Cost=${self.session_token_metrics[sid]['accumulated_cost']:.6f}"
+                    )
+                    del self.sessions[sid]
+                    del self.session_token_metrics[sid]
+                    self.memory_manager.delete_session(sid)
+            await asyncio.sleep(60)
 
     @staticmethod
     def extract_message_content(

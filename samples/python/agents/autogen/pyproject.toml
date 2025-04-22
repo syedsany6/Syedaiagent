@@ -9,6 +9,7 @@ dependencies = [
     "psycopg2-binary==2.9.10",
     "ollama>=0.4.8",
     "litellm>=1.60.0",
+    "anthropic>=0.49.0",
 ]
 
 [tool.hatch.build.targets.wheel]
