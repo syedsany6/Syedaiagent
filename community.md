@@ -6,7 +6,7 @@ The **Agent2Agent (A2A) protocol** is generating significant buzz across the tec
 
 The launch of A2A has sparked lively discussions and positive reactions on various social platforms. Here's a glimpse of the excitement:
 
-- **Rapid Interest and Adoption:** The A2A [GitHub repository](https://github.com/The-Pocket/PocketFlow/tree/main/cookbook/pocketflow-a2a) has seen an **explosive surge in popularity**. This rapid interest underscores the industry's eagerness for a standardized agent communication protocol, with many companies collaborating and contributing.  
+- **Rapid Interest and Adoption:** The A2A [GitHub repository](https://github.com/google/a2a) has seen an **explosive surge in popularity**. This rapid interest underscores the industry's eagerness for a standardized agent communication protocol, with many companies collaborating and contributing.  
 
 - **Microsoft's interest via Semantic Kernel:** [Asha Sharma](https://www.linkedin.com/in/aboutasha/), Head of AI Platform Product at Microsoft, [announced on LinkedIn](https://www.linkedin.com/posts/aboutasha_a2a-ugcPost-7318649411704602624-0C_8/?utm_source=share&utm_medium=member_ios&rcm=ACoAAAGHMHcBm1C7gO_0Wg3nDGTXcaFafUrkeNQ) that "**Semantic Kernel now speaks A2A: a lightweight JSON-RPC protocol that lets agents swap context, not code or credentials, over plain HTTP. Drop it into your Foundry stack for instant, secure, async interoperability with any A2A-compliant agent, regardless of modality**". The post received numerous positive reactions, including "**A2A support in Semantic Kernel is a key unlock — context-level interoperability without sharing code or creds is how agent ecosystems scale securely across clouds**".  
 
