@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -90,6 +91,63 @@ func (c *Client) CancelTask(params models.TaskIDParams) (*models.JSONRPCResponse
 	}
 
 	return &resp, nil
+}
+
+// SendTaskStreaming sends a task message and streams the response
+func (c *Client) SendTaskStreaming(params models.TaskSendParams, eventChan chan<- interface{}) error {
+	req := models.JSONRPCRequest{
+		JSONRPCMessage: models.JSONRPCMessage{
+			JSONRPC: "2.0",
+		},
+		Method: "tasks/send",
+		Params: params,
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	httpReq, err := http.NewRequest("POST", c.baseURL, bytes.NewBuffer(body))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept", "text/event-stream")
+
+	httpResp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", httpResp.StatusCode)
+	}
+
+	decoder := json.NewDecoder(httpResp.Body)
+	for {
+		var event models.SendTaskStreamingResponse
+		if err := decoder.Decode(&event); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return fmt.Errorf("failed to decode event: %w", err)
+		}
+
+		if event.Error != nil {
+			return fmt.Errorf("A2A error: %s (code: %d)", event.Error.Message, event.Error.Code)
+		}
+
+		select {
+		case eventChan <- event.Result:
+		case <-httpReq.Context().Done():
+			return httpReq.Context().Err()
+		}
+	}
+
+	return nil
 }
 
 // doRequest performs the HTTP request and handles the response

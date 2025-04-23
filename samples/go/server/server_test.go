@@ -16,8 +16,30 @@ func mockTaskHandler(task *models.Task, message *models.Message) (*models.Task, 
 	return task, nil
 }
 
+// mockAgentCard is a simple agent card for testing
+var mockAgentCard = models.AgentCard{
+	Name:        "Test Agent",
+	Description: stringPtr("A test agent for unit tests"),
+	URL:         "http://localhost:8080",
+	Version:     "1.0.0",
+	Capabilities: models.AgentCapabilities{
+		Streaming:              boolPtr(true),
+		PushNotifications:      boolPtr(false),
+		StateTransitionHistory: boolPtr(true),
+	},
+	Skills: []models.AgentSkill{
+		{
+			ID:          "test-skill",
+			Name:        "Test Skill",
+			Description: stringPtr("A test skill for unit tests"),
+		},
+	},
+}
+
 func TestA2AServer_HandleTaskSend(t *testing.T) {
-	server := NewA2AServer(mockTaskHandler, 8080, "/")
+	server := NewA2AServer(mockAgentCard, mockTaskHandler)
+	server.port = 8080
+	server.basePath = "/"
 
 	// Create a test request
 	params := models.TaskSendParams{
@@ -81,7 +103,9 @@ func TestA2AServer_HandleTaskSend(t *testing.T) {
 }
 
 func TestA2AServer_HandleTaskGet(t *testing.T) {
-	server := NewA2AServer(mockTaskHandler, 8080, "/")
+	server := NewA2AServer(mockAgentCard, mockTaskHandler)
+	server.port = 8080
+	server.basePath = "/"
 
 	// First create a task
 	params := models.TaskSendParams{
@@ -165,7 +189,9 @@ func TestA2AServer_HandleTaskGet(t *testing.T) {
 }
 
 func TestA2AServer_HandleTaskCancel(t *testing.T) {
-	server := NewA2AServer(mockTaskHandler, 8080, "/")
+	server := NewA2AServer(mockAgentCard, mockTaskHandler)
+	server.port = 8080
+	server.basePath = "/"
 
 	// First create a task
 	params := models.TaskSendParams{
@@ -251,7 +277,9 @@ func TestA2AServer_HandleTaskCancel(t *testing.T) {
 }
 
 func TestErrorResponse(t *testing.T) {
-	server := NewA2AServer(mockTaskHandler, 8080, "/")
+	server := NewA2AServer(mockAgentCard, mockTaskHandler)
+	server.port = 8080
+	server.basePath = "/"
 
 	// Test with invalid JSON
 	req := httptest.NewRequest("POST", "/", bytes.NewBufferString("invalid json"))
@@ -278,6 +306,10 @@ func TestErrorResponse(t *testing.T) {
 	}
 }
 
-func stringPtr(s string) *string {
+func testStringPtr(s string) *string {
 	return &s
+}
+
+func testBoolPtr(b bool) *bool {
+	return &b
 }
