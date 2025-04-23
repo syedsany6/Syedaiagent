@@ -20,20 +20,59 @@ We recommend enterprises host their agent cards at a well-known path. Specifical
 This will enable web-crawlers and applications to easily discover agents for known or configured domains. This effectively reduces the discovery process to "find a domain". 
 
 ## Curated Discovery (Registry-Based)
-We anticipate enterprise applications making curated registries of agents available through a catalog interface. This opens up more enterprise scenarios such as company-specific or team-specific agent registries that are curated by an administrator. 
+We anticipate enterprise applications making curated registries of agents available through a catalog interface. This opens up more enterprise scenarios such as organization-specific agent registries that are curated by an administrator. 
 
 
-我们提议设计一个在组织（company 或者 team）范围 内全局唯一的 Discovery Agent，用来提供 Registry-Based 的 Agent 服务发现能力。
+我们提议设计一个在组织范围内全局唯一的 Discovery Agent，用来提供 Registry-Based 的 Agent 服务发现能力。
 Discovery Agent 包括以下必须的能力：
-- Agent Registry：负责 Agent 的注册，反注册和更新注册信息，例如能够回答 “注册我的代理，其具备以下功能：...”
-- Agent Discovery：基于各种标准和能力发现已经注册的合适的 Agent，例如能够回答 “寻找能够处理 pfd 文档的 agent”。
+- Agent Registry：负责 Agent 的注册，反注册和更新注册信息，例如能够回答 "注册我的代理，其具备以下功能：..."
+- Agent Discovery：基于各种标准和能力发现已经注册的合适的 Agent，例如能够回答 "寻找能够处理 pfd 文档的 agent"。
 
-其中的 Agent Registry 能力只有具备 administrator 认证权限能够使用成功。
-已经注册到 Discovery Agent 的 Agent 可以被组织范围内普通授权的 Agent 发现。
+其中的 Agent Registry 能力只有具备 registry 相关认证权限能够使用成功。
+已经注册到 Discovery Agent 的 Agent 根据其注册选择的可见性，可以被组织内或组织外的 Agent 发现。
 
 Discovery Agent 也可以提供一些可选的能力：
-- Registry Analytics：提供关于已注册的 Agent 的分析和见解，例如能够回答 “哪个 agent 的评分最高？” 。
+- Registry Analytics：提供关于已注册的 Agent 的分析和见解，例如能够回答 "哪个 agent 的评分最高？" 。
 
+### agent 的可见性
+
+Agent 的可见性是通过 Agent 注册到 Discovery Agent 的方式决定的。
+Agent 可以选择 private 或者 public 的方式注册到 Discovery Agent 中，默认采用 public 的方式注册。
+
+![](../images/discovery/a2a_organization.png)
+注册到同一个 Discovery Agent 中的 agent 处于同一个组织。
+
+| Agent 的注册方式 | 是否可以被同组织内的其他 Agent 发现 | 是否可以被组织外的 Agent 发现 |
+|-------------|-----------------------|--------------------|
+| private     | Yes                   | No                 |
+| public      | Yes                   | Yes                |
+
+在使用Discovery Agent API进行Agent注册和更新时，必须明确指定`visibility`字段来控制Agent的可见性。这个字段有两个可选值：
+- `private`: 只对同组织内的其他Agent可见
+- `public`: 对组织内和组织外的Agent都可见
+
+如果注册或更新时未提供`visibility`字段，Discovery Agent将默认使用`public`可见性。可见性设置会影响Agent在跨组织搜索中的发现能力，特别是在组织层次结构中尤为重要。
+
+### agent 的组织层次
+
+agent 的组织层次可以通过 Discovery Agent 的注册来实现。 
+
+Sub-Discovery Agent 可以同样地可以采用 private 或者 public 的方式注册更上层的 Discovery Agent 中。
+下图展示了 Sub-Organization 中的 Sub-Discovery Agent 采用 *private* 方式注册到 Discovery Agent 形成更大的 Organization。
+
+如果 Organization 外的 Agent 只知道  Discovery Agent 的话，则其只能发现 Agent-5，无法发现 Agent-4 和 Sub-Discovery Agent，从而也无法通过 Sub-Discovery Agent 发现 Agent-1 和 Agent-2。
+
+![](../images/discovery/a2a_organization_private_tree.png)
+
+
+下图展示了 Sub-Organization 中的 Sub-Discovery Agent 采用 *public* 方式注册到 Discovery Agent 形成更大的Organization 。
+如果 Organization 外的 Agent 只知道  Discovery Agent 的话，则其能发现 Agent-5 和 Sub-Discovery Agent，从而能通过 Sub-Discovery Agent 发现 Agent-2，但是无法发现 Agent-1 和 Agent-4。
+![](../images/discovery/a2a_organization_public_tree.png)
+
+
+
+
+### Discovery Agent 的 Agent Card
 
 Discovery Agent 的 Agent Card 可以描述为：
 
@@ -103,10 +142,12 @@ Discovery Agent 的 Agent Card 可以描述为：
 }
 ```
 
+### 其他 Agent 和 Discovery Agent 的交互流程
+
 下面通过 SendTask 来展示其他 Agent 和 Discovery Agent 的交互流程：
 
 ```json
-/ 1. Agent Registration Request (with Administrator Authentication)
+/ 1. Agent Registration Request (with Registry Authentication)
 // Request
 {
   "jsonrpc": "2.0",
@@ -125,11 +166,13 @@ Discovery Agent 的 Agent Card 可以描述为：
           "type": "data",
           "data": {
             "operation": "register",
-            "administratorContext": {
-              "adminId": "admin-789012",
-              "adminAuthToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-              "adminRole": "registry-administrator"
+            "registryAuth": {
+              "authId": "registry-user-789012",
+              "authToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "permissions": ["registry:write", "agent:register"]
             },
+            "organizationId": "org-fintech-123",
+            "visibility": "private",
             "agentCard": {
               "name": "Finance Reports Agent",
               "description": "An agent specialized in generating financial reports and analysis",
@@ -183,7 +226,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 2. Discovery Agent Response (Success - Administrator Authenticated)
+// 2. Discovery Agent Response (Success - Registry Authentication)
 // Response
 {
   "jsonrpc": "2.0",
@@ -204,8 +247,10 @@ Discovery Agent 的 Agent Card 可以描述为：
             "data": {
               "registrationStatus": "success",
               "registryId": "agent-fin-345678",
+              "organizationId": "org-fintech-123",
               "registrationTimestamp": "2023-09-15T14:28:31.982Z",
-              "administratorId": "admin-789012",
+              "authId": "registry-user-789012",
+              "visibility": "private",
               "message": "Your agent has been successfully registered with the A2A Registry."
             }
           },
@@ -219,7 +264,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 3. Registration Request (Failed - No Administrator Authentication)
+// 3. Registration Request (Failed - No Registry Authentication)
 // Request
 {
   "jsonrpc": "2.0",
@@ -256,24 +301,24 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 4. Discovery Agent Response (Failed - Administrator Authentication Required)
+// 4. Discovery Agent Response (Failed - Registry Authentication Required)
 // Response
 {
   "jsonrpc": "2.0",
   "id": 2,
   "error": {
     "code": -32401,
-    "message": "Administrator authentication required",
+    "message": "Registry authentication required",
     "data": {
       "operation": "register",
-      "requiredPermissions": ["registry:admin", "agent:register"],
+      "requiredPermissions": ["registry:write", "agent:register"],
       "authenticationSchemes": ["OAuth2"],
       "authenticationEndpoint": "https://discovery-agent.example.com/auth"
     }
   }
 }
 
-// 5. Update Agent Information (with Administrator Authentication)
+// 5. Update Agent Information (with Registry Authentication)
 // Request
 {
   "jsonrpc": "2.0",
@@ -293,10 +338,11 @@ Discovery Agent 的 Agent Card 可以描述为：
           "data": {
             "operation": "update",
             "registryId": "agent-fin-345678",
-            "administratorContext": {
-              "adminId": "admin-789012",
-              "adminAuthToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-              "adminRole": "registry-administrator"
+            "organizationId": "org-fintech-123",
+            "registryAuth": {
+              "authId": "registry-user-789012",
+              "authToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "permissions": ["registry:write", "agent:update"]
             },
             "updates": {
               "agentCard": {
@@ -315,6 +361,7 @@ Discovery Agent 的 Agent Card 可以描述为：
                   }
                 ]
               },
+              "visibility": "public",
               "metadata": {
                 "tags": ["finance", "enterprise", "reporting", "investment"]
               }
@@ -326,7 +373,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 6. Discovery Agent Update Response (Success - Administrator Authenticated)
+// 6. Discovery Agent Update Response (Success - Registry Authentication)
 // Response
 {
   "jsonrpc": "2.0",
@@ -347,8 +394,10 @@ Discovery Agent 的 Agent Card 可以描述为：
             "data": {
               "updateStatus": "success",
               "registryId": "agent-fin-345678",
+              "organizationId": "org-fintech-123",
               "updateTimestamp": "2023-09-15T15:36:44.521Z",
-              "administratorId": "admin-789012",
+              "authId": "registry-user-789012",
+              "visibility": "public",
               "message": "Your agent information has been successfully updated."
             }
           },
@@ -362,7 +411,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 7. Agent Discovery Request (No Administrator Authentication Required)
+// 7. Agent Discovery Request (No Registry Authentication Required)
 // Request
 {
   "jsonrpc": "2.0",
@@ -382,7 +431,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 8. Discovery Agent Response (Discovery operations don't require admin auth)
+// 8. Discovery Agent Response (Discovery operations don't require registry auth)
 // Response
 {
   "jsonrpc": "2.0",
@@ -420,6 +469,8 @@ Discovery Agent 的 Agent Card 可以描述为：
                     "defaultInputModes": ["application/pdf", "image/jpeg", "image/png", "text/plain"],
                     "defaultOutputModes": ["text/plain", "application/json", "application/pdf"]
                   },
+                  "organizationId": "org-doctech-456",
+                  "visibility": "public",
                   "matchScore": 0.95,
                   "matchReason": "Explicit support for PDF processing in input modes"
                 },
@@ -441,7 +492,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 9. Registry Analytics Request (No Administrator Authentication Required)
+// 9. Registry Analytics Request (No Registry Authentication Required)
 // Request
 {
   "jsonrpc": "2.0",
@@ -503,7 +554,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 11. Agent Deregistration Request (with Administrator Authentication)
+// 11. Agent Deregistration Request (with Registry Authentication)
 // Request
 {
   "jsonrpc": "2.0",
@@ -523,10 +574,11 @@ Discovery Agent 的 Agent Card 可以描述为：
           "data": {
             "operation": "deregister",
             "registryId": "agent-fin-345678",
-            "administratorContext": {
-              "adminId": "admin-789012",
-              "adminAuthToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-              "adminRole": "registry-administrator"
+            "organizationId": "org-fintech-123",
+            "registryAuth": {
+              "authId": "registry-user-789012",
+              "authToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "permissions": ["registry:write", "agent:register"]
             }
           }
         }
@@ -535,7 +587,7 @@ Discovery Agent 的 Agent Card 可以描述为：
   }
 }
 
-// 12. Discovery Agent Deregistration Response (Success - Administrator Authenticated)
+// 12. Discovery Agent Deregistration Response (Success - Registry Authenticated)
 // Response
 {
   "jsonrpc": "2.0",
@@ -556,8 +608,9 @@ Discovery Agent 的 Agent Card 可以描述为：
             "data": {
               "deregistrationStatus": "success",
               "registryId": "agent-fin-345678",
+              "organizationId": "org-fintech-123",
               "deregistrationTimestamp": "2023-09-15T17:05:17.842Z",
-              "administratorId": "admin-789012",
+              "authId": "registry-user-789012",
               "message": "Your agent has been successfully removed from the registry."
             }
           },
