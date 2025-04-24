@@ -9,6 +9,7 @@ This directory contains a Go server implementation for the Agent-to-Agent (A2A) 
   - `tasks/send`: Send a new task
   - `tasks/get`: Get task status
   - `tasks/cancel`: Cancel a task
+- Streaming task updates with Server-Sent Events (SSE)
 - Thread-safe task storage
 - Task history tracking
 - Error handling with A2A error codes
@@ -68,6 +69,23 @@ func (s *A2AServer) Start() error
 
 Starts the HTTP server on the configured port.
 
+## Streaming Support
+
+The server supports streaming task updates using Server-Sent Events (SSE). To use streaming:
+
+1. Set the `Accept` header to `text/event-stream` in your request
+2. The server will respond with a stream of task status updates
+3. Each update will be a JSON object containing:
+   - Task ID
+   - Current status
+   - Whether it's the final update
+
+Example streaming response:
+```json
+{"result":{"id":"task-1","status":{"state":"working"},"final":false}}
+{"result":{"id":"task-1","status":{"state":"completed"},"final":true}}
+```
+
 ## Testing
 
 Run the tests with:
@@ -80,4 +98,5 @@ The test suite includes examples of:
 - Sending tasks
 - Getting task status
 - Canceling tasks
+- Streaming task updates
 - Error handling 

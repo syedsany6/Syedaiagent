@@ -9,6 +9,7 @@ This package provides a Go client implementation for the Agent-to-Agent (A2A) co
   - `tasks/send`: Send a new task
   - `tasks/get`: Get task status
   - `tasks/cancel`: Cancel a task
+- Streaming task updates with Server-Sent Events (SSE)
 - Error handling with A2A error codes
 - Type-safe request/response handling
 
@@ -93,6 +94,51 @@ func (c *Client) CancelTask(params models.TaskIDParams) (*models.JSONRPCResponse
 
 Cancels a task. Returns a JSON-RPC response containing the task or an error.
 
+## Streaming Support
+
+The client supports streaming task updates using Server-Sent Events (SSE). To use streaming:
+
+1. Set the `Accept` header to `text/event-stream` in your request
+2. The server will respond with a stream of task status updates
+3. Each update will be a JSON object containing:
+   - Task ID
+   - Current status
+   - Whether it's the final update
+
+Example streaming usage:
+```go
+// Create a task with streaming
+message := models.Message{
+    Role: "user",
+    Parts: []models.Part{
+        {
+            Type: stringPtr("text"),
+            Text: stringPtr("Hello, A2A agent!"),
+        },
+    },
+}
+
+// Send a task with streaming enabled
+response, err := a2aClient.SendTaskWithStreaming(models.TaskSendParams{
+    ID:      "task-1",
+    Message: message,
+})
+if err != nil {
+    log.Fatalf("Failed to send task: %v", err)
+}
+
+// Process streaming updates
+for update := range response.Updates {
+    if update.Error != nil {
+        log.Printf("Error: %v", update.Error)
+        continue
+    }
+    
+    // Process the update
+    log.Printf("Task %s: %s", update.Result.ID, update.Result.Status.State)
+}
+```
+
 ## Testing
 
 Run the tests with:
@@ -105,5 +151,5 @@ The test suite includes examples of:
 - Sending tasks
 - Getting task status
 - Canceling tasks
-- Error handling
-- Response type handling 
+- Streaming task updates
+- Error handling 
