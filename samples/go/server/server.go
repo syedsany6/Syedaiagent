@@ -228,13 +228,33 @@ func (s *A2AServer) handleStreamingTask(w http.ResponseWriter, r *http.Request, 
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
+	// Check if response writer supports flushing
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
 	// Create a channel to receive task updates
 	updates := make(chan interface{})
-	defer close(updates)
+
+	// Create a done channel to signal when the goroutine is finished
+	done := make(chan struct{})
 
 	// Start task processing in a goroutine
 	go func() {
-		defer close(updates)
+		defer func() {
+			close(updates) // Close updates channel when goroutine exits
+			close(done)    // Signal that goroutine is done
+		}()
+
+		// Recover from any panics to ensure channels are closed
+		defer func() {
+			if r := recover(); r != nil {
+				// Log the panic (you might want to use a proper logger)
+				fmt.Printf("Recovered from panic in streaming task: %v\n", r)
+			}
+		}()
 
 		s.mu.Lock()
 		// Create new task
@@ -283,22 +303,29 @@ func (s *A2AServer) handleStreamingTask(w http.ResponseWriter, r *http.Request, 
 	}()
 
 	// Stream updates to the client
-	flusher, ok := w.(http.Flusher)
-	if !ok {
-		http.Error(w, "Streaming not supported", http.StatusInternalServerError)
-		return
-	}
-
 	encoder := json.NewEncoder(w)
-	for update := range updates {
-		resp := models.SendTaskStreamingResponse{
-			Result: update,
-			Error:  nil,
-		}
+	for {
+		select {
+		case update, ok := <-updates:
+			if !ok {
+				// Channel closed, we're done
+				return
+			}
+			resp := models.SendTaskStreamingResponse{
+				Result: update,
+				Error:  nil,
+			}
 
-		if err := encoder.Encode(resp); err != nil {
+			if err := encoder.Encode(resp); err != nil {
+				return
+			}
+			flusher.Flush()
+		case <-r.Context().Done():
+			// Client disconnected
+			return
+		case <-done:
+			// Goroutine finished
 			return
 		}
-		flusher.Flush()
 	}
 }
