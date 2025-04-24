@@ -24,24 +24,27 @@ We anticipate enterprise applications making curated registries of agents availa
 
 
 我们提议设计一个在组织范围内全局唯一的 Agent Registrar，用来提供 Registry-Based 的 Agent 服务发现能力。
+组织由多个团队组成，每个团队可以管理自己拥有的 Agent，而每个 Agent 必须属于唯一的一个团体。
 Agent Registrar 包括以下必须的能力：
+- Team Management：负责团队的注册、更新、删除，例如能够回答 "创建一个新团队"。
 - Agent Registry：负责 Agent 的注册，反注册和更新注册信息，例如能够回答 "注册我的代理，其具备以下功能：..."
 - Agent Discovery：基于各种标准和能力发现已经注册的合适的 Agent，例如能够回答 "寻找能够处理 pfd 文档的 agent"。
 
-组织有多个团队组成，每个团队可以管理自己拥有的 Agent，而每个 Agent 必须属于唯一的一个团体。
-
 ![](../images/discovery/a2a_organization_team.png)
-
-已经注册到 Agent Registrar 的 Agent 根据其注册选择的可见性，可以被团队内或团队外的 Agent 发现。
 
 Agent Registrar 也可以提供一些可选的能力：
 - Registry Analytics：提供关于已注册的 Agent 的分析和见解，例如能够回答 "哪个 agent 的评分最高？" 。
 
-### agent 的可见性
+### Team Management
 
-Agent 的可见性是通过 Agent 注册到 Agent Registrar 的方式决定的。
+团队需要在 Agent Registrar 中注册，Agent Registrar 会为每个团队分配唯一的 `teamID`。
+
+###  Agent Registry 
+
+#### Agent 的可见性
+Agent 的可见性是指该 Agent 是否可以被团队内或团队外其他 Agent 发现， Agent 注册到 Agent Registrar 的方式会影响其可见性。
+
 Agent 可以选择 private 或者 public 的方式注册到 Agent Registrar 中，默认采用 public 的方式注册。
-
 
 | Agent 的注册方式 | 是否可以被团队内的其他 Agent 发现 | 是否可以被团队外的 Agent 发现 |
 |-------------|----------------------|--------------------|
@@ -50,12 +53,14 @@ Agent 可以选择 private 或者 public 的方式注册到 Agent Registrar 中�
 
 Agent 通过明确指指定 `teamID` 和 `visibility` 字段来控制 Agent 的可见性。
 在 Agent Registrar 的所有交互都需要带上 `teamID` 字段用来标志 Agent 所属的 Team, 每个 Agent 的 `teamID` 有且只有一个。
-相应地，也需要带上 teamToken 来进行鉴权。
 
 在使用 Agent Registrar 进行 Agent 注册和更新时, 使用 `visibility` 字段，其有两个可选值：
 - `private`: 只对同团队内的其他 Agent 可见
 - `public`: 对团队内和团队外的 Agent 都可见
 
+### 鉴权与认证
+
+Agent 往 Agent Registrar 注册时，需要持有团队分发的  `teamToken` 对 Agent 进行鉴权。 
 
 
 ### Agent Registrar 的 Agent 实现
@@ -82,8 +87,23 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
     "schemes": ["OAuth2"]
   },
   "defaultInputModes": ["text/plain", "application/json"],
-  "defaultOutputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json", "text/html"],
   "skills": [
+    {
+      "id": "team-management",
+      "name": "Team Management",
+      "description": "Manages teams within the organization with CRUD operations for team administration",
+      "tags": ["team", "management", "administration", "organization"],
+      "examples": [
+        "Create a new team for my organization",
+        "Update our team information",
+        "Delete our existing team",
+        "List all teams in our organization",
+        "Retrieve our team's details and token"
+      ],
+      "inputModes": ["application/json", "text/plain"],
+      "outputModes": ["application/json"]
+    },
     {
       "id": "agent-registry",
       "name": "Agent Registry",
@@ -133,11 +153,147 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
 下面通过 SendTask 来展示其他 Agent 和 Agent Registrar 的交互流程：
 
 ```json
-/ 1. Agent Registration Request (with Team Authentication)
+// 1. Team Registration Request
 // Request
 {
   "jsonrpc": "2.0",
   "id": 1,
+  "method": "tasks/send",
+  "params": {
+    "id": "team-reg-task-123456",
+    "message": {
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "创建一个新团队"
+        },
+        {
+          "type": "data",
+          "data": {
+            "operation": "registerTeam",
+            "adminToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "teamInfo": {
+              "name": "FinTech Solutions Team",
+              "description": "Financial technology solutions development team",
+              "contact": "team-lead@fintechsolutions.example.com"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+// 2. Agent Registrar Response (Team Registration Success)
+// Response
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "id": "team-reg-task-123456",
+    "sessionId": "session-789012",
+    "status": {
+      "state": "completed",
+      "timestamp": "2023-09-15T13:25:17.328Z"
+    },
+    "artifacts": [
+      {
+        "name": "team-registration-result",
+        "parts": [
+          {
+            "type": "data",
+            "data": {
+              "registrationStatus": "success",
+              "teamID": "team-fintech-123",
+              "teamToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "registrationTimestamp": "2023-09-15T13:25:16.912Z",
+              "message": "Your team has been successfully registered with the A2A Registry."
+            }
+          },
+          {
+            "type": "text",
+            "text": "Your team 'FinTech Solutions Team' has been successfully registered. Your Team ID is: team-fintech-123. Please securely store your teamToken as it will be required for all team operations and agent registrations."
+          }
+        ]
+      }
+    ]
+  }
+}
+
+// 3. Team Update Request
+// Request
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tasks/send",
+  "params": {
+    "id": "team-update-task-234567",
+    "message": {
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "更新我的团队信息"
+        },
+        {
+          "type": "data",
+          "data": {
+            "operation": "updateTeam",
+            "teamID": "team-fintech-123",
+            "teamToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "updates": {
+              "name": "FinTech Enterprise Solutions",
+              "description": "Enterprise financial technology solutions and consulting team",
+              "contact": "enterprise-lead@fintechsolutions.example.com"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+// 4. Agent Registrar Response (Team Update Success)
+// Response
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "id": "team-update-task-234567",
+    "sessionId": "session-345678",
+    "status": {
+      "state": "completed",
+      "timestamp": "2023-09-15T14:12:08.541Z"
+    },
+    "artifacts": [
+      {
+        "name": "team-update-result",
+        "parts": [
+          {
+            "type": "data",
+            "data": {
+              "updateStatus": "success",
+              "teamID": "team-fintech-123",
+              "updateTimestamp": "2023-09-15T14:12:07.823Z",
+              "message": "Your team information has been successfully updated."
+            }
+          },
+          {
+            "type": "text",
+            "text": "Your team information has been successfully updated. Team name changed to 'FinTech Enterprise Solutions'."
+          }
+        ]
+      }
+    ]
+  }
+}
+
+// 5. Agent Registration Request (with Team Authentication)
+// Request
+{
+  "jsonrpc": "2.0",
+  "id": 3,
   "method": "tasks/send",
   "params": {
     "id": "reg-task-123456",
@@ -208,11 +364,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 2. Agent Registrar Response (Success - Team Authentication)
+// 6. Agent Registrar Response (Success - Team Authentication)
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 1,
+  "id": 3,
   "result": {
     "id": "reg-task-123456",
     "sessionId": "session-789012",
@@ -245,11 +401,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 3. Registration Request (Failed - No Team Authentication)
+// 7. Registration Request (Failed - No Team Authentication)
 // Request
 {
   "jsonrpc": "2.0",
-  "id": 2,
+  "id": 4,
   "method": "tasks/send",
   "params": {
     "id": "failed-reg-task-234567",
@@ -282,11 +438,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 4. Agent Registrar Response (Failed - Team Authentication Required)
+// 8. Agent Registrar Response (Failed - Team Authentication Required)
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 2,
+  "id": 4,
   "error": {
     "code": -32401,
     "message": "Team authentication required",
@@ -298,11 +454,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 5. Update Agent Information (with Team Authentication)
+// 9. Update Agent Information (with Team Authentication)
 // Request
 {
   "jsonrpc": "2.0",
-  "id": 3,
+  "id": 5,
   "method": "tasks/send",
   "params": {
     "id": "update-task-345678",
@@ -349,11 +505,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 6. Agent Registrar Update Response (Success - Team Authentication)
+// 10. Agent Registrar Update Response (Success - Team Authentication)
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 3,
+  "id": 5,
   "result": {
     "id": "update-task-345678",
     "sessionId": "session-456789",
@@ -386,11 +542,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 7. Agent Discovery Request (No Team Authentication Required for Public Agents)
+// 11. Agent Discovery Request (No Team Authentication Required for Public Agents)
 // Request
 {
   "jsonrpc": "2.0",
-  "id": 4,
+  "id": 6,
   "method": "tasks/send",
   "params": {
     "id": "discovery-task-456789",
@@ -406,11 +562,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 8. Agent Registrar Response (Discovery operations of public agents don't require auth)
+// 12. Agent Registrar Response (Discovery operations of public agents don't require auth)
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 4,
+  "id": 6,
   "result": {
     "id": "discovery-task-456789",
     "sessionId": "session-567890",
@@ -467,11 +623,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 9. Team-specific Agent Discovery Request (Authenticated - includes private team agents)
+// 13. Team-specific Agent Discovery Request (Authenticated - includes private team agents)
 // Request
 {
   "jsonrpc": "2.0",
-  "id": 5,
+  "id": 7,
   "method": "tasks/send",
   "params": {
     "id": "team-discovery-task-567890",
@@ -499,11 +655,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 10. Agent Registrar Team Discovery Response
+// 14. Agent Registrar Team Discovery Response
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 5,
+  "id": 7,
   "result": {
     "id": "team-discovery-task-567890",
     "sessionId": "session-678901",
@@ -562,11 +718,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 11. Agent Deregistration Request (with Team Authentication)
+// 15. Agent Deregistration Request (with Team Authentication)
 // Request
 {
   "jsonrpc": "2.0",
-  "id": 6,
+  "id": 8,
   "method": "tasks/send",
   "params": {
     "id": "deregister-task-678901",
@@ -591,11 +747,11 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
   }
 }
 
-// 12. Agent Registrar Deregistration Response (Success - Team Authenticated)
+// 16. Agent Registrar Deregistration Response (Success - Team Authenticated)
 // Response
 {
   "jsonrpc": "2.0",
-  "id": 6,
+  "id": 8,
   "result": {
     "id": "deregister-task-678901",
     "sessionId": "session-789012",
