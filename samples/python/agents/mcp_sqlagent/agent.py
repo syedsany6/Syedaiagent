@@ -98,7 +98,7 @@ class Chat:
                             }
                         )
                         yield {
-                            "is_task_complete": False,
+                            "is_task_complete": True,
                             "require_user_input": False,
                             "content": getattr(res.content[0], "text", "")
                         }
