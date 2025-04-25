@@ -136,6 +136,8 @@ async def completeTask(client: A2AClient, streaming, use_push_notifications: boo
         ## task is complete
         return True
 
+def main():
+    asyncio.run(cli())
 
 if __name__ == "__main__":
-    asyncio.run(cli())
+    main()

@@ -31,6 +31,9 @@ members = [
     "src/google_a2a/agents/semantickernel",
 ]
 
+[project.scripts]
+google-a2a-cli = "google_a2a.hosts.cli.__main__:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
