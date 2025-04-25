@@ -81,7 +81,7 @@ sequenceDiagram
    uv run . --host 0.0.0.0 --port 8080
    ```
 
-4. In a separate terminal, run an A2A [client](/samples/python/hosts/README.md):
+4. In a separate terminal, run an A2A [client](/samples/python/src/google_a2a/hosts/README.md):
 
    ```bash
    cd samples/python/hosts/cli
