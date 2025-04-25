@@ -1200,6 +1200,7 @@ name = "google-a2a"
 version = "0.2.0"
 source = { editable = "." }
 dependencies = [
+    { name = "asyncclick" },
     { name = "httpx" },
     { name = "httpx-sse" },
     { name = "jwcrypto" },
@@ -1220,6 +1221,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "asyncclick", specifier = ">=8.1.8" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "httpx-sse", specifier = ">=0.4.0" },
     { name = "jwcrypto", specifier = ">=1.5.6" },
