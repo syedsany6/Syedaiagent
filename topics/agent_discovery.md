@@ -23,50 +23,50 @@ This will enable web-crawlers and applications to easily discover agents for kno
 We anticipate enterprise applications making curated registries of agents available through a catalog interface. This opens up more enterprise scenarios such as organization-specific agent registries that are curated by an administrator. 
 
 
-我们提议设计一个在全局唯一的 Agent Registrar 来统一管理各个组织下面的 Agent，用来提供 Registry-Based 的 Agent 服务发现能力。
+We recommend designing a globally unique Agent Registrar to uniformly manage Agents under various organizations, providing Registry-Based Agent service discovery capabilities.
 
-组织可以管理自己拥有的 Agent，而每个 Agent 必须属于唯一的一个组织。
-Agent Registrar 包括以下必须的能力：
-- Organization Management：负责组织的注册、更新、删除，例如能够回答 "创建一个新组织"。
-- Agent Registry：负责 Agent 的注册，反注册和更新注册信息，例如能够回答 "注册我的代理，其具备以下功能：..."
-- Agent Discovery：基于各种标准和能力发现已经注册的合适的 Agent，例如能够回答 "寻找能够处理 pfd 文档的 agent"。
+Organizations can manage their own Agents, and each Agent must belong to exactly one organization.
+Agent Registrar includes the following required capabilities:
+- Organization Management: Responsible for organization registration, updating, and deletion, such as being able to answer "Create a new organization".
+- Agent Registry: Responsible for Agent registration, deregistration, and updating registration information, such as being able to answer "Register my agent with the following capabilities: ...".
+- Agent Discovery: Discovering suitable registered Agents based on various standards and capabilities, such as being able to answer "Find an agent that can process PDF documents".
 
 ![](../images/discovery/a2a_organization.png)
 
-Agent Registrar 也可以提供一些可选的能力：
-- Registry Analytics：提供关于已注册的 Agent 的分析和见解，例如能够回答 "哪个 agent 的评分最高？" 。
+Agent Registrar can also provide some optional capabilities:
+- Registry Analytics: Provides analysis and insights about registered Agents, such as being able to answer "Which agent has the highest rating?".
 
 ### Organization Management
 
-组织需要在 Agent Registrar 中注册，Agent Registrar 会为每个组织分配唯一的 `organizationID`。
+Organizations need to register with the Agent Registrar, and the Agent Registrar will assign a unique `organizationID` to each organization.
 
 ###  Agent Registry 
 
-#### Agent 的可见性
-Agent 的可见性是指该 Agent 是否可以被组织内或组织外其他 Agent 发现， Agent 注册到 Agent Registrar 的方式会影响其可见性。
+#### Agent Visibility
+Agent visibility refers to whether the Agent can be discovered by other Agents within or outside the organization. The way an Agent registers with the Agent Registrar affects its visibility.
 
-Agent 可以选择 private 或者 public 的方式注册到 Agent Registrar 中，默认采用 public 的方式注册。
+Agents can choose to register with the Agent Registrar in either a private or public way, with public registration being the default.
 
-| Agent 的注册方式 | 是否可以被组织内的其他 Agent 发现 | 是否可以被组织外的 Agent 发现 |
+| Agent Registration Method | Can be discovered by other Agents within the organization | Can be discovered by Agents outside the organization |
 |-------------|----------------------|--------------------|
 | private     | Yes                  | No                 |
 | public      | Yes                  | Yes                |
 
-Agent 通过明确指指定 `organizationID` 和 `visibility` 字段来控制 Agent 的可见性。
-在 Agent Registrar 的所有交互都需要带上 `organizationID` 字段用来标志 Agent 所属的 Organization, 每个 Agent 的 `organizationID` 有且只有一个。
+Agents control their visibility by explicitly specifying the `organizationID` and `visibility` fields.
+All interactions with the Agent Registrar need to include the `organizationID` field to indicate which Organization the Agent belongs to. Each Agent can have one and only one `organizationID`.
 
-在使用 Agent Registrar 进行 Agent 注册和更新时, 使用 `visibility` 字段，其有两个可选值：
-- `private`: 只对同组织内的其他 Agent 可见
-- `public`: 对组织内和组织外的 Agent 都可见
+When using the Agent Registrar for Agent registration and updates, use the `visibility` field, which has two possible values:
+- `private`: Visible only to other Agents within the same organization
+- `public`: Visible to Agents both within and outside the organization
 
-#### 鉴权与认证
+#### Authentication and Authorization
 
-Agent 往 Agent Registrar 注册时，需要持有组织分发的凭证信息（例如  `organizationToken` ）对 Agent 进行鉴权。 
+When registering with the Agent Registrar, Agents need to have credentials distributed by the organization (such as an `organizationToken`) for authentication.
 
 
-### Agent Registrar 的 Agent 实现
+### Agent Implementation of the Agent Registrar
 
-Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为：
+The Agent Registrar can be implemented as an Agent, with its Agent Card described as:
 
 ```json
 {
@@ -149,9 +149,9 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
 }
 ```
 
-#### 其他 Agent 和 Agent Registrar 的交互流程
+#### Interaction Flow Between Other Agents and the Agent Registrar
 
-下面通过 SendTask 来展示其他 Agent 和 Agent Registrar 的交互流程：
+The following demonstrates the interaction flow between other Agents and the Agent Registrar using SendTask:
 
 ```json
 // 1. Organization Registration Request
@@ -167,7 +167,7 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
       "parts": [
         {
           "type": "text",
-          "text": "创建一个新组织"
+          "text": "Create a new organization"
         },
         {
           "type": "data",
@@ -234,7 +234,7 @@ Agent Registrar 可以使用 Agent 来实现， 其 Agent Card 可以描述为�
       "parts": [
         {
           "type": "text",
-          "text": "更新我的组织信息"
+          "text": "Update my organization information"
         },
         {
           "type": "data",
