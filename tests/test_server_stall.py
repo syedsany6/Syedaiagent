@@ -9,6 +9,7 @@ from common.types import Message, TaskSendParams
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class ServerStallTest:
     def __init__(self, a2a_server_url: str):
         self.a2a_server_url = a2a_server_url

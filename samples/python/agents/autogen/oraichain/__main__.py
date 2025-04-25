@@ -9,11 +9,23 @@ import os
 import logging
 import asyncio
 from dotenv import load_dotenv
+import pathlib
 
-load_dotenv()
-
+# Set up logging first
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Get the path to the .env file
+current_dir = os.path.abspath(os.getcwd())
+env_path = os.path.join(current_dir, '.env')
+logger.info(f"Loading .env from: {env_path}")
+load_dotenv(dotenv_path=env_path)
+
+# Debug prints
+logger.info(f"API_KEY is set: {bool(os.getenv('API_KEY'))}")
+logger.info(f"LLM_MODEL is set: {bool(os.getenv('LLM_MODEL'))}")
+logger.info(f"MCP_SERVER_URL is set: {bool(os.getenv('MCP_SERVER_URL'))}")
+logger.info(f"Current working directory: {os.getcwd()}")
 
 
 @click.command()
@@ -21,9 +33,18 @@ logger = logging.getLogger(__name__)
 @click.option("--port", default=10002)
 def main(host, port):
     try:
-        if not os.getenv("API_KEY"):
+        api_key = os.getenv("API_KEY")
+        llm_model = os.getenv("LLM_MODEL")
+        mcp_server_url = os.getenv("MCP_SERVER_URL")
+        
+        if api_key:
+            logger.info(f"API_KEY: {api_key[:5]}... (truncated)")
+        logger.info(f"LLM_MODEL: {llm_model}")
+        logger.info(f"MCP_SERVER_URL: {mcp_server_url}")
+        
+        if not api_key:
             raise MissingAPIKeyError("API_KEY environment variable not set.")
-        if not os.getenv("LLM_MODEL"):
+        if not llm_model:
             raise MissingAPIKeyError("LLM_MODEL environment variable not set.")
 
         capabilities = AgentCapabilities(streaming=True)
@@ -52,9 +73,12 @@ def main(host, port):
         )
         
         asyncio.run(
-            agent.initialize(
-                mcp_server_params=[
-                    SseServerParams(url=os.getenv("MCP_SERVER_URL")),
+            agent.initialize_with_mcp_sse_urls(
+                # mcp_server_params=[
+                #     SseServerParams(url=mcp_server_url),
+                # ]
+                sse_mcp_server_urls = [
+                    "http://15.235.225.246:4010/sse",
                 ]
             )
         )
@@ -70,6 +94,8 @@ def main(host, port):
         exit(1)
     except Exception as e:
         logger.error(f"An error occurred during server startup: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         exit(1)
 
 
