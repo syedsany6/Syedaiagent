@@ -59,9 +59,9 @@ Agent 通过明确指指定 `organizationID` 和 `visibility` 字段来控制 Ag
 - `private`: 只对同组织内的其他 Agent 可见
 - `public`: 对组织内和组织外的 Agent 都可见
 
-### 鉴权与认证
+#### 鉴权与认证
 
-Agent 往 Agent Registrar 注册时，需要持有组织分发的  `organizationToken` 对 Agent 进行鉴权。 
+Agent 往 Agent Registrar 注册时，需要持有组织分发的凭证信息（例如  `organizationToken` ）对 Agent 进行鉴权。 
 
 
 ### Agent Registrar 的 Agent 实现
