@@ -4,10 +4,10 @@ import traceback
 from collections.abc import AsyncIterable
 from typing import Any
 
-import common.server.utils as utils
-from agents.marvin.agent import ExtractorAgent
-from common.server.task_manager import InMemoryTaskManager
-from common.types import (
+import google_a2a.common.server.utils as utils
+from google_a2a.agents.marvin.agent import ExtractorAgent
+from google_a2a.common.server.task_manager import InMemoryTaskManager
+from google_a2a.common.types import (
     Artifact,
     DataPart,
     InternalError,
@@ -28,7 +28,7 @@ from common.types import (
     TaskStatusUpdateEvent,
     TextPart,
 )
-from common.utils.push_notification_auth import PushNotificationSenderAuth
+from google_a2a.common.utils.push_notification_auth import PushNotificationSenderAuth
 
 logger = logging.getLogger(__name__)
 

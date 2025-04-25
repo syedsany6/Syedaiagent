@@ -4,7 +4,7 @@ import threading
 from collections.abc import AsyncIterable
 from typing import Annotated, Any, ClassVar
 
-from common.types import TextPart
+from google_a2a.common.types import TextPart
 from pydantic import BaseModel, Field
 
 import marvin

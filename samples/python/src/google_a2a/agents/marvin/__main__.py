@@ -6,11 +6,11 @@ It is integrated with the Agent2Agent (A2A) protocol.
 import logging
 
 import click
-from agents.marvin.agent import ExtractorAgent
-from agents.marvin.task_manager import AgentTaskManager
-from common.server import A2AServer
-from common.types import AgentCapabilities, AgentCard, AgentSkill
-from common.utils.push_notification_auth import PushNotificationSenderAuth
+from google_a2a.agents.marvin.agent import ExtractorAgent
+from google_a2a.agents.marvin.task_manager import AgentTaskManager
+from google_a2a.common.server import A2AServer
+from google_a2a.common.types import AgentCapabilities, AgentCard, AgentSkill
+from google_a2a.common.utils.push_notification_auth import PushNotificationSenderAuth
 from pydantic import BaseModel, EmailStr, Field
 
 logging.basicConfig(level=logging.INFO)
