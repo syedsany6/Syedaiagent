@@ -42,8 +42,7 @@ This conforms to the skills section of the [Agent Card](documentation?id=represe
 Let's create this Agent Skill in code. Open up `src/my-project/__init__.py` and replace the contents with the following code
 
 ```python
-import google_a2a
-from google_a2a.common.types import AgentSkill
+from common.types import AgentSkill
 
 def main():
   skill = AgentSkill(
@@ -60,7 +59,6 @@ def main():
 if __name__ == "__main__":
   main()
 ```
-
 
 ## Test Run <!-- {docsify-ignore} -->
 

@@ -19,8 +19,7 @@ import logging
 
 import click
 from dotenv import load_dotenv
-import google_a2a
-from google_a2a.common.types import AgentSkill, AgentCapabilities, AgentCard
+from common.types import AgentSkill, AgentCapabilities, AgentCard
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -67,7 +66,6 @@ def main(host, port):
 if __name__ == "__main__":
   main()
 ```
-
 
 ## Test Run <!-- {docsify-ignore} -->
 
