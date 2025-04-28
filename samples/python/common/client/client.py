@@ -1,5 +1,6 @@
 import httpx
 from httpx_sse import connect_sse
+from httpx._types import TimeoutTypes
 from typing import Any, AsyncIterable
 from common.types import (
     AgentCard,
@@ -23,7 +24,7 @@ import json
 
 
 class A2AClient:
-    def __init__(self, agent_card: AgentCard = None, url: str = None):
+    def __init__(self, agent_card: AgentCard = None, url: str = None, timeout: TimeoutTypes = 60.0):
         if agent_card:
             self.url = agent_card.url
         elif url:
@@ -56,7 +57,7 @@ class A2AClient:
             try:
                 # Image generation could take time, adding timeout
                 response = await client.post(
-                    self.url, json=request.model_dump(), timeout=30
+                    self.url, json=request.model_dump(), timeout=timeout
                 )
                 response.raise_for_status()
                 return response.json()
